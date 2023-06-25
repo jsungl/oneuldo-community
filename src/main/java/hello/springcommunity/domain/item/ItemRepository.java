@@ -1,15 +1,20 @@
 package hello.springcommunity.domain.item;
 
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.*;
+
+import static hello.springcommunity.domain.item.QItem.*;
 
 @Slf4j
 @Repository
@@ -19,18 +24,32 @@ public class ItemRepository {
     private static final Map<Long, Item> store = new HashMap<>(); //static
     private static long sequence = 0L; //static
 
-//    private final EntityManager em;
+    private final EntityManager em;
 
 //    public ItemRepository(EntityManager em) {
 //        this.em = em;
 //    }
 
-    private final SpringDataJpaItemRepository repository; //SpringDataJpaItemRepository 를 사용
+//    private final SpringDataJpaItemRepository repository; //SpringDataJpaItemRepository 를 사용
+//
+//    @Autowired
+//    public ItemRepository(SpringDataJpaItemRepository repository) {
+//        this.repository = repository;
+//    }
+
+    //Querydsl 사용하기 위해 JPAQueryFactory 가 필요하다
+    //JPAQueryFactory 는 JPQL을 만들기 때문에 EntityManager 가 필요하다
+    private final JPAQueryFactory query;
 
     @Autowired
-    public ItemRepository(SpringDataJpaItemRepository repository) {
-        this.repository = repository;
+    public ItemRepository(EntityManager em) {
+        this.em = em;
+        this.query = new JPAQueryFactory(em);
     }
+
+
+
+//    -----------------------------------------------------------------------------------------------------
 
 //    public Item save(Item item) {
 //        item.setId(++sequence);
@@ -43,9 +62,15 @@ public class ItemRepository {
 //        return item;
 //    }
 
+//    public Item save(Item item) {
+//        return repository.save(item);
+//    }
+
     public Item save(Item item) {
-        return repository.save(item);
+        em.persist(item);
+        return item;
     }
+
 
 
 //    -----------------------------------------------------------------------------------------------------
@@ -64,9 +89,14 @@ public class ItemRepository {
 //        return Optional.ofNullable(item);
 //    }
 
-      public Optional<Item> findById(Long id) {
-        return repository.findById(id);
-      }
+//    public Optional<Item> findById(Long id) {
+//        return repository.findById(id);
+//    }
+
+    public Optional<Item> findById(Long id) {
+        Item item = em.find(Item.class, id);
+        return Optional.ofNullable(item);
+    }
 
 //    -----------------------------------------------------------------------------------------------------
 
@@ -142,23 +172,53 @@ public class ItemRepository {
 //        return query.getResultList();
 //    }
 
-      public List<Item> findAll(ItemSearchCond cond) {
+//    public List<Item> findAll(ItemSearchCond cond) {
+//
+//        String itemName = cond.getItemName();
+//        Integer maxPrice = cond.getMaxPrice();
+//
+//        if(StringUtils.hasText(itemName) && maxPrice != null) {
+//    //              return repository.findByItemNameLikeAndPriceLessThanEqual("%" + itemName + "%", maxPrice);
+//            return repository.findItems("%" + itemName + "%", maxPrice);
+//        } else if (StringUtils.hasText(itemName)) {
+//            return repository.findByItemNameLike("%" + itemName + "%");
+//        } else if (maxPrice != null) {
+//            return repository.findByPriceLessThanEqual(maxPrice);
+//        } else {
+//            return repository.findAll();
+//        }
+//    }
 
-          String itemName = cond.getItemName();
-          Integer maxPrice = cond.getMaxPrice();
+    /**
+     * Querydsl 을 사용해서 동적쿼리 문제 해결
+     * likeItemName() , maxPrice() 메서드는 다른 쿼리를 작성할 때 재사용 가능 -> 쿼리 조건을 부분적으로 모듈화
+     */
+    public List<Item> findAll(ItemSearchCond cond) {
 
-          if(StringUtils.hasText(itemName) && maxPrice != null) {
-//              return repository.findByItemNameLikeAndPriceLessThanEqual("%" + itemName + "%", maxPrice);
-               return repository.findItems("%" + itemName + "%", maxPrice);
-          } else if (StringUtils.hasText(itemName)) {
-              return repository.findByItemNameLike("%" + itemName + "%");
-          } else if (maxPrice != null) {
-              return repository.findByPriceLessThanEqual(maxPrice);
-          } else {
-              return repository.findAll();
-          }
-      }
+        String itemName = cond.getItemName();
+        Integer maxPrice = cond.getMaxPrice();
 
+        List<Item> result = query.select(item)
+                .from(item)
+                .where(likeItemName(itemName), maxPrice(maxPrice))
+                .fetch();
+
+        return result;
+    }
+
+    private BooleanExpression maxPrice(Integer maxPrice) {
+        if(maxPrice != null) {
+            return item.price.loe(maxPrice);
+        }
+        return null;
+    }
+
+    private BooleanExpression likeItemName(String itemName) {
+        if(StringUtils.hasText(itemName)) {
+            return item.itemName.like("%" + itemName + "%");
+        }
+        return  null;
+    }
 
 
 //    -----------------------------------------------------------------------------------------------------
@@ -197,12 +257,19 @@ public class ItemRepository {
 ////        findItem.setDeliveryCode(updateParam.getDeliveryCode());
 //    }
 
-      public void update(Long itemId, ItemUpdateDto updateParam) {
-          Item findItem = repository.findById(itemId).orElseThrow(); //스프링 데이터 JPA 가 제공하는 findById 메서드를 사용해서 엔티티를 찾는다
-          findItem.setItemName(updateParam.getItemName());
-          findItem.setPrice(updateParam.getPrice());
-          findItem.setQuantity(updateParam.getQuantity());
-      }
+//    public void update(Long itemId, ItemUpdateDto updateParam) {
+//        Item findItem = repository.findById(itemId).orElseThrow(); //스프링 데이터 JPA 가 제공하는 findById 메서드를 사용해서 엔티티를 찾는다
+//        findItem.setItemName(updateParam.getItemName());
+//        findItem.setPrice(updateParam.getPrice());
+//        findItem.setQuantity(updateParam.getQuantity());
+//    }
+
+    public void update(Long itemId, ItemUpdateDto updateParam) {
+        Item findItem = findById(itemId).orElseThrow();
+        findItem.setItemName(updateParam.getItemName());
+        findItem.setPrice(updateParam.getPrice());
+        findItem.setQuantity(updateParam.getQuantity());
+    }
 
 
     public void clearStore() {
