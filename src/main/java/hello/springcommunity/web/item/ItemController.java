@@ -23,7 +23,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ItemController {
 
-    private final ItemRepository itemRepository;
+//    private final ItemRepository itemRepository;
     private final ItemService itemService;
 
     /**

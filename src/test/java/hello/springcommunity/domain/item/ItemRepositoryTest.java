@@ -1,9 +1,12 @@
 package hello.springcommunity.domain.item;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -18,7 +21,10 @@ class ItemRepositoryTest {
 
     @Autowired
     ItemRepository itemRepository; //의존관계 주입
-    
+
+    @Autowired
+    ApplicationContext applicationContext;
+
 
     @Test
     void save() {
@@ -84,6 +90,19 @@ class ItemRepositoryTest {
         List<Item> result = itemRepository.findAll(new ItemSearchCond(itemName, maxPrice));
         log.info("result={}",result);
         assertThat(result).containsExactly(items);
+    }
+
+    @Test
+    @DisplayName("컨테이너에 등록된 모든 빈 조회")
+    void findAllBean() {
+        if(applicationContext != null) {
+            String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
+            for (String beanDefinitionName : beanDefinitionNames) {
+                log.info("bean={}", beanDefinitionName);
+//                Object bean = applicationContext.getBean(beanDefinitionName);
+//                log.info("beanDefinitionName={}, bean={}", beanDefinitionName, bean);
+            }
+        }
     }
 
 
