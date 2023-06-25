@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * JPA 사용
+ */
 @Slf4j
 @Repository
 @Transactional
