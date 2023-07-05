@@ -2,6 +2,7 @@ package hello.springcommunity.web.member;
 
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.member.MemberRepository;
+import hello.springcommunity.domain.validation.ValidationSequence;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -24,10 +25,11 @@ public class MemberController {
     }
 
     @PostMapping("/add")
-    public String save(@Validated @ModelAttribute Member member, BindingResult result) {
+    public String save(@Validated(ValidationSequence.class) @ModelAttribute Member member, BindingResult result) {
         if (result.hasErrors()) {
             return "members/addMemberForm";
         }
+
         memberRepository.save(member);
         return "redirect:/";
     }
