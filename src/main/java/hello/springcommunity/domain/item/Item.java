@@ -1,8 +1,11 @@
 package hello.springcommunity.domain.item;
 
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
@@ -18,9 +21,11 @@ public class Item {
     //스프링부트와 통합해서 사용하면 필드 이름을 테이블 컬럼명으로 변경할 때 객체 필드의 카멜 케이스를 테이블 컬럼의 언더스코어로 자동 변환해주므로
     //@Column 에노테이션은 생략가능하다
     @Column(name = "item_name", length = 10)
+    @NotBlank
     private String itemName;
-
+    @Range(min = 1000, max = 1000000)
     private Integer price;
+    @Max(9999)
     private Integer quantity;
 
 //    private Boolean open; //판매 여부
