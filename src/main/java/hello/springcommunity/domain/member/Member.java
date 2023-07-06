@@ -9,11 +9,17 @@ import javax.validation.constraints.*;
 
 import static hello.springcommunity.domain.validation.ValidationGroups.*;
 
-@Data
+/**
+ * MemberDTO
+ */
+
+@Getter
+@Setter
 @Entity
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_id")
     private Long id;
 
     @NotBlank(groups = NotBlankGroup.class) //groups 속성으로 해당 검증에 해당하는 인터페이스를 설정

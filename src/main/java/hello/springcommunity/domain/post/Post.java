@@ -1,6 +1,9 @@
 package hello.springcommunity.domain.post;
 
+import hello.springcommunity.domain.member.Member;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -13,25 +16,26 @@ import java.time.LocalDate;
  * JPA 사용
  */
 
-@Data
+@Getter
+@Setter
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class Post {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_id")
     private Long id;
 
-    @Column(name = "post_title")
     @NotBlank
-    private String postTitle;
+    private String title;
 
-    @Column(name = "post_body")
     @NotBlank
-    private String postBody;
+    private String content;
 
-    @Column(name = "post_author")
+    @ManyToOne
+    @JoinColumn(name = "member_id")
     @NotBlank
-    private String postAuthor;
+    private Member member;
 
     @Column(name = "reg_date")
     @CreatedDate
@@ -40,9 +44,5 @@ public class Post {
     public Post() {
     }
 
-    public Post(String postTitle, String postBody, String postAuthor) {
-        this.postTitle = postTitle;
-        this.postBody = postBody;
-        this.postAuthor = postAuthor;
-    }
+
 }
