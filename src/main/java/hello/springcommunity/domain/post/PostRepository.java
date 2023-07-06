@@ -1,6 +1,7 @@
 package hello.springcommunity.domain.post;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * 스프링 데이터 JPA 적용
@@ -10,5 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * PostRepository 는 스프링 데이터 JPA 가 프록시 기술로 만들어주고 스프링 빈으로도 등록해준다
  *
  */
+
+@Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 }

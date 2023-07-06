@@ -1,9 +1,7 @@
 package hello.springcommunity.domain.post;
 
 import hello.springcommunity.domain.member.Member;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -16,9 +14,9 @@ import java.time.LocalDate;
  * JPA 사용
  */
 
-@Getter
-@Setter
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class Post {
 
@@ -32,7 +30,7 @@ public class Post {
     @NotBlank
     private String content;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY) //관계를 지연로딩으로 설정.
     @JoinColumn(name = "member_id")
     @NotBlank
     private Member member;
@@ -41,7 +39,28 @@ public class Post {
     @CreatedDate
     private LocalDate regDate;
 
-    public Post() {
+    @Builder
+    public Post(String title, String content, Member member, LocalDate regDate) {
+        this.title = title;
+        this.content = content;
+        this.member = member;
+        this.regDate = regDate;
+    }
+    
+    //생성 메서드
+    public static Post createPost(String title, String content, Member member) {
+        return Post.builder()
+                .title(title)
+                .content(content)
+                .member(member)
+                .regDate(LocalDate.now())
+                .build();
+    }
+    
+    //비즈니스 메서드
+    public void updatePost(String title, String content) {
+        this.title = title;
+        this.content = content;
     }
 
 
