@@ -1,8 +1,6 @@
 package hello.springcommunity.domain.member;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -14,8 +12,8 @@ import static hello.springcommunity.domain.validation.ValidationGroups.*;
  */
 
 @Getter
-@Setter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED) //외부에서 기본 생성자를 통해 엔티티를 생성하지 못하도록 하여 객체 생성의 안전성을 높인다. 접근레벨은 protected
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,8 +36,10 @@ public class Member {
 //    @Email(message = "이메일 형식에 맞지 않습니다")
 //    private String userEmail;
 
-    public Member() {
+    @Builder //빌더패턴으로 해당 생성자를 사용한다
+    public Member(String loginId, String name, String password) {
+        this.loginId = loginId;
+        this.name = name;
+        this.password = password;
     }
-
-
 }
