@@ -38,7 +38,7 @@ dependencies {
 //	runtimeOnly 'com.h2database:h2'
 
 	//MySQL 데이터베이스 추가
-//	runtimeOnly 'mysql:mysql-connector-java'
+//	runtimeOnly 'mysql:mysql-connector-java:8.0.32'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	compileOnly 'org.projectlombok:lombok'
