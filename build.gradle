@@ -34,6 +34,9 @@ dependencies {
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
+	//서버 재시작없이 정적소스 변경
+	implementation 'org.springframework.boot:spring-boot-devtools'
+
 	//H2 데이터베이스 추가
 //	runtimeOnly 'com.h2database:h2'
 
