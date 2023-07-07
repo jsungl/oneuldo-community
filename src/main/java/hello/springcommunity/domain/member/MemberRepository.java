@@ -48,13 +48,19 @@ public class MemberRepository {
 //    }
 
     public Optional<Member> findByLoginId(String loginId) {
-        TypedQuery<Member> query = em.createQuery("select m from Member m where m.loginId = :loginId", Member.class);
-        query.setParameter("loginId", loginId);
-        Member foundMember = query.getSingleResult();
+//        TypedQuery<Member> query = em.createQuery("select m from Member m where m.loginId = :loginId", Member.class);
+//        query.setParameter("loginId", loginId);
+//        Member foundMember = query.getSingleResult();
+//
+//        log.info("foundMember={}", foundMember);
+//
+//        return Optional.ofNullable(foundMember);
 
-        log.info("foundMember={}", foundMember);
+        List<Member> members = em.createQuery("select m from Member m where m.loginId = :loginId", Member.class)
+                .setParameter("loginId", loginId)
+                .getResultList();
 
-        return Optional.ofNullable(foundMember);
+        return members.stream().findAny();
     }
 
 
