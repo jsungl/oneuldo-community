@@ -1,6 +1,7 @@
 package hello.springcommunity.domain.post;
 
 import hello.springcommunity.domain.member.Member;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,7 @@ import javax.persistence.EntityManager;
 
 import static org.assertj.core.api.Assertions.*;
 
-
+@Slf4j
 @SpringBootTest
 @Transactional
 class PostServiceTest {
@@ -25,7 +26,7 @@ class PostServiceTest {
     void save() {
 
         //given
-        Member member = Member.builder().loginId("userA").build();
+        Member member = Member.builder().loginId("userA").name("aaa").password("123123a!").build();
         em.persist(member);
 
         //when
@@ -44,7 +45,7 @@ class PostServiceTest {
     void update() {
 
         //given
-        Member member = Member.builder().loginId("userA").build();
+        Member member = Member.builder().loginId("userA").name("aaa").password("123123a!").build();
         em.persist(member);
         Post savedPost = postService.save("AAA", "BBB", member.getId());
         PostUpdateDto updateParam = new PostUpdateDto("CCC", "DDD");
