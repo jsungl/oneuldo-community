@@ -22,6 +22,7 @@ import javax.servlet.http.HttpSession;
  * 로그인 서비스를 호출해서 로그인에 성공하면 홈 화면으로 이동,
  * 로그인에 실패하면 글로벌 오류를 생성한다. 그리고 정보를 다시 입력하도록 로그인 폼(loginForm)을 뷰 템플릿으로 사용한다
  */
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -35,14 +36,17 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String login(@Validated @ModelAttribute LoginForm form, BindingResult bindingResult, HttpServletRequest request) {
+    public String login(@Validated @ModelAttribute("loginForm") LoginForm form, BindingResult bindingResult, HttpServletRequest request) {
+
         if (bindingResult.hasErrors()) {
+            log.info("errors={}", bindingResult);
             return "login/loginForm";
         }
 
         Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
-        log.info("login? {}", loginMember);
+        log.info("loginMember={}", loginMember);
 
+        //로그인 실패시 글로벌 오류 생성
         if (loginMember == null) {
             bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
             return "login/loginForm";
@@ -50,6 +54,7 @@ public class LoginController {
 
         //로그인 성공 처리
         //세션이 있으면 기존 세션 반환, 없으면 신규 세션 생성
+        //getSession(true) 가 default, getSession(false) 이면 기존 세션이 없는경우 신규 세션을 생성하지 않는다 -> null 반환
         HttpSession session = request.getSession();
         //세션에 로그인 회원 정보 보관
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
@@ -59,8 +64,9 @@ public class LoginController {
 
     @PostMapping("/logout")
     public String logout(HttpServletRequest request) {
-        //세션을 삭제
+
         HttpSession session = request.getSession(false);
+        //세션을 삭제
         if (session != null) {
             session.invalidate();
         }

@@ -1,14 +1,21 @@
 package hello.springcommunity.web.login;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 
-@Data
+/**
+ * 로그인 폼 전송용 객체
+ */
+
+@Getter
+@Setter
 public class LoginForm {
 
-    @NotEmpty
+    @NotBlank
     private String loginId;
-    @NotEmpty
+    @NotBlank
     private String password;
 }

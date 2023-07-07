@@ -24,11 +24,11 @@ public class HomeController {
     public String homeLogin(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model) {
 
         //로그인
-        //세션에 회원 데이터가 없으면 기존 home 으로 이동
+        //세션에 회원 데이터가 없으면 기존 home 으로 이동 -> 비로그인 사용자
         if (loginMember == null) {
             return "home";
         }
-        //세션이 유지되면 loginhome 으로 이동
+        //세션이 유지되면 loginhome 으로 이동 -> 로그인 사용자
         model.addAttribute("member", loginMember);
         return "loginHome";
     }
