@@ -13,6 +13,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static hello.springcommunity.domain.item.QItem.*;
 
@@ -21,8 +22,8 @@ import static hello.springcommunity.domain.item.QItem.*;
 @Transactional
 public class ItemRepository {
 
-    private static final Map<Long, Item> store = new HashMap<>(); //static
-    private static long sequence = 0L; //static
+//    private static final Map<Long, Item> store = new ConcurrentHashMap<>(); //static
+//    private static long sequence = 0L; //static
 
     private final EntityManager em;
 
@@ -272,7 +273,7 @@ public class ItemRepository {
     }
 
 
-    public void clearStore() {
-        store.clear();
-    }
+//    public void clearStore() {
+//        store.clear();
+//    }
 }
