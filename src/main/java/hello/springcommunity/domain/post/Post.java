@@ -27,12 +27,12 @@ public class Post {
     @NotBlank
     private String title;
 
-    @NotBlank
+//    @NotBlank
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY) //관계를 지연로딩으로 설정.
     @JoinColumn(name = "member_id")
-    @NotBlank
+//    @NotBlank
     private Member member;
 
     @Column(name = "reg_date")
