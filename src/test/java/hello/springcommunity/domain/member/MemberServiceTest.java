@@ -20,7 +20,7 @@ class MemberServiceTest {
     void 회원가입() {
 
         //given
-        Member member = Member.builder().loginId("userA").build();
+        Member member = Member.builder().loginId("userA").name("AAA").password("123123a!").build();
 
         //when
         Long joinId = memberService.join(member);
@@ -34,8 +34,8 @@ class MemberServiceTest {
     void 중복회원() {
 
         //given
-        Member memberA = Member.builder().loginId("userA").build();
-        Member memberB = Member.builder().loginId("userB").build();
+        Member memberA = Member.builder().loginId("userA").name("AAA").password("123123a!").build();
+        Member memberB = Member.builder().loginId("userA").name("BBB").password("123123a!").build();
 
         //when
         memberService.join(memberA);
