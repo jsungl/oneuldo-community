@@ -1,6 +1,7 @@
 package hello.springcommunity.domain.post;
 
 import hello.springcommunity.domain.member.Member;
+import hello.springcommunity.web.post.form.PostUpdateForm;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -48,10 +49,12 @@ class PostServiceTest {
         Member member = Member.builder().loginId("userA").name("aaa").password("123123a!").build();
         em.persist(member);
         Post savedPost = postService.save("AAA", "BBB", member.getId());
-        PostUpdateDto updateParam = new PostUpdateDto("CCC", "DDD");
+        PostUpdateForm updateForm = new PostUpdateForm();
+        updateForm.setTitle("CCC");
+        updateForm.setContent("DDD");
 
         //when
-        postService.update(savedPost.getId(), updateParam);
+        postService.update(savedPost.getId(), updateForm);
 
         //then
         Post post = postService.findOne(savedPost.getId()).orElseThrow();

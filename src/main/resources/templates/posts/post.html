@@ -54,16 +54,19 @@
 
     <hr class="my-4">
 
+    <form th:action="@{/posts/{postId}/delete(postId=${post.id})}" method="post">
 
-    <button class="btn btn-primary"
-            onclick="location.href='editForm.html'"
-            th:onclick="|location.href='@{/posts/{postId}/edit(postId=${post.id})}'|"
-            type="button">수정</button>
+        <button class="btn btn-primary"
+                onclick="location.href='editForm.html'"
+                th:onclick="|location.href='@{/posts/{postId}/edit(postId=${post.id})}'|"
+                type="button">수정</button>
 
 
-    <button class="btn btn-danger"
-            th:onclick="|location.href='@{/posts/{postId}/delete(postId=${post.id})}'|"
-            type="button">삭제</button>
+        <button class="btn btn-danger"
+                type="submit">삭제</button>
+    </form>
+
+
 
 
 </div> <!-- /container -->

@@ -2,6 +2,7 @@ package hello.springcommunity.domain.post;
 
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.member.MemberRepository;
+import hello.springcommunity.web.post.form.PostUpdateForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,9 +36,9 @@ public class PostService {
     /**
      * 게시물 수정
      */
-    public void update(Long postId, PostUpdateDto updateParam) {
+    public void update(Long postId, PostUpdateForm postUpdateForm) {
         Post findPost = findOne(postId).orElseThrow();
-        findPost.updatePost(updateParam.getTitle(), updateParam.getContent());
+        findPost.updatePost(postUpdateForm.getTitle(), postUpdateForm.getContent());
     }
 //    public void update(Long postId, PostUpdateDto updateParam) {
 //        Post findPost = findById(postId).orElseThrow();

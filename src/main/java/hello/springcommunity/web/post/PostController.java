@@ -3,9 +3,9 @@ package hello.springcommunity.web.post;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.post.Post;
 import hello.springcommunity.domain.post.PostService;
-import hello.springcommunity.domain.post.PostUpdateDto;
 import hello.springcommunity.web.SessionConst;
 import hello.springcommunity.web.post.form.PostSaveForm;
+import hello.springcommunity.web.post.form.PostUpdateForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -35,7 +35,7 @@ public class PostController {
 
     //상세
     @GetMapping("/{postId}")
-    public String post(@PathVariable long postId, Model model) {
+    public String post(@PathVariable Long postId, Model model) {
 //        Post post = postService.findById(postId).get();
         Post post = postService.findOne(postId).orElseThrow();
         model.addAttribute("post", post);
@@ -72,23 +72,36 @@ public class PostController {
     @GetMapping("/{postId}/edit")
     public String editForm(@PathVariable Long postId, Model model) {
 //        Post post = postService.findById(postId).get();
-        Post post = postService.findOne(postId).get();
-        model.addAttribute("post", post);
+        Post post = postService.findOne(postId).orElseThrow();
+
+        PostUpdateForm postUpdateForm = new PostUpdateForm();
+        postUpdateForm.setTitle(post.getTitle());
+        postUpdateForm.setContent(post.getContent());
+
+        model.addAttribute("postUpdateForm", postUpdateForm);
+        model.addAttribute("postId", postId);
         return "posts/editForm";
     }
 
     @PostMapping("/{postId}/edit")
-    public String edit(@PathVariable Long postId, @ModelAttribute("post") PostUpdateDto updateParam, BindingResult bindingResult) {
+    public String edit(@PathVariable Long postId, @ModelAttribute("postUpdateForm") PostUpdateForm postUpdateForm, BindingResult bindingResult) {
 
         if(bindingResult.hasErrors()) {
             log.info("errors={}", bindingResult);
             return "posts/editForm";
         }
 
-        log.info("updateParam={}", updateParam);
-        postService.update(postId, updateParam);
+        log.info("postUpdateForm={}", postUpdateForm);
+        postService.update(postId, postUpdateForm);
         return "redirect:/posts/{postId}"; //상세페이지로 이동
 
+    }
+    
+    //삭제
+    @PostMapping("/{postId}/delete")
+    public String delete(@PathVariable Long postId) {
+        postService.deleteById(postId);
+        return "redirect:/posts"; //게시물 목록으로 이동
     }
 
 

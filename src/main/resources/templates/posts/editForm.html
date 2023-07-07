@@ -8,6 +8,10 @@
         .container {
             max-width: 560px;
         }
+        .field-error {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -18,14 +22,15 @@
         <h2>게시물 수정</h2>
     </div>
 
-    <form action="post.html" th:action method="post">
+    <form action="post.html" th:action th:object="${postUpdateForm}" method="post">
         <div>
-            <label for="postTitle">제목</label>
-            <input type="text" id="postTitle" name="postTitle" class="form-control" value="제목" th:value="${post.postTitle}" readonly>
+            <label for="title">제목</label>
+            <input type="text" id="title" name="title" class="form-control" th:field="*{title}" th:errorclass="field-error">
+            <div class="field-error" th:errors="*{title}" />
         </div>
-        <div>
-            <label for="postBody">내용</label>
-            <input type="text" id="postBody" name="postBody" class="form-control" value="내용" th:value="${post.postBody}">
+        <div class="mb-3">
+            <label for="content">내용</label>
+            <textarea id="content" name="content" class="form-control" rows="5" th:value="*{content}" th:text="*{content}"></textarea>
         </div>
 
         <hr class="my-4">
@@ -37,7 +42,7 @@
             <div class="col">
                 <button class="w-100 btn btn-secondary btn-lg"
                         onclick="location.href='post.html'"
-                        th:onclick="|location.href='@{/posts/{postId}(postId=${post.id})}'|"
+                        th:onclick="|location.href='@{/posts/{postId}(postId=${postId})}'|"
                         type="button">취소</button>
             </div>
         </div>
