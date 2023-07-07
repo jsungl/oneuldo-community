@@ -8,6 +8,10 @@
         .container {
             max-width: 560px;
         }
+        .field-error {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -18,18 +22,15 @@
         <h2>게시물 등록</h2>
     </div>
 
-    <form action="post.html" th:action method="post">
+    <form action="post.html" th:action th:object="${postForm}" method="post">
         <div>
-            <label for="postTitle">제목</label>
-            <input type="text" id="postTitle" name="postTitle" class="form-control" placeholder="제목을 입력하세요">
+            <label for="title">제목</label>
+            <input type="text" id="title" name="title" th:field="*{title}" class="form-control" th:errorclass="field-error" placeholder="제목을 입력하세요">
+            <div class="field-error" th:errors="*{title}" />
         </div>
-        <div>
-            <label for="postBody">내용</label>
-            <input type="text" id="postBody" name="postBody" class="form-control" placeholder="내용을 입력하세요">
-        </div>
-        <div>
-            <label for="postAuthor">작성자</label>
-            <input type="text" id="postAuthor" name="postAuthor" class="form-control">
+        <div class="mb-3">
+            <label for="content">내용</label>
+            <textarea id="content" name="content" class="form-control" rows="5" th:value="*{content}" placeholder="내용을 입력하세요"></textarea>
         </div>
 
         <hr class="my-4">

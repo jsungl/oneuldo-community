@@ -10,11 +10,11 @@
   <div class="py-5 text-center">
     <h2>홈 화면</h2>
   </div>
-  <h4 class="mb-3" th:text="|${member.name} 님|">로그인 사용자 이름</h4>
+  <h4 class="mb-3" th:text="|${member.name} 님 로그인 하셨습니다|">로그인 사용자 이름</h4>
   <hr class="my-4">
   <div class="row">
     <div class="col">
-      <button class="w-100 btn btn-secondary btn-lg" type="button"
+      <button class="w-100 btn btn-primary btn-lg" type="button"
               th:onclick="|location.href='@{/posts}'|">
         게시판
       </button>

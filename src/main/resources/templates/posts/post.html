@@ -8,6 +8,10 @@
         .container {
             max-width: 560px;
         }
+        .field-error {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -21,39 +25,46 @@
     <!-- 등록했을 때 화면 위에 글자 추가 -->
     <h2 th:if="${param.status}" th:text="'저장 완료'"></h2>
 
+    <button class="w-100 btn btn-secondary"
+            onclick="location.href='posts.html'"
+            th:onclick="|location.href='@{/posts}'|"
+            type="button">목록으로</button>
+
     <div>
-        <label for="postId">게시물 ID</label>
+        <label for="postId">게시물 번호</label>
         <input type="text" id="postId" name="postId" class="form-control" value="1" th:value="${post.id}" readonly>
     </div>
     <div>
         <label for="title">제목</label>
-        <input type="text" id="title" name="title" class="form-control" value="테스트입니다" th:value="${post.postTitle}" readonly>
+        <input type="text" id="title" name="title" class="form-control" value="제목" th:value="${post.title}" readonly>
     </div>
     <div>
-        <label for="description">내용</label>
-        <input type="text" id="description" name="description" class="form-control" value="테스트 내용입니다" th:value="${post.postBody}" readonly>
+        <label for="content">내용</label>
+        <textarea id="content" name="content" class="form-control" rows="5" th:value="${post.content}" th:text="${post.content}" readonly></textarea>
     </div>
     <div>
         <label for="author">작성자</label>
-        <input type="text" id="author" name="author" class="form-control" value="unknown1" th:value="${post.postAuthor}" readonly>
+        <input type="text" id="author" name="author" class="form-control" value="작성자" th:value="${post.member.loginId}" readonly>
+    </div>
+    <div>
+        <label for="regDate">작성일</label>
+        <input type="text" id="regDate" name="regDate" class="form-control"
+               value="작성자" th:value="${post.regDate}" readonly>
     </div>
 
     <hr class="my-4">
 
-    <div class="row">
-        <div class="col">
-            <button class="w-100 btn btn-primary btn-lg"
-                    onclick="location.href='editForm.html'"
-                    th:onclick="|location.href='@{/posts/{postId}/edit(postId=${post.id})}'|"
-                    type="button">게시물 수정</button>
-        </div>
-        <div class="col">
-            <button class="w-100 btn btn-secondary btn-lg"
-                    onclick="location.href='posts.html'"
-                    th:onclick="|location.href='@{/posts}'|"
-                    type="button">목록으로</button>
-        </div>
-    </div>
+
+    <button class="btn btn-primary"
+            onclick="location.href='editForm.html'"
+            th:onclick="|location.href='@{/posts/{postId}/edit(postId=${post.id})}'|"
+            type="button">수정</button>
+
+
+    <button class="btn btn-danger"
+            th:onclick="|location.href='@{/posts/{postId}/delete(postId=${post.id})}'|"
+            type="button">삭제</button>
+
 
 </div> <!-- /container -->
 </body>

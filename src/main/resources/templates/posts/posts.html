@@ -8,47 +8,45 @@
 <body>
 
 <div class="container" style="max-width: 600px">
-  <div class="py-5 text-center">
-    <h2>게시물 목록</h2>
-  </div>
-
-  <div class="row">
-    <div class="col">
+  <div class="col-md-12">
+    <div class="py-5 text-center">
+      <h2>게시물 목록</h2>
     </div>
-    <div class="col">
-      <div class="col">
-        <button class="btn btn-primary float-end"
-                onclick="location.href='addForm.html'"
-                th:onclick="|location.href='@{/posts/add}'|"
-                type="button">게시물 등록
-        </button>
-      </div>
+    <button class="btn btn-dark"
+            th:onclick="|location.href='@{/}'|" type="button">
+      홈으로
+    </button>
+    <button class="btn btn-primary"
+            th:onclick="|location.href='@{/posts/add}'|" type="button">
+      게시물 등록
+    </button>
+
+    <hr class="my-4">
+
+    <div>
+      <table class="table">
+        <thead>
+        <tr>
+          <th>No.</th>
+          <th>제목</th>
+          <th>작성자</th>
+          <th>작성일</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="post : ${posts}">
+          <td th:text="${post.id}">게시물 번호</a></td>
+          <td><a href="post.html" th:href="@{|/posts/${post.id}|}" th:text="${post.title}">제목</a></td>
+          <td th:text="${post.member.loginId}">작성자</td>
+          <td th:text="${post.regDate}">작성일</td>
+        </tr>
+        </tbody>
+      </table>
     </div>
+
+    <hr class="my-4">
+
   </div>
-
-
-  <hr class="my-4">
-  <div>
-    <table class="table">
-      <thead>
-      <tr>
-        <th>ID</th>
-        <th>제목</th>
-        <th>작성자</th>
-        <th>날짜</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr th:each="post : ${posts}">
-        <td><a href="post.html" th:href="@{/posts/{postId}(postId=${post.id})}" th:text="${post.id}">id</a></td>
-        <td><a href="post.html" th:href="@{|/posts/${post.id}|}" th:text="${post.postTitle}">테스트입니다</a></td>
-        <td th:text="${post.postAuthor}">unknown1</td>
-        <td th:text="${post.regDate}">2023.07.04</td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
-
 </div> <!-- /container -->
 
 </body>
