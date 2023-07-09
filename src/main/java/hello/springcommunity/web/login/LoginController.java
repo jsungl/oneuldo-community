@@ -63,6 +63,7 @@ public class LoginController {
         //세션에 로그인 회원 정보 보관
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
 
+        //로그인에 성공하면 처음 요청한 URL로 이동
         return "redirect:" + redirectURL;
     }
 

@@ -34,12 +34,14 @@ public class PostController {
     }
 
     //상세
+    //Path Variable : localhost:8080/posts/1
 //    @GetMapping("/{postId}")
 //    public String post(@PathVariable Long postId, Model model) {
 //        Post post = postService.findOne(postId).orElseThrow();
 //        model.addAttribute("post", post);
 //        return "posts/post";
 //    }
+    //Query Param(Query String) : localhost:8080/posts/detail?postId=1
     @GetMapping("/detail")
     public String post(@RequestParam Long postId, Model model) {
         Post post = postService.findOne(postId).orElseThrow();
