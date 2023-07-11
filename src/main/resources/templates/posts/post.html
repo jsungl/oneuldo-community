@@ -30,10 +30,10 @@
             th:onclick="|location.href='@{/posts}'|"
             type="button">목록으로</button>
 
-    <div>
-        <label for="postId">게시물 번호</label>
-        <input type="text" id="postId" name="postId" class="form-control" value="1" th:value="${post.id}" readonly>
-    </div>
+<!--    <div>-->
+<!--        <label for="postId">게시물 번호</label>-->
+<!--        <input type="text" id="postId" name="postId" class="form-control" value="1" th:value="${post.id}" readonly>-->
+<!--    </div>-->
     <div>
         <label for="title">제목</label>
         <input type="text" id="title" name="title" class="form-control" value="제목" th:value="${post.title}" readonly>

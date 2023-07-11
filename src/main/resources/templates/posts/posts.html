@@ -34,17 +34,94 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="post : ${posts}">
-          <td th:text="${post.id}">게시물 번호</a></td>
-          <td><a href="post.html" th:href="@{|/posts/detail?postId=${post.id}|}" th:text="${post.title}">제목</a></td>
-          <td th:text="${post.member.loginId}">작성자</td>
-          <td th:text="${post.regDate}">작성일</td>
-        </tr>
+<!--        <tr th:each="post : ${posts}">-->
+<!--          <td th:text="${post.id}">게시물 번호</a></td>-->
+<!--          <td><a href="post.html" th:href="@{|/posts/detail?postId=${post.id}|}" th:text="${post.title}">제목</a></td>-->
+<!--          <td th:text="${post.member.loginId}">작성자</td>-->
+<!--          <td th:text="${post.regDate}">작성일</td>-->
+<!--        </tr>-->
+
+          <!--
+          <tr th:each="list,index: ${listMap.list}" th:with="paging=${listMap.paging}">
+            <td>
+              <span th:text="${(listMap.totalCount - index.index) - (paging.pageNumber * paging.pageSize)}"></span>
+            </td>
+            <td>
+              <a th:href="@{/posts/detail(postId=${list.id})}" th:text="${list.title}">제목</a>
+            </td>
+            <td th:text="${list.member.loginId}">작성자</td>
+            <td th:text="${list.regDate}">작성일</td>
+          </tr>
+          -->
+
+          <tr th:each="post:${posts}">
+            <td th:text="${post.id}">1</a></td>
+            <td>
+              <a th:href="@{/posts/detail(postId=${post.id})}" th:text="${post.title}">제목</a>
+            </td>
+            <td th:text="${post.member.loginId}">작성자</td>
+            <td th:text="${post.regDate}">작성일</td>
+          </tr>
         </tbody>
       </table>
     </div>
 
-    <hr class="my-4">
+    <!-- 페이징 -->
+    <div th:if="${!posts.isEmpty()}">
+        <ul class="pagination justify-content-center"
+            th:with="
+                pageNumber = ${posts.pageable.pageNumber},
+                pageSize = ${posts.pageable.pageSize},
+                totalPages = ${posts.totalPages},
+                startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+                tempEndPage = ${startPage + pageSize - 1},
+                endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})">
+
+          <!-- 처음으로 이동 -->
+          <!-- 현재 페이지 인덱스(0부터 시작)가 페이지 사이즈보다 작을 경우 첫 페이지 라인(1~5페이지)에 머물러 있는 경우이므로 비활성화 한다 -->
+          <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
+            <a class="page-link" th:href="@{/posts(page=0)}">
+              <span>&laquo;</span>
+<!--              <span class="sr-only">First</span>-->
+            </a>
+          </li>
+
+          <!-- 이전으로 이동 -->
+          <!-- 첫 페이지인 경우 비활성화, 첫 페이지가 아니라면 현재 페이지 인덱스(0부터 시작) - 1 -->
+          <li th:classappend="${posts.first} ? 'disabled'" class="page-item">
+            <a class="page-link" th:href="${posts.first} ? '#' : @{/posts(page=${pageNumber - 1})}" aria-label="Previous">
+              <span aria-hidden="true">&lt;</span>
+<!--              <span class="sr-only">Previous</span>-->
+            </a>
+          </li>
+
+          <!-- 페이지 리스트 루프(5페이지씩 분리)로 startPage 부터 endPage까지 반복 -->
+          <!-- 페이지 번호 누르면 해당 페이지로 이동 -->
+          <!-- page(페이지 번호) 와 현재 페이지 인덱스(0부터 시작) + 1 이 같으면 현재 보고있는 페이지이므로 활성화 -->
+          <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
+            <a th:text="${page}" class="page-link" th:href="@{/posts(page=${page - 1})}"></a>
+          </li>
+
+          <!-- 다음으로 이동 -->
+          <li th:classappend="${posts.last} ? 'disabled'" class="page-item">
+            <a class="page-link" th:href="${posts.last} ? '#' : @{/posts(page=${pageNumber + 1})}" aria-label="Next">
+              <span aria-hidden="true">&gt;</span>
+<!--              <span class="sr-only">Next</span>-->
+            </a>
+          </li>
+
+          <!-- 마지막으로 이동 -->
+          <!-- startPage 가 왼쪽 연산보다 이상일 경우 마지막 페이지 라인에 있는 경우이므로 비활성화, 그게 아니면 전체 페이지수(totalPages) - 1 만큼 이동하여 마지막 페이지로 이동한다 -->
+          <li th:classappend="${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
+            <a class="page-link" th:href="@{/posts(page=${totalPages - 1})}">
+              <span>&raquo;</span>
+            </a>
+          </li>
+
+        </ul>
+    </div>
+
+
 
   </div>
 </div> <!-- /container -->

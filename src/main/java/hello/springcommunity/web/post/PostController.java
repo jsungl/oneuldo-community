@@ -8,6 +8,10 @@ import hello.springcommunity.web.post.form.PostSaveForm;
 import hello.springcommunity.web.post.form.PostUpdateForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -25,15 +30,35 @@ public class PostController {
 
     private final PostService postService;
 
-    //목록
+    /**
+     * 게시물 목록
+     */
+//    @GetMapping
+//    public String posts(Model model) {
+//        List<Post> posts = postService.findPosts();
+//        model.addAttribute("posts", posts);
+//        return "posts/posts";
+//    }
+    //게시물 목록 페이징
+    //@PageableDefault 어노테이션을 이용하여 정렬 순서, 사이즈 등의 정보를 넣고 해당객체를 서비스에 파라미터로 전달
     @GetMapping
-    public String posts(Model model) {
-        List<Post> posts = postService.findPosts();
+    public String posts(Model model, @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 5) Pageable pageable) {
+
+//        HashMap<String, Object> listMap = postService.findPosts(pageable);
+//        log.info("listMap is Empty={}", listMap.isEmpty());
+//        model.addAttribute("listMap", listMap);
+
+        Page<Post> posts = postService.findPosts(pageable);
+        log.info("totalPages={}", posts.getTotalPages());
         model.addAttribute("posts", posts);
+
         return "posts/posts";
     }
 
-    //상세
+
+    /**
+     * 게시물 상세
+     */
     //Path Variable : localhost:8080/posts/1
 //    @GetMapping("/{postId}")
 //    public String post(@PathVariable Long postId, Model model) {
@@ -50,7 +75,9 @@ public class PostController {
     }
 
 
-    //등록폼
+    /**
+     * 게시물 등록 폼
+     */
     @GetMapping("/add")
     public String addForm(@ModelAttribute("postForm") PostSaveForm postForm) {
         return "posts/addForm";
@@ -72,10 +99,16 @@ public class PostController {
 
         redirectAttributes.addAttribute("postId", savedPost.getId());
         redirectAttributes.addAttribute("status", true);
-        return "redirect:/posts/{postId}"; //해당 게시물의 상세페이지로 이동
+
+        //해당 게시물의 상세페이지로 이동
+//        return "redirect:/posts/{postId}";
+        return "redirect:/posts/detail?postId={postId}";
     }
 
-    //수정폼
+
+    /**
+     * 게시물 수정 폼
+     */
     @GetMapping("/{postId}/edit")
     public String editForm(@PathVariable Long postId, Model model) {
 //        Post post = postService.findById(postId).get();
@@ -100,11 +133,17 @@ public class PostController {
 
         log.info("postUpdateForm={}", postUpdateForm);
         postService.update(postId, postUpdateForm);
-        return "redirect:/posts/{postId}"; //상세페이지로 이동
+
+        //상세페이지로 이동
+//        return "redirect:/posts/{postId}";
+        return "redirect:/posts/detail?postId={postId}";
 
     }
-    
-    //삭제
+
+
+    /**
+     * 게시물 삭제 폼
+     */
     @PostMapping("/{postId}/delete")
     public String delete(@PathVariable Long postId) {
         postService.deleteById(postId);
