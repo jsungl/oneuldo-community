@@ -25,7 +25,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-
+    private final PostQueryRepository postQueryRepository;
 
     /**
      * 게시물 등록
@@ -76,26 +76,38 @@ public class PostService {
     /**
      * 게시물 전체 조회 - 페이징
      */
-//    public HashMap<String, Object> findPosts(Pageable pageable) {
-//        HashMap<String, Object> listMap = new HashMap<>();
-//        Page<Post> list = postRepository.findAll(pageable);
-//
-//        log.info("pageNumber={}",list.getPageable().getPageNumber()); //현재 페이지 index
-//        log.info("pageSize={}",list.getPageable().getPageSize()); //페이지당 보여줄 데이터 개수
-//
-//        if(!list.isEmpty()) {
-//
-//        }
-//
-//        listMap.put("list", list);
-//        listMap.put("paging", list.getPageable()); //페이지 번호와 페이지 사이즈(한 페이지당 보여줄 데이터 개수)를 담고있다
-//        listMap.put("totalCount", list.getTotalElements()); //전체 데이터 개수
-//        listMap.put("totalPage", list.getTotalPages()); //전체 페이지 수
-//        return listMap;
-//    }
-
-    public Page<Post> findPosts(Pageable pageable) {
+    public Page<Post> findAll(Pageable pageable) {
         return postRepository.findAll(pageable);
     }
 
+    /**
+     * 게시물 검색 - 페이징
+     */
+    public Page<Post> findPostsBySearch(String searchType, String keyword, Pageable pageable) {
+        switch (searchType) {
+            case "title":
+                return postQueryRepository.findAll(new PostSearchCond(keyword, null, null), pageable);
+            case "content" :
+                return postQueryRepository.findAll(new PostSearchCond(null, keyword, null), pageable);
+            case "loginId" :
+                return postQueryRepository.findAll(new PostSearchCond(null, null, keyword), pageable);
+            default:
+                return postQueryRepository.findAll(new PostSearchCond(null, null, null), pageable);
+
+        }
+    }
+
+    /**
+     * 게시물 검색
+     */
+//    public Page<Post> findPostBySearch(String searchType, String keyword, Pageable pageable) {
+//        switch (searchType) {
+//            case "title":
+//                return postRepository.findByTitleContaining(keyword, pageable);
+//            case "content" :
+//                return postRepository.findByContentContaining(keyword, pageable);
+//            default:
+//                return postRepository.findAll(pageable);
+//        }
+//    }
 }

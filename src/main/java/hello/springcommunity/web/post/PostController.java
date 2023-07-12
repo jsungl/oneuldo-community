@@ -2,6 +2,7 @@ package hello.springcommunity.web.post;
 
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.post.Post;
+import hello.springcommunity.domain.post.PostSearchCond;
 import hello.springcommunity.domain.post.PostService;
 import hello.springcommunity.web.SessionConst;
 import hello.springcommunity.web.post.form.PostSaveForm;
@@ -44,15 +45,61 @@ public class PostController {
     @GetMapping
     public String posts(Model model, @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 5) Pageable pageable) {
 
-//        HashMap<String, Object> listMap = postService.findPosts(pageable);
-//        log.info("listMap is Empty={}", listMap.isEmpty());
-//        model.addAttribute("listMap", listMap);
-
-        Page<Post> posts = postService.findPosts(pageable);
+        Page<Post> posts = postService.findAll(pageable);
         log.info("totalPages={}", posts.getTotalPages());
         model.addAttribute("posts", posts);
 
         return "posts/posts";
+    }
+
+
+    /**
+     * 게시물 검색
+     */
+//    @GetMapping("/search")
+//    public String postsBySearch(@RequestParam("searchType") String searchType,
+//                                @RequestParam("keyword") String keyword,
+//                                @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 5) Pageable pageable,
+//                                Model model) {
+//
+//        log.info("searchType={}", searchType);
+//        log.info("keyword={}", keyword);
+//
+//        Page<Post> list = postService.findPostBySearch(searchType, keyword, pageable);
+//        for (Post post : list) {
+//            log.info("post={}", post.getTitle());
+//        }
+//
+//        model.addAttribute("posts", list);
+//
+//        return "posts/posts";
+//
+//    }
+
+    /**
+     * 게시물 검색 - 페이징
+     */
+    @GetMapping("/search")
+    public String postBySearch(@RequestParam("searchType") String searchType,
+                               @RequestParam("keyword") String keyword,
+                               @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 5) Pageable pageable,
+                               Model model) {
+
+        log.info("searchType={}", searchType);
+
+        if(!searchType.isBlank()) {
+            Page<Post> list = postService.findPostsBySearch(searchType, keyword, pageable);
+            log.info("search result totalPages={}", list.getTotalPages());
+            model.addAttribute("posts", list);
+            model.addAttribute("searchType", searchType);
+            model.addAttribute("keyword", keyword);
+            return "posts/searchPosts";
+        }else {
+            //검색조건을 선택하지 않고 검색시 전체 게시물 목록 조회
+            return "redirect:/posts";
+        }
+
+
     }
 
 
