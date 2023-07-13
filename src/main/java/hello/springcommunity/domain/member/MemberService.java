@@ -3,6 +3,7 @@ package hello.springcommunity.domain.member;
 import hello.springcommunity.web.member.form.MemberSaveForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 회원가입
@@ -23,6 +25,10 @@ public class MemberService {
      * DTO(MemberSaveForm)를 사용하여 정보를 전달받고 Builder를 통해 Entity 화
      */
     public Long join(MemberSaveForm memberSaveForm) {
+
+        //비밀번호 암호화
+        memberSaveForm.setPassword(passwordEncoder.encode(memberSaveForm.getPassword()));
+
         Member member = Member.builder()
                 .loginId(memberSaveForm.getLoginId())
                 .password(memberSaveForm.getPassword())

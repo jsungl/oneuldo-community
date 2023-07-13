@@ -22,6 +22,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
+	//spring-security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
 	//Bean Validation 사용
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
