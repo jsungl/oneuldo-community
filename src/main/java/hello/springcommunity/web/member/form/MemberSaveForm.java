@@ -1,6 +1,7 @@
 package hello.springcommunity.web.member.form;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
@@ -14,6 +15,7 @@ import static hello.springcommunity.domain.validation.ValidationGroups.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class MemberSaveForm {
 
     @NotBlank(groups = NotBlankGroup.class) //groups 속성으로 해당 검증에 해당하는 인터페이스를 설정
