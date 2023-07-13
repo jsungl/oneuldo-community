@@ -1,5 +1,6 @@
 package hello.springcommunity.domain.member;
 
+import hello.springcommunity.web.member.form.MemberSaveForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,31 +19,23 @@ public class MemberService {
 
     /**
      * 회원가입
+     * 간단한 회원가입이기 때문에 크게 상관은 없지만 나중에 Entity에 중요 정보가 있다면 해당 내용은 외부에 노출되지 않게끔
+     * DTO(MemberSaveForm)를 사용하여 정보를 전달받고 Builder를 통해 Entity 화
      */
-    public Long join(Member member) {
-        validateDuplicateLoginId(member); //중복 아이디 검증
-        Member savedMember = memberRepository.save(member);
-        return savedMember.getId();
-    }
+    public Long join(MemberSaveForm memberSaveForm) {
+        Member member = Member.builder()
+                .loginId(memberSaveForm.getLoginId())
+                .password(memberSaveForm.getPassword())
+                .name(memberSaveForm.getName())
+                .build();
 
-    /**
-     * 아이디 중복 검증
-     */
-    private void validateDuplicateLoginId(Member member) {
-        Optional<Member> findMember = memberRepository.findByLoginId(member.getLoginId());
-        if(!findMember.isEmpty()) {
-            throw new IllegalStateException("이미 존재하는 아이디입니다.");
-        }
-
-//        memberRepository.findByLoginId(member.getLoginId()).ifPresent(m -> {
-//            throw new IllegalStateException("이미 존재하는 아이디입니다");
-//        });
+        return memberRepository.save(member).getId();
     }
 
     /**
      * 전체 회원 조회
      */
-    public List<Member> findMembers() {
+    public List<Member> findAll() {
         return memberRepository.findAll();
     }
 
@@ -50,11 +43,6 @@ public class MemberService {
      * 회원 1명 조회
      */
     public Optional<Member> findOne(Long id) {
-        return memberRepository.findOne(id);
+        return memberRepository.findById(id);
     }
-
-
-
-
-
 }

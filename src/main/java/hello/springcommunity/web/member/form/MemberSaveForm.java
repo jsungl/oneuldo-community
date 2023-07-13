@@ -9,7 +9,7 @@ import javax.validation.constraints.Pattern;
 import static hello.springcommunity.domain.validation.ValidationGroups.*;
 
 /**
- * 회원가입 폼 등록용 객체
+ * 회원가입 폼 등록용 객체(DTO)
  */
 
 @Getter

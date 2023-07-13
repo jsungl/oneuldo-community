@@ -1,71 +1,19 @@
 package hello.springcommunity.domain.member;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * 회원 리포지토리
- * JPA 사용
+ * 중복 체크는 Bean validation (validation 어노테이션)으로 해결할 수 없기 때문에 따로 로직을 만들어주어야 한다
+ * 별도의 Validator 사용 - 검증 로직 별도 분리
  */
 
-@Slf4j
-@Repository
-//@Transactional
-public class MemberRepository {
+public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    private final EntityManager em;
-
-    //생성자를 통해 EntityManager 의존성 주입
-    public MemberRepository(EntityManager em) {
-        this.em = em;
-    }
-    
-
-    public Member save(Member member) {
-        em.persist(member);
-        return member;
-    }
-    
-
-    public Optional<Member> findOne(Long id) {
-        Member member = em.find(Member.class, id);
-        return Optional.ofNullable(member);
-    }
-
-//    public Optional<Member> findByLoginId(String loginId) {
-//        return findAll().stream()
-//                .filter(m -> m.getLoginId().equals(loginId))
-//                .findFirst();
-//    }
-
-    public Optional<Member> findByLoginId(String loginId) {
-//        TypedQuery<Member> query = em.createQuery("select m from Member m where m.loginId = :loginId", Member.class);
-//        query.setParameter("loginId", loginId);
-//        Member foundMember = query.getSingleResult();
-//
-//        log.info("foundMember={}", foundMember);
-//
-//        return Optional.ofNullable(foundMember);
-
-        List<Member> members = em.createQuery("select m from Member m where m.loginId = :loginId", Member.class)
-                .setParameter("loginId", loginId)
-                .getResultList();
-
-        return members.stream().findAny();
-    }
-
-
-    public List<Member> findAll() {
-        return em.createQuery("select m from Member m", Member.class).getResultList();
-    }
-    
+    /**
+     * 유효성 검사 - 중복체크
+     * 중복이면 true
+     * 중복이 아니면 false
+     */
+    boolean existsByLoginId(String loginId);
+    boolean existsByName(String name);
 }
