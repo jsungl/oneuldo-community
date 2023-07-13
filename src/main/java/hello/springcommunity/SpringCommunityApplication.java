@@ -1,11 +1,8 @@
 package hello.springcommunity;
 
-import hello.springcommunity.domain.item.ItemRepository;
-import hello.springcommunity.domain.member.MemberRepository;
+import hello.springcommunity.domain.member.MemberRepositoryOld;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
@@ -18,8 +15,8 @@ public class SpringCommunityApplication {
 
 //	@Bean
 //	@Profile("local")
-	public TestDataInit testDataInit(MemberRepository memberRepository, ItemRepository itemRepository) {
-		return new TestDataInit(memberRepository, itemRepository);
+	public TestDataInit testDataInit(MemberRepositoryOld memberRepositoryOld) {
+		return new TestDataInit(memberRepositoryOld);
 	}
 
 }

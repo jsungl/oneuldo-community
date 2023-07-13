@@ -1,6 +1,5 @@
 package hello.springcommunity.domain.member;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,10 +10,10 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class MemberServiceTest {
+class MemberServiceOldTest {
 
     @Autowired
-    MemberService memberService;
+    MemberServiceOld memberServiceOld;
 
     @Test
     void 회원가입() {
@@ -23,10 +22,10 @@ class MemberServiceTest {
         Member member = Member.builder().loginId("userA").name("AAA").password("123123a!").build();
 
         //when
-        Long joinId = memberService.join(member);
+        Long joinId = memberServiceOld.join(member);
 
         //then
-        assertThat(member).isEqualTo(memberService.findOne(joinId).orElseThrow());
+        assertThat(member).isEqualTo(memberServiceOld.findOne(joinId).orElseThrow());
 
     }
 
@@ -38,10 +37,10 @@ class MemberServiceTest {
         Member memberB = Member.builder().loginId("userA").name("BBB").password("123123a!").build();
 
         //when
-        memberService.join(memberA);
+        memberServiceOld.join(memberA);
 
         //then
-        assertThatThrownBy(() -> memberService.join(memberB)).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> memberServiceOld.join(memberB)).isInstanceOf(IllegalStateException.class);
 
     }
 

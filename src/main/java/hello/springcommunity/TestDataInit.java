@@ -1,16 +1,11 @@
 package hello.springcommunity;
 
-import hello.springcommunity.domain.item.Item;
 import hello.springcommunity.domain.item.ItemRepository;
-import hello.springcommunity.domain.member.Member;
-import hello.springcommunity.domain.member.MemberRepository;
+import hello.springcommunity.domain.member.MemberRepositoryOld;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 
 /**
  * 테스트용 초기 데이터 추가
@@ -19,8 +14,7 @@ import javax.annotation.PostConstruct;
 @RequiredArgsConstructor
 public class TestDataInit {
 
-    private final MemberRepository memberRepository;
-    private final ItemRepository itemRepository;
+    private final MemberRepositoryOld memberRepositoryOld;
 
     /**
      * 스프링 컨테이너가 완전히 초기화를 다 끝내고, 실행준비가 되었을 때 발생하는 이벤트
@@ -35,8 +29,6 @@ public class TestDataInit {
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
         log.info("test data init~!");
-//        itemRepository.save(new Item("itemA", 10000, 10));
-//        itemRepository.save(new Item("itemB", 20000, 20));
 //
 //        Member member = Member.builder().loginId("test").password("test123!").name("테스터").build();
 //        memberRepository.save(member);

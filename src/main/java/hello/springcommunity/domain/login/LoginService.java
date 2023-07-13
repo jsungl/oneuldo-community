@@ -1,7 +1,7 @@
 package hello.springcommunity.domain.login;
 
 import hello.springcommunity.domain.member.Member;
-import hello.springcommunity.domain.member.MemberRepository;
+import hello.springcommunity.domain.member.MemberRepositoryOld;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,14 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LoginService {
 
-    private final MemberRepository memberRepository;
+    private final MemberRepositoryOld memberRepositoryOld;
 
     /**
      * 로그인
      * 로그인에 실패하면 null 반환
      */
     public Member login(String loginId, String password) {
-        return memberRepository.findByLoginId(loginId)
+        return memberRepositoryOld.findByLoginId(loginId)
                 .filter(m -> m.getPassword().equals(password))
                 .orElse(null);
     }

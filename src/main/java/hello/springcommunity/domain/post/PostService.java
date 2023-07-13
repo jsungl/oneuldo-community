@@ -2,19 +2,15 @@ package hello.springcommunity.domain.post;
 
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.member.MemberRepository;
+import hello.springcommunity.domain.member.MemberRepositoryOld;
 import hello.springcommunity.web.post.form.PostUpdateForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -31,13 +27,12 @@ public class PostService {
      * 게시물 등록
      */
     public Post save(String title, String content, Long memberId) {
-        Member member = memberRepository.findOne(memberId).orElseThrow();
+//        Member member = memberRepositoryOld.findOne(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow();
         Post post = Post.createPost(title, content, member);
         return postRepository.save(post);
     }
-//    public Post save(Post post) {
-//        return postRepository.save(post);
-//    }
+
 
     /**
      * 게시물 수정
@@ -69,7 +64,7 @@ public class PostService {
     /**
      * 게시물 전체 조회
      */
-//    public List<Post> findPosts() {
+//    public List<Post> findAll() {
 //        return postRepository.findAll();
 //    }
 
