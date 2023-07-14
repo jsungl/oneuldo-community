@@ -85,7 +85,7 @@ public class MemberController {
         memberService.join(memberSaveForm);
         log.info("signup success");
 
-        return "redirect:/";
+        return "redirect:/login";
     }
 
 

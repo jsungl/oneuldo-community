@@ -2,6 +2,8 @@ package hello.springcommunity.domain.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 /**
  * 중복 체크는 Bean validation (validation 어노테이션)으로 해결할 수 없기 때문에 따로 로직을 만들어주어야 한다
  * 별도의 Validator 사용 - 검증 로직 별도 분리
@@ -16,4 +18,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      */
     boolean existsByLoginId(String loginId);
     boolean existsByName(String name);
+
+    Optional<Member> findByLoginId(String loginId);
+    //Optional<Member>
+
 }

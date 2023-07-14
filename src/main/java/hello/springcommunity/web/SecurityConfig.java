@@ -24,9 +24,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().disable() //cors 방지
-            .csrf().disable() //csrf 방지
+            .csrf().disable() //csrf 방지(post 요청마다 token이 필요한 과정을 생략하겠다는 의미)
             .formLogin().disable() //기본 로그인 페이지 없애기
-            .headers().frameOptions().disable(); //XFrameOptionsHeaderWriter 의 최적화 설정을 허용하지 않음(스프링 시큐리티는 기본적으로 X-Frame-Options Click jacking 공격 막기 설정이 되어 있음)
+            .headers().frameOptions().disable(); //xframe 방어 해제
+
+        /* Spring Security 의 로그아웃 기능 */
+        http.logout()
+            .logoutUrl("/logout") //csrf 기능을 비활성화 할 경우에는 GET 방식도 LogoutFilter 가 처리 -> 직접 url에 /logout 을 쳐도 로그아웃 처리 됨
+            .logoutSuccessUrl("/?logout=true")
+            .invalidateHttpSession(true)
+            .deleteCookies("JSESSIONID");
 
         return http.build();
     }

@@ -1,5 +1,6 @@
 package hello.springcommunity.web.login;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +12,8 @@ import javax.validation.constraints.NotBlank;
  */
 
 @Getter
-@Setter
+//@Setter
+@AllArgsConstructor
 public class LoginForm {
 
     @NotBlank

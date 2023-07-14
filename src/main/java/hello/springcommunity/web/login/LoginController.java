@@ -31,13 +31,18 @@ public class LoginController {
 
     private final LoginService loginService;
 
+    /**
+     * 로그인
+     */
+
     @GetMapping("/login")
     public String loginForm(@ModelAttribute("loginForm") LoginForm form) {
         return "login/loginForm";
     }
 
     @PostMapping("/login")
-    public String login(@Validated @ModelAttribute("loginForm") LoginForm form, BindingResult bindingResult,
+    public String login(@Validated @ModelAttribute("loginForm") LoginForm form,
+                        BindingResult bindingResult,
                         HttpServletRequest request,
                         @RequestParam(defaultValue = "/") String redirectURL) {
 
@@ -46,7 +51,7 @@ public class LoginController {
             return "login/loginForm";
         }
 
-        Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
+        Member loginMember = loginService.login(form);
         log.info("loginMember={}", loginMember);
 
         //로그인 실패시 글로벌 오류 생성
@@ -63,25 +68,29 @@ public class LoginController {
         //세션에 로그인 회원 정보 보관
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
 
+        log.info("redirectURL={}", redirectURL);
         //로그인에 성공하면 처음 요청한 URL로 이동
         return "redirect:" + redirectURL;
     }
 
-    @PostMapping("/logout")
+    /**
+     * 기존 로그아웃 요청 처리
+     * 세션에 있던 회원 데이터가 삭제되지만, 브라우저에서는 세션이 삭제되지는 않는다
+     */
+//    @PostMapping("/logout")
     public String logout(HttpServletRequest request) {
 
+        log.info("로그아웃 요청");
+
         HttpSession session = request.getSession(false);
+        log.info("session={}", session);
+
         //세션을 삭제
         if (session != null) {
+            log.info("세션삭제");
             session.invalidate();
         }
         return "redirect:/";
     }
 
-    //로그아웃시 해당 쿠키의 종료 날짜를 0으로 지정
-    private void expireCookie(HttpServletResponse response, String cookieName) {
-        Cookie cookie = new Cookie(cookieName, null);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-    }
 }
