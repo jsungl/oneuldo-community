@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <link th:href="@{/css/bootstrap.min.css}"
+        href="../css/bootstrap.min.css" rel="stylesheet">
+  <title>Error page</title>
+</head>
+<body>
+<div class="container">
+  <div class="text-center my-3">
+    <img src="https://http.cat/500" alt="500">
+  </div>
+  <div class="py-5 text-center">
+    <button class="btn btn-outline-secondary btn-large"
+            th:onclick="|location.href='@{/}'|" type="button">
+      홈으로
+    </button>
+  </div>
+</div> <!-- /container -->
+</body>
+</html>
