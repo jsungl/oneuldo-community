@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Controller
@@ -46,7 +47,7 @@ public class PostController {
     public String posts(Model model, @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 5) Pageable pageable) {
 
         Page<Post> posts = postService.findAll(pageable);
-        log.info("totalPages={}", posts.getTotalPages());
+//        log.info("totalPages={}", posts.getTotalPages());
         model.addAttribute("posts", posts);
 
         return "posts/posts";
@@ -116,7 +117,7 @@ public class PostController {
     //Query Param(Query String) : localhost:8080/posts/detail?postId=1
     @GetMapping("/detail")
     public String post(@RequestParam Long postId, Model model) {
-        Post post = postService.findOne(postId).orElseThrow();
+        Post post = postService.findOne(postId).orElseThrow(() -> new NoSuchElementException("post is not exist"));
         model.addAttribute("post", post);
         return "posts/post";
     }
@@ -159,7 +160,7 @@ public class PostController {
     @GetMapping("/{postId}/edit")
     public String editForm(@PathVariable Long postId, Model model) {
 //        Post post = postService.findById(postId).get();
-        Post post = postService.findOne(postId).orElseThrow();
+        Post post = postService.findOne(postId).orElseThrow(() -> new NoSuchElementException("post is not exist"));
 
         PostUpdateForm postUpdateForm = new PostUpdateForm();
         postUpdateForm.setTitle(post.getTitle());
