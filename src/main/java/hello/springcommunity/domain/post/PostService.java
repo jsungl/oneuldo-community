@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -28,7 +29,7 @@ public class PostService {
      */
     public Post save(String title, String content, Long memberId) {
 //        Member member = memberRepositoryOld.findOne(memberId).orElseThrow();
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("member is not exist"));
         Post post = Post.createPost(title, content, member);
         return postRepository.save(post);
     }
@@ -38,7 +39,7 @@ public class PostService {
      * 게시물 수정
      */
     public void update(Long postId, PostUpdateForm postUpdateForm) {
-        Post findPost = findOne(postId).orElseThrow();
+        Post findPost = findOne(postId).orElseThrow(() -> new NoSuchElementException("Post is not exist"));
         findPost.updatePost(postUpdateForm.getTitle(), postUpdateForm.getContent());
     }
 //    public void update(Long postId, PostUpdateDto updateParam) {
