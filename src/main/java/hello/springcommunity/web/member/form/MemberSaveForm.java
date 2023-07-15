@@ -11,6 +11,9 @@ import static hello.springcommunity.domain.validation.ValidationGroups.*;
 
 /**
  * 회원가입 폼 등록용 객체(DTO)
+ *
+ * 외부로부터 전달받기 위한 DTO 로, 나중에 사용자에게 값을 return 해줘야 하는 상황에서
+ * Entity 를 전부 전달하지 않고, DTO 를 통해 정보를 걸러낸 뒤 return 하는 방식을 사용한다
  */
 
 @Getter
