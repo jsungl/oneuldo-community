@@ -38,4 +38,15 @@ public class Member {
         this.name = name;
         this.password = password;
     }
+
+    /**
+     * repository를 제외한 다른 영역에서 Entity를 수정할 수 있게 만들고 싶지 않아서
+     */
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
 }
