@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <link th:href="@{/css/bootstrap.min.css}"
+        href="css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container" style="max-width: 600px">
+  <div class="py-5 text-center">
+    <h2>마이페이지</h2>
+  </div>
+
+  <p class="row">
+  <p class="col">
+    <button class="w-100 btn btn-lg btn-primary" type="button"
+            th:onclick="|location.href='@{/members/{memberId}/detail(memberId=${memberId})}'|">
+      회원 정보
+    </button>
+  </p>
+  </p>
+
+  <div class="row">
+    <div class="col">
+      <button class="w-100 btn btn-danger btn-lg" type="button"
+              th:onclick="|location.href='@{/members/withdrawal}'|">
+        회원 탈퇴
+      </button>
+    </div>
+    <div class="col">
+      <button class="w-100 btn btn-secondary btn-lg"
+              th:onclick="|location.href='@{/}'|" type="button">
+        홈으로
+      </button>
+    </div>
+  </div>
+  <hr class="my-4">
+</div> <!-- /container -->
+</body>
+</html>
