@@ -25,7 +25,7 @@ public class CheckIdValidator implements Validator {
      */
     @Override
     public boolean supports(Class<?> clazz) {
-        //return true;
+//        return true;
         return MemberSaveForm.class.isAssignableFrom(clazz);
     }
 
@@ -33,9 +33,13 @@ public class CheckIdValidator implements Validator {
     public void validate(Object target, Errors errors) {
 
         MemberSaveForm memberSaveForm = (MemberSaveForm) target;
+//        MemberSaveRequestDTO memberDTO = (MemberSaveRequestDTO) target;
 
         if(memberRepository.existsByLoginId(memberSaveForm.getLoginId())) {
             errors.rejectValue("loginId", "아이디 중복 오류", "이미 사용중인 아이디입니다.");
         }
+//        if(memberRepository.existsByLoginId(memberDTO.getLoginId())) {
+//            errors.rejectValue("loginId", "아이디 중복 오류", "이미 사용중인 아이디입니다.");
+//        }
     }
 }

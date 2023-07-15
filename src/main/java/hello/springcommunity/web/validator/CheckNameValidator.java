@@ -25,7 +25,7 @@ public class CheckNameValidator implements Validator {
      */
     @Override
     public boolean supports(Class<?> clazz) {
-        //return true;
+//        return true;
         return MemberSaveForm.class.isAssignableFrom(clazz);
     }
 
@@ -33,9 +33,13 @@ public class CheckNameValidator implements Validator {
     public void validate(Object target, Errors errors) {
 
         MemberSaveForm memberSaveForm = (MemberSaveForm) target;
+//        MemberSaveRequestDTO memberDTO = (MemberSaveRequestDTO) target;
 
         if(memberRepository.existsByName(memberSaveForm.getName())) {
             errors.rejectValue("name", "닉네임 중복 오류", "이미 사용중인 닉네임입니다.");
         }
+//        if(memberRepository.existsByName(memberDTO.getName())) {
+//            errors.rejectValue("name", "닉네임 중복 오류", "이미 사용중인 닉네임입니다.");
+//        }
     }
 }
