@@ -23,7 +23,7 @@
   <div class="row">
     <div class="col">
       <button class="w-100 btn btn-danger btn-lg" type="button"
-              th:onclick="|location.href='@{/members/withdrawal}'|">
+              th:onclick="|location.href='@{/members/{memberId}/withdrawal(memberId=${memberId})}'|">
         회원 탈퇴
       </button>
     </div>
