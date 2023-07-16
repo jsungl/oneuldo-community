@@ -55,16 +55,6 @@ public class MemberService {
     public Optional<Member> findOne(Long memberId) {
         return memberRepository.findById(memberId);
     }
-//    public MemberResponseDTO findMember(String loginId) {
-//        Member member = memberRepository.findByLoginId(loginId).orElseThrow(() -> new UsernameNotFoundException("아이디가 존재하지 않습니다"));
-//
-//        MemberResponseDTO result = MemberResponseDTO.builder()
-//                .member(member)
-//                .build();
-//
-//        return result;
-//
-//    }
 
     public MemberResponseDTO findMember(Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new UsernameNotFoundException("아이디가 존재하지 않습니다"));
@@ -77,6 +67,9 @@ public class MemberService {
 
     }
 
+    /**
+     * 회원 닉네임 수정
+     */
     public Long updateMemberName(MemberNameUpdateForm memberNameUpdateForm) {
         Member member = memberRepository.findByLoginId(memberNameUpdateForm.getLoginId()).orElseThrow(() -> new UsernameNotFoundException("아이디가 존재하지 않습니다"));
 
@@ -86,6 +79,9 @@ public class MemberService {
         return member.getId();
     }
 
+    /**
+     * 회원 비밀번호 수정
+     */
     public Long updateMemberPassword(MemberPwdUpdateForm memberPwdUpdateForm, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new UsernameNotFoundException("아이디가 존재하지 않습니다"));
 
@@ -100,5 +96,20 @@ public class MemberService {
         }
 
         return member.getId();
+    }
+
+    /**
+     * 회원 탈퇴
+     */
+    public boolean withdrawal(Long memberId, String currentPassword) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new UsernameNotFoundException("아이디가 존재하지 않습니다"));
+
+        //입력한 기존 비밀번호가 맞는지 확인
+        if(passwordEncoder.matches(currentPassword, member.getPassword())) {
+            memberRepository.delete(member);
+            return true;
+        }else {
+            return false;
+        }
     }
 }

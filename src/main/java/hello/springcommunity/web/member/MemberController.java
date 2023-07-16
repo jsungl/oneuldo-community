@@ -12,6 +12,7 @@ import hello.springcommunity.web.validator.CheckIdValidator;
 import hello.springcommunity.web.validator.CheckNameValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,8 +33,6 @@ import java.util.Objects;
 @RequestMapping("/members")
 public class MemberController {
 
-    private final MemberRepositoryOld memberRepositoryOld;
-//    private final MemberService memberService;
     private final MemberService memberService;
     private final CheckIdValidator checkIdValidator;
     private final CheckNameValidator checkNameValidator;
@@ -43,7 +42,10 @@ public class MemberController {
      * WebDataBinder binder : HTTP 요청 정보를 컨트롤러 메소드의 파라미터나 모델에 바인딩할 때 사용되는 바인딩 객체. 스프링의 파라미터 바인딩의 역할을 해주고 검증 기능도 내부에 포함한다
      * WebDataBinder 에 검증기를 추가하면 해당 컨트롤러(MemberController) 에서는 검증기를 자동으로 적용할 수 있다
      * 해당 컨트롤러에만 영향을 주고 글로벌 설정은 별도로 해야한다
-     * @param dataBinder
+     *
+     * 여러 모델 객체를 사용할 때 @InitBinder 에 이름을 넣어주면 해당 모델 객체에만 영향을 준다
+     * 반면 이름을 넣지않으면 모든 모델 객체에 영향을 준다
+     * 지금은 MemberSaveForm 객체에만 검증기 작동
      */
     @InitBinder("memberSaveForm")
     public void init(WebDataBinder dataBinder) {
@@ -72,25 +74,15 @@ public class MemberController {
             }
             /* Model에 담아 view resolve */
             for(String key : errorMap.keySet()) {
-                log.info("key={}, errors={}", key, errorMap.get(key));
+//                log.info("key={}, errors={}", key, errorMap.get(key));
                 model.addAttribute(key, errorMap.get(key));
             }
             /* 회원가입 페이지로 리턴 */
             return "members/addMemberForm";
         }
 
-        //성공로직
-//        Member member = Member.builder()
-//                .loginId(memberSaveForm.getLoginId())
-//                .password(memberSaveForm.getPassword())
-//                .name(memberSaveForm.getName())
-//                .build();
-
-//        memberService.join(member);
-
-
         memberService.join(memberSaveForm);
-        log.info("signup success");
+        log.info("회원가입 성공");
 
         return "redirect:/login";
     }
@@ -101,9 +93,8 @@ public class MemberController {
      */
     @GetMapping("/{memberId}/info")
     public String info(@PathVariable Long memberId, Model model) {
-        log.info("memberId={}", memberId);
         model.addAttribute("memberId", memberId);
-        return "members/myPage";
+        return "members/info";
     }
 
 
@@ -114,15 +105,14 @@ public class MemberController {
     public String memberDetail(@PathVariable Long memberId, Model model) {
         MemberResponseDTO member = memberService.findMember(memberId);
         model.addAttribute("member", member);
-        return "members/memberDetail";
+        return "members/detail";
     }
 
     /**
      * 회원 닉네임 수정
      */
     @GetMapping("/{memberId}/updateName")
-    public String updateUserNameForm(@PathVariable Long memberId, Model model) {
-        log.info("memberId={}", memberId);
+    public String updateUsernameForm(@PathVariable Long memberId, Model model) {
 
         Member member = memberService.findOne(memberId).orElseThrow(() -> new UsernameNotFoundException("아이디가 존재하지 않습니다"));
         MemberNameUpdateForm memberNameUpdateForm = new MemberNameUpdateForm(member.getLoginId(), member.getName());
@@ -149,7 +139,7 @@ public class MemberController {
             }
             /* Model에 담아 view resolve */
             for(String key : errorMap.keySet()) {
-                log.info("key={}, errors={}", key, errorMap.get(key));
+//                log.info("key={}, errors={}", key, errorMap.get(key));
                 model.addAttribute(key, errorMap.get(key));
             }
             /* 닉네임 수정 페이지로 리턴 */
@@ -157,9 +147,9 @@ public class MemberController {
         }
 
         Long id = memberService.updateMemberName(memberNameUpdateForm);
-        log.info("updateMemberId={}", id);
         redirectAttributes.addAttribute("memberId", id);
 
+        log.info("닉네임 수정 완료");
         return "redirect:/members/{memberId}/detail";
     }
 
@@ -169,7 +159,6 @@ public class MemberController {
      */
     @GetMapping("/{memberId}/updatePassword")
     public String updatePasswordForm(@PathVariable Long memberId, @ModelAttribute MemberPwdUpdateForm memberPwdUpdateForm, Model model) {
-        log.info("memberId={}", memberId);
         model.addAttribute("memberId", memberId);
         return "members/editMemberPwdForm";
     }
@@ -198,7 +187,7 @@ public class MemberController {
             }
 
             for(String key : errorMap.keySet()) {
-                log.info("key={}, errors={}", key, errorMap.get(key));
+//                log.info("key={}, errors={}", key, errorMap.get(key));
                 model.addAttribute(key, errorMap.get(key));
             }
 
@@ -210,14 +199,40 @@ public class MemberController {
         //기존 비밀번호가 틀린경우
         if(result == null) {
             model.addAttribute("valid_currentPassword", "비밀번호가 틀렸습니다.");
-            return "/members/editMemberPwdForm";
+            return "members/editMemberPwdForm";
         }
 
+        log.info("비밀번호 수정 완료");
         return "redirect:/members/{memberId}/detail";
 
     }
 
+    /**
+     * 회원 탈퇴
+     */
+    @GetMapping("/{memberId}/withdrawal")
+    public String memberWithdrawal(@PathVariable Long memberId, Model model) {
+        model.addAttribute("memberId", memberId);
+        return "members/withdrawal";
+    }
 
+    /**
+     * 비밀번호 하나만 입력받기 때문에 따로 DTO 를 통해 받지 않고, @RequestParam 을 통해 받는다
+     * 회원탈퇴에 성공하면 로그아웃 시킨다
+     */
+    @PostMapping("/{memberId}/withdrawal")
+    public String withdrawal(@PathVariable Long memberId, @RequestParam String currentPassword, Model model) {
+        boolean result = memberService.withdrawal(memberId, currentPassword);
 
+        if(result) {
+            //탈퇴 성공
+            log.info("회원 탈퇴 완료");
+            return "redirect:/logout";
+        }else {
+            model.addAttribute("memberId", memberId);
+            model.addAttribute("valid_currentPassword", "비밀번호가 틀렸습니다.");
+            return "members/withdrawal";
+        }
+    }
 
 }
