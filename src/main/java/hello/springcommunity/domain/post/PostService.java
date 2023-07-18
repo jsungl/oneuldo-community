@@ -2,8 +2,7 @@ package hello.springcommunity.domain.post;
 
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.member.MemberRepository;
-import hello.springcommunity.domain.member.MemberRepositoryOld;
-import hello.springcommunity.web.post.form.PostUpdateForm;
+import hello.springcommunity.web.post.form.PostSaveForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -27,10 +25,10 @@ public class PostService {
     /**
      * 게시물 등록
      */
-    public Post save(String title, String content, Long memberId) {
+    public Post save(PostSaveForm postSaveForm, Long memberId) {
 //        Member member = memberRepositoryOld.findOne(memberId).orElseThrow();
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("member is not exist"));
-        Post post = Post.createPost(title, content, member);
+        Post post = Post.savePost(postSaveForm, member);
         return postRepository.save(post);
     }
 
@@ -38,9 +36,12 @@ public class PostService {
     /**
      * 게시물 수정
      */
-    public void update(Long postId, PostUpdateForm postUpdateForm) {
-        Post findPost = findOne(postId).orElseThrow(() -> new NoSuchElementException("Post is not exist"));
-        findPost.updatePost(postUpdateForm.getTitle(), postUpdateForm.getContent());
+    public Long update(Long id, PostSaveForm postSaveForm) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+        post.updatePost(postSaveForm.getTitle(), postSaveForm.getContent());
+        postRepository.save(post);
+
+        return post.getId();
     }
 //    public void update(Long postId, PostUpdateDto updateParam) {
 //        Post findPost = findById(postId).orElseThrow();
@@ -51,15 +52,29 @@ public class PostService {
     /**
      * 게시물 삭제
      */
-    public void deleteById(Long id) {
-        postRepository.deleteById(id);
+    public void delete(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+        postRepository.delete(post);
     }
 
     /**
      * 게시물 1개 조회
      */
-    public Optional<Post> findOne(Long id) {
-        return postRepository.findById(id);
+//    public Optional<Post> findOne(Long id) {
+//        return postRepository.findById(id);
+//    }
+    public PostResponseDTO findOne(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+
+        /**
+         * 파라미터로 전달받은 id 로 게시물을 찾은 뒤 Entity로 바로 넘겨주지 않고 DTO에서 한번 감싼후
+         * DTO 값을 넘겨준다
+         */
+        PostResponseDTO result = PostResponseDTO.builder()
+                .post(post)
+                .build();
+
+        return result;
     }
 
     /**

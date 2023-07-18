@@ -44,7 +44,7 @@
     </div>
     <div>
         <label for="author">작성자</label>
-        <input type="text" id="author" name="author" class="form-control" value="작성자" th:value="${post.member.loginId}" readonly>
+        <input type="text" id="author" name="author" class="form-control" value="작성자" th:value="${post.loginId}" readonly>
     </div>
     <div>
         <label for="regDate">작성일</label>
@@ -54,17 +54,25 @@
 
     <hr class="my-4">
 
-    <form th:action="@{/posts/{postId}/delete(postId=${post.id})}" method="post">
+<!--    <span th:text="${session.loginMember}"></span>-->
 
-        <button class="btn btn-primary"
-                onclick="location.href='editForm.html'"
-                th:onclick="|location.href='@{/posts/{postId}/edit(postId=${post.id})}'|"
-                type="button">수정</button>
+    <th:block th:if="${session.loginMember} != null and ${post.loginId == session.loginMember.loginId}">
+
+        <form th:action="@{/posts/{postId}/delete(postId=${post.id})}" method="post" onsubmit="return confirm('게시물을 삭제하시겠습니까?')">
+
+            <button class="btn btn-primary"
+                    onclick="location.href='editForm.html'"
+                    th:onclick="|location.href='@{/posts/{postId}/edit(postId=${post.id})}'|"
+                    type="button">수정</button>
 
 
-        <button class="btn btn-danger"
-                type="submit">삭제</button>
-    </form>
+            <button class="btn btn-danger"
+                    type="submit">삭제</button>
+        </form>
+
+    </th:block>
+
+
 
 
 

@@ -22,7 +22,7 @@
         <h2>게시물 수정</h2>
     </div>
 
-    <form action="post.html" th:action th:object="${postUpdateForm}" method="post">
+    <form action="post.html" th:action th:object="${postForm}" method="post">
         <div>
             <label for="title">제목</label>
             <input type="text" id="title" name="title" class="form-control" th:field="*{title}" th:errorclass="field-error">

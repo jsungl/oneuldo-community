@@ -2,13 +2,14 @@ package hello.springcommunity.web.post.form;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
- * 게시물 등록용 폼 객체
+ * 게시물 등록용 폼 객체(DTO)
  * 실무에서는 회원 등록시 회원과 관련된 데이터만 전달받는것이 아니라, 추가로 많은 부가 데이터가 넘어온다
  * 그래서 보통 Post 을 직접 전달받는것이 아니라, 복잡한 폼의 데이터를 컨트롤러까지 전달할 별도의 객체를 만들어서 전달한다
  * 여기서는 PostSaveForm 이라는 폼을 전달받는 전용 객체를 만들어서 @ModelAttribute 로 사용한다
@@ -17,6 +18,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class PostSaveForm {
 
     @NotBlank(message = "제목을 입력해주세요")
