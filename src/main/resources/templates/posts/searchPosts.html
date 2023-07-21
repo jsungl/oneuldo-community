@@ -63,7 +63,7 @@
             <td>
               <a th:href="@{/posts/detail(postId=${post.id})}" th:text="${post.title}">제목</a>
             </td>
-            <td th:text="${post.member.loginId}">작성자</td>
+            <td th:text="${post.loginId}">작성자</td>
             <td th:text="${post.regDate}">작성일</td>
           </tr>
         </tbody>

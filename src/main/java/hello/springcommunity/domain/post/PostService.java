@@ -6,10 +6,13 @@ import hello.springcommunity.web.post.form.PostSaveForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Slf4j
@@ -87,29 +90,69 @@ public class PostService {
     /**
      * 게시물 전체 조회 - 페이징
      */
-    public Page<Post> findAll(Pageable pageable) {
-        return postRepository.findAll(pageable);
+//    public Page<Post> findAll(Pageable pageable) {
+//        return postRepository.findAll(pageable);
+//    }
+    public Page<PostResponseDTO> findAll(Pageable pageable) {
+        Page<Post> posts = postRepository.findAll(pageable);
+        List<PostResponseDTO> list = new ArrayList<>();
+
+        for (Post post : posts) {
+            PostResponseDTO result = PostResponseDTO.builder()
+                                                    .post(post)
+                                                    .build();
+            list.add(result);
+        }
+
+        return new PageImpl<>(list, pageable, posts.getTotalElements());
     }
 
     /**
      * 게시물 검색 - 페이징
      */
-    public Page<Post> findPostsBySearch(String searchType, String keyword, Pageable pageable) {
+//    public Page<Post> findPostBySearch(String searchType, String keyword, Pageable pageable) {
+//        switch (searchType) {
+//            case "title":
+//                return postQueryRepository.findAll(new PostSearchCond(keyword, null, null), pageable);
+//            case "content" :
+//                return postQueryRepository.findAll(new PostSearchCond(null, keyword, null), pageable);
+//            case "loginId" :
+//                return postQueryRepository.findAll(new PostSearchCond(null, null, keyword), pageable);
+//            default:
+//                return postQueryRepository.findAll(new PostSearchCond(null, null, null), pageable);
+//
+//        }
+//    }
+
+    public Page<PostResponseDTO> findPostBySearch(String searchType, String keyword, Pageable pageable) {
         switch (searchType) {
             case "title":
-                return postQueryRepository.findAll(new PostSearchCond(keyword, null, null), pageable);
+                return getPostResponseDto(postQueryRepository.findAll(new PostSearchCond(keyword, null, null), pageable), pageable);
             case "content" :
-                return postQueryRepository.findAll(new PostSearchCond(null, keyword, null), pageable);
+                return getPostResponseDto(postQueryRepository.findAll(new PostSearchCond(null, keyword, null), pageable), pageable);
             case "loginId" :
-                return postQueryRepository.findAll(new PostSearchCond(null, null, keyword), pageable);
+                return getPostResponseDto(postQueryRepository.findAll(new PostSearchCond(null, null, keyword), pageable), pageable);
             default:
-                return postQueryRepository.findAll(new PostSearchCond(null, null, null), pageable);
+                return getPostResponseDto(postQueryRepository.findAll(new PostSearchCond(null, null, null), pageable), pageable);
 
         }
     }
 
+    private Page<PostResponseDTO> getPostResponseDto(Page<Post> posts, Pageable pageable) {
+        List<PostResponseDTO> list = new ArrayList<>();
+
+        for(Post post : posts) {
+            PostResponseDTO result = PostResponseDTO.builder()
+                                                    .post(post)
+                                                    .build();
+            list.add(result);
+        }
+
+        return new PageImpl<>(list, pageable, posts.getTotalElements());
+    }
+
     /**
-     * 게시물 검색
+     * 게시물 검색(페이징 x)
      */
 //    public Page<Post> findPostBySearch(String searchType, String keyword, Pageable pageable) {
 //        switch (searchType) {
