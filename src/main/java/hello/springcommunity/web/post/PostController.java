@@ -1,5 +1,7 @@
 package hello.springcommunity.web.post;
 
+import hello.springcommunity.domain.comment.CommentResponseDTO;
+import hello.springcommunity.domain.comment.CommentService;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.post.Post;
 import hello.springcommunity.domain.post.PostResponseDTO;
@@ -19,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -28,6 +31,7 @@ import java.util.Objects;
 public class PostController {
 
     private final PostService postService;
+    private final CommentService commentService;
 
     /**
      * 게시물 목록
@@ -44,7 +48,9 @@ public class PostController {
     @GetMapping
     public String posts(Model model, @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 5) Pageable pageable) {
 
-        Page<Post> posts = postService.findAll(pageable);
+//        Page<Post> posts = postService.findAll(pageable);
+        Page<PostResponseDTO> posts = postService.findAll(pageable);
+
         model.addAttribute("posts", posts);
 
         return "posts/posts";
@@ -86,8 +92,9 @@ public class PostController {
         log.info("searchType={}", searchType);
 
         if(!searchType.isBlank()) {
-            Page<Post> list = postService.findPostsBySearch(searchType, keyword, pageable);
-            log.info("search result totalPages={}", list.getTotalPages());
+            //Page<Post> list = postService.findPostBySearch(searchType, keyword, pageable);
+            Page<PostResponseDTO> list = postService.findPostBySearch(searchType, keyword, pageable);
+
             model.addAttribute("posts", list);
             model.addAttribute("searchType", searchType);
             model.addAttribute("keyword", keyword);
@@ -110,7 +117,12 @@ public class PostController {
     public String post(@RequestParam Long postId, Model model) {
 
         PostResponseDTO post = postService.findOne(postId);
+        //해당 게시물의 댓글조회
+        List<CommentResponseDTO> commentList = commentService.getCommentList(postId);
+
         model.addAttribute("post", post);
+        model.addAttribute("postId", postId);
+        model.addAttribute("comments", commentList);
         return "posts/post";
 
     }
