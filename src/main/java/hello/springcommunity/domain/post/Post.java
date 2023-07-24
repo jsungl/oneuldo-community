@@ -1,5 +1,6 @@
 package hello.springcommunity.domain.post;
 
+import hello.springcommunity.domain.comment.Comment;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.web.post.form.PostSaveForm;
 import lombok.*;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * PostDTO
@@ -37,6 +39,10 @@ public class Post {
     @CreatedDate
     private LocalDate regDate;
 
+//    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+//    @OrderBy("id asc")
+//    private List<Comment> comments;
+
     @Builder
     public Post(Long id, String title, String content, Member member) {
         this.id = id;
@@ -46,6 +52,7 @@ public class Post {
     }
     
     //생성 메서드
+    //게시물 등록
     public static Post savePost(PostSaveForm postSaveForm, Member member) {
         return Post.builder()
                 .title(postSaveForm.getTitle())
@@ -55,6 +62,7 @@ public class Post {
     }
     
     //비즈니스 메서드
+    //게시물 수정
     public void updatePost(String title, String content) {
         this.title = title;
         this.content = content;

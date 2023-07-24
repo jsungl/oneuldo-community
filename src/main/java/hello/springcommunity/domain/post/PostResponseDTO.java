@@ -1,10 +1,19 @@
 package hello.springcommunity.domain.post;
 
+import hello.springcommunity.domain.comment.CommentResponseDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * 게시물 정보를 리턴한 응답 클래스
+ * Entity 클래스를 생성자 파라미터로 받아서 데이터를 DTO로 변환하여 응답
+ * 별도의 전달 객체를 활용해 연관관계를 맺은 엔티티간의 무한참조를 방지
+ */
 
 @Getter
 @NoArgsConstructor
@@ -17,6 +26,7 @@ public class PostResponseDTO {
     private String loginId;
     private String name;
 
+    // Entity -> DTO
     @Builder
     public PostResponseDTO(Post post) {
         this.id = post.getId();
