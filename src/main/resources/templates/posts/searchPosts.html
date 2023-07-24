@@ -1,11 +1,11 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
 <head>
-  <meta charset="utf-8">
-  <link th:href="@{/css/bootstrap.min.css}"
-        href="../css/bootstrap.min.css" rel="stylesheet">
+  <title>게시물 목록</title>
 </head>
-<body>
+<th:block layout:fragment="content">
 
 <div class="container" style="max-width: 600px">
   <div class="col-md-12">
@@ -130,5 +130,5 @@
   </div>
 </div> <!-- /container -->
 
-</body>
+</th:block>
 </html>

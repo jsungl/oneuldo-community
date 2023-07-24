@@ -11,8 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST 방식을 이용해 댓글 처리
+ *
+ */
+
 @Slf4j
-@RestController
+@RestController //REST 방식 처리를 위한 에노테이션(@ResponseBody를 포함). 기본 리턴타입으로 JSON을 사용한다
 //@Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/post")
@@ -43,6 +48,7 @@ public class CommentController {
     public ResponseEntity<Long> updateComment(@PathVariable Long commentId, @PathVariable Long postId, @RequestBody CommentRequestDTO commentRequestDTO) {
         commentService.updateComment(commentRequestDTO, commentId);
         return ResponseEntity.ok(commentId);
+        //return new ResponseEntity<>(commentId, HttpStatus.OK);
     }
 
 
