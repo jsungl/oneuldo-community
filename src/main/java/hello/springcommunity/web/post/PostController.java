@@ -21,6 +21,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Objects;
 
@@ -114,11 +116,14 @@ public class PostController {
     //Path Variable : localhost:8080/posts/1 -> @PathVariable
     //Query Param(Query String) : localhost:8080/posts/detail?postId=1 -> @RequestParam
     @GetMapping("/detail")
-    public String post(@RequestParam Long postId, Model model) {
+    public String post(@RequestParam Long postId, Model model, HttpServletRequest request, HttpServletResponse response) {
 
         PostResponseDTO post = postService.findOne(postId);
         //해당 게시물의 댓글조회
         List<CommentResponseDTO> commentList = commentService.getCommentList(postId);
+
+        //조회수 증가
+        postService.updateViews(postId, request, response);
 
         model.addAttribute("post", post);
         model.addAttribute("postId", postId);

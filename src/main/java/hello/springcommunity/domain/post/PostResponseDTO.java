@@ -23,6 +23,7 @@ public class PostResponseDTO {
     private String title;
     private String content;
     private LocalDate regDate;
+    private int viewCount;
     private String loginId;
     private String name;
 
@@ -33,6 +34,7 @@ public class PostResponseDTO {
         this.title = post.getTitle();
         this.content = post.getContent();
         this.regDate = post.getRegDate();
+        this.viewCount = post.getViewCount();
         this.loginId = post.getMember().getLoginId();
         this.name = post.getMember().getName();
     }

@@ -18,7 +18,9 @@ import java.util.List;
  */
 
 @Entity
+@Builder
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class Post {
@@ -39,33 +41,35 @@ public class Post {
     @CreatedDate
     private LocalDate regDate;
 
+    //@Column(columnDefinition = "integer default 0", nullable = false)
+    @Column(name = "view_count")
+    private int viewCount;
+
 //    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
 //    @OrderBy("id asc")
 //    private List<Comment> comments;
 
-    @Builder
-    public Post(Long id, String title, String content, Member member) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.member = member;
-    }
     
     //생성 메서드
     //게시물 등록
-    public static Post savePost(PostSaveForm postSaveForm, Member member) {
-        return Post.builder()
-                .title(postSaveForm.getTitle())
-                .content(postSaveForm.getContent())
-                .member(member)
-                .build();
-    }
+//    public static Post savePost(PostSaveForm postSaveForm, Member member) {
+//        return Post.builder()
+//                .title(postSaveForm.getTitle())
+//                .content(postSaveForm.getContent())
+//                .member(member)
+//                .build();
+//    }
     
     //비즈니스 메서드
     //게시물 수정
     public void updatePost(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    //조회수 증가
+    public void updateViewCount() {
+        this.viewCount++;
     }
 
 
