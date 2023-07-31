@@ -1,24 +1,21 @@
 package hello.springcommunity.domain.comment;
 
-import hello.springcommunity.domain.member.Member;
-import hello.springcommunity.domain.post.Post;
 import lombok.*;
-
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 
 /**
  * 댓글 폼 요청 전용 객체 DTO
  */
 
-//@Getter
-//@Setter
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommentRequestDTO {
 
+    private Long parentId;
     private String content;
+    private int depth;
+
+    public CommentRequestDTO(String content) {
+        this.content = content;
+    }
 
 }

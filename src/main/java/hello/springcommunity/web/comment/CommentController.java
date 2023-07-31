@@ -1,5 +1,6 @@
 package hello.springcommunity.web.comment;
 
+import hello.springcommunity.domain.comment.Comment;
 import hello.springcommunity.domain.comment.CommentRequestDTO;
 import hello.springcommunity.domain.comment.CommentService;
 import hello.springcommunity.domain.member.Member;
@@ -29,15 +30,17 @@ public class CommentController {
      * 댓글 등록
      */
     @PostMapping("/{postId}/comment/add")
-    public String addComment(@PathVariable Long postId,
-                             @RequestBody CommentRequestDTO commentRequestDTO,
-                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember) {
-//        log.info("postId={}", postId);
-//        log.info("content={}", commentRequestDTO.getContent());
-        commentService.addComment(commentRequestDTO, postId, loginMember.getId());
+    public ResponseEntity<String> addComment(@PathVariable Long postId,
+                      @RequestBody CommentRequestDTO commentRequestDTO,
+                      @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember) {
+
+        Comment comment = commentService.add(commentRequestDTO, postId, loginMember.getId());
 
 
-        return "ok"; //dataType 이 JSON이 아니여야 한다
+        //dataType 이 JSON이 아니여야 한다
+        //return "ok";
+
+        return ResponseEntity.ok("ok");
     }
 
 
@@ -46,9 +49,8 @@ public class CommentController {
      */
     @PutMapping("/{postId}/comment/{commentId}/edit")
     public ResponseEntity<Long> updateComment(@PathVariable Long commentId, @PathVariable Long postId, @RequestBody CommentRequestDTO commentRequestDTO) {
-        commentService.updateComment(commentRequestDTO, commentId);
+        commentService.update(commentRequestDTO, commentId);
         return ResponseEntity.ok(commentId);
-        //return new ResponseEntity<>(commentId, HttpStatus.OK);
     }
 
 
@@ -57,32 +59,8 @@ public class CommentController {
      */
     @DeleteMapping("/{postId}/comment/{commentId}/delete")
     public ResponseEntity<Long> deleteComment(@PathVariable Long postId, @PathVariable Long commentId) {
-//        log.info("postId={}", postId);
-//        log.info("commentId={}", commentId);
-        commentService.deleteComment(commentId);
-
+        commentService.delete(commentId);
         return ResponseEntity.ok(commentId);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

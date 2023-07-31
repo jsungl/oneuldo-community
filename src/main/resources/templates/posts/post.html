@@ -22,10 +22,6 @@
             th:onclick="|location.href='@{/posts}'|"
             type="button">목록으로</button>
 
-<!--    <div>-->
-<!--        <label for="postId">게시물 번호</label>-->
-<!--        <input type="text" id="postId" name="postId" class="form-control" value="1" th:value="${post.id}" readonly>-->
-<!--    </div>-->
     <div>
         <label for="title">제목</label>
         <input type="text" id="title" name="title" class="form-control" value="제목" th:value="${post.title}" readonly>
@@ -51,8 +47,7 @@
 
     <hr class="my-4">
 
-<!--    <span th:text="${session.loginMember}"></span>-->
-
+    <!-- 게시물 수정 삭제 버튼 -->
     <th:block th:if="${session.loginMember} != null and ${post.loginId == session.loginMember.loginId}">
 
         <form th:action="@{/posts/{postId}/delete(postId=${post.id})}" method="post" onsubmit="return confirm('게시물을 삭제하시겠습니까?')">
@@ -61,67 +56,113 @@
                     onclick="location.href='editForm.html'"
                     th:onclick="|location.href='@{/posts/{postId}/edit(postId=${post.id})}'|"
                     type="button">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                </svg>
+                <i class="bi bi-pencil-square"></i>
                 수정
             </button>
 
 
             <button class="btn btn-danger"
                     type="submit">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
-                    <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
-                </svg>
+                <i class="bi bi-trash"></i>
                 삭제
             </button>
         </form>
 
     </th:block>
 
-    <div class="my-5"></div>
-
     <!-- Comment list -->
-    <div class="card my-4" th:if="${comments.size()} != 0">
-        <h6 class="card-header">댓글 [[${comments.size}]]</h6>
-        <ul class="list-group list-group-flush" >
-            <li class="list-group-item" th:each="comment:${comments}">
-                <span>
-                    <span th:text="${comment.name}">nickname</span>
-                    <small class="text-muted" th:text="${comment.regDate}">registerDate</small>
-                    <th:block th:if="${session.loginMember} != null and ${comment.loginId == session.loginMember.loginId}">
-<!--                        <button class="btn btn-primary btn-sm" id="btnCommentUpdate" onclick="editComment()">수정</button>-->
-<!--                        <button class="btn btn-danger btn-sm">삭제</button>-->
-<!--                        <a href="javascript:editComment();" class="text-decoration-none">-->
-<!--                            수정-->
-<!--                        </a>-->
-                        <a href="javascript:;" class="text-decoration-none" th:onclick="editComment([[${comment.id}]]);">
-                            수정
-                        </a>
-                        <a href="javascript:;" class="text-decoration-none text-danger" th:onclick="deleteComment([[${comment.id}]], [[${postId}]]);">
-                            삭제
-                        </a>
-                    </th:block>
-                </span>
-                <input type="hidden" th:id="commentId" th:value="${comment.id}">
+    <div class="comment-list" th:if="${comments.size()} != 0">
+        <h6 class="card-header">댓글 [[${totalCount}]]</h6>
+        <ul class="list-group list-group-flush">
 
-                <div class="content-wrapper my-3" th:id="'commentContent' + ${comment.id}">[[${comment.content}]]</div>
+            <th:block th:each="comment:${comments}">
+                <!-- 템플릿 조각이 들어갈 곳 -->
+                <div th:replace=":: comments(${comment})"></div>
+            </th:block>
 
-                <!-- 댓글 수정 폼 -->
-                <form class="collapse multi-collapse my-3" th:id="'commentUpdateForm' + ${comment.id}" style="display:none;">
-                    <input type="hidden" name="commentId" th:value="${comment.id}">
-                    <input type="hidden" name="postId" th:value="${postId}">
-                    <div class="form-group mb-3">
-                        <textarea class="form-control" rows="3" id="commentUpdateContent" name="commentContent" th:text="${comment.content}"></textarea>
+            <!-- 템플릿 조각 -->
+            <th:block th:if="${false}">
+                <li class="list-group-item" th:fragment="comments(comment)"
+                    th:classappend="${comment.parent != null} ? 're' : ''"
+                    th:id="'comment_' + ${comment.id}"
+                    th:style="|margin-left: ${comment.depth * 2}%|">
+                    <div>
+                        <i class="bi bi-arrow-return-right" th:if="${comment.parent} != null"></i>
+                        <span th:text="${comment.member.name}">nickname</span>
+                        <small class="text-muted" th:text="${comment.regDate}">registerDate</small>
+                        <th:block th:if="${session.loginMember} != null">
+                            <!-- 자기 댓글 수정/삭제 -->
+                            <th:block th:if="${comment.member.loginId == session.loginMember.loginId} and ${comment.isDeleted} == false">
+                                <a href="javascript:;" class="text-decoration-none" th:onclick="editComment([[${comment.id}]]);">
+                                수정
+                                </a>
+                                <a href="javascript:;" class="text-decoration-none text-danger" th:onclick="deleteComment([[${comment.id}]], [[${postId}]]);">
+                                    삭제
+                                </a>
+                            </th:block>
+
+                            <!-- 다른사람 댓글 답글달기 -->
+                            <th:block th:unless="${comment.member.loginId == session.loginMember.loginId}">
+                                <a href="javascript:;" class="text-decoration-none text-secondary" th:onclick="replyComment([[${comment.id}]]);">
+                                    답글
+                                    <i class="bi bi-chat-dots"></i>
+                                </a>
+                            </th:block>
+                        </th:block>
                     </div>
-                    <button type="button" id="btnCommentUpdateSave" class="btn btn-outline-primary" onclick="editCommentSave(this.form)">저장</button>
-                </form>
 
-            </li>
+                    <input type="hidden" th:id="commentId" th:value="${comment.id}">
+
+                    <div class="content-wrapper my-3" th:id="'commentContent' + ${comment.id}">[[${comment.content}]]</div>
+
+                    <!-- 댓글 수정 폼 -->
+                    <form class="collapse multi-collapse my-3" th:id="'commentUpdateForm' + ${comment.id}" style="display:none;">
+                        <input type="hidden" name="commentId" th:value="${comment.id}">
+                        <input type="hidden" name="postId" th:value="${postId}">
+                        <div class="form-group mb-3">
+                            <textarea class="form-control" rows="3" id="commentUpdateContent" name="commentContent" th:text="${comment.content}"></textarea>
+                        </div>
+                        <button type="button" id="btnCommentUpdateSave" class="btn btn-outline-primary" onclick="editCommentSave(this.form)">저장</button>
+                    </form>
+
+                    <!-- 답글 폼 -->
+                    <div class="reComment wrapper my-3" th:id="'replyCommentForm' + ${comment.id}" style="display:none;">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item" style="margin-left:2%;">
+                                <span>
+                                    <i class="bi bi-arrow-return-right"></i>
+                                    <span>답글달기</span>
+                                </span>
+                                <form>
+                                    <input type="hidden" name="parentId" th:value="${comment.id}">
+                                    <input type="hidden" name="postId" th:value="${postId}">
+                                    <input type="hidden" name="depth" th:value="${comment.depth}">
+                                    <div class="form-group mb-3">
+                                        <textarea class="form-control" rows="3" id="replyCommentContent" name="commentContent"></textarea>
+                                    </div>
+                                    <button type="button" id="btnReplyCommentSave" class="btn btn-outline-primary" onclick="replyCommentSave(this.form)">등록</button>
+                                    <button type="button" class="btn btn-outline-secondary" th:onclick="replyComment([[${comment.id}]]);">
+                                        닫기
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 자식 댓글이 있는지 확인 -->
+                    <th:block th:unless="${#lists.isEmpty(comment.children)}" th:each="child:${comment.children}">
+                        <div th:replace=":: comments(${child})" />
+                    </th:block>
+                </li>
+            </th:block>
+
+            <div class="paging my-4"></div>
+
         </ul>
     </div>
+
+    <!-- 댓글을 처음 등록하는 경우, 비동기 통신으로 가져온 갱신된 댓글 리스트를 보여주기 위해 -->
+<!--    <div class="comment-list my-5" th:unless="${comments.size()} != 0"></div>-->
 
     <!-- Comment Form -->
     <div class="card my-4">
@@ -136,7 +177,8 @@
             <form th:id="commentSaveForm" th:onsubmit="return addComment(this, event)">
                 <div class="form-group mb-3">
                     <input type="hidden" name="postId" th:value="${postId}">
-                    <textarea name="content" class="form-control" rows="3" placeholder="댓글을 입력하세요"></textarea>
+                    <input type="hidden" name="contextPath" th:value="${#httpServletRequest.getContextPath()}">
+                    <textarea name="content" class="form-control" id="commentTextarea" rows="3" placeholder="댓글을 입력하세요"></textarea>
                 </div>
                 <button type="submit" class="btn btn-outline-primary">등록</button>
             </form>

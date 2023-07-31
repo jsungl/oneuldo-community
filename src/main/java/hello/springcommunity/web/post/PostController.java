@@ -36,7 +36,7 @@ public class PostController {
     private final CommentService commentService;
 
     /**
-     * 게시물 목록
+     * 게시물 목록 - 페이징
      */
 //    @GetMapping
 //    public String posts(Model model) {
@@ -47,6 +47,7 @@ public class PostController {
 
     //게시물 목록 페이징
     //@PageableDefault 어노테이션을 이용하여 정렬 순서, 사이즈 등의 정보를 넣고 해당객체를 서비스에 파라미터로 전달
+
     @GetMapping
     public String posts(Model model, @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 5) Pageable pageable) {
 
@@ -121,6 +122,13 @@ public class PostController {
         PostResponseDTO post = postService.findOne(postId);
         //해당 게시물의 댓글조회
         List<CommentResponseDTO> commentList = commentService.getCommentList(postId);
+        for (CommentResponseDTO commentResponseDTO : commentList) {
+            log.info("comment id={}", commentResponseDTO.getId());
+        }
+
+
+        //해당 게시물 댓글 총 갯수(대댓글 포함)
+        Long totalCount = commentService.getCommentTotalCount(postId);
 
         //조회수 증가
         postService.updateViews(postId, request, response);
@@ -128,6 +136,8 @@ public class PostController {
         model.addAttribute("post", post);
         model.addAttribute("postId", postId);
         model.addAttribute("comments", commentList);
+        model.addAttribute("totalCount", totalCount);
+
         return "posts/post";
 
     }
@@ -141,6 +151,9 @@ public class PostController {
         return "posts/addForm";
     }
 
+    /**
+     * 게시물 등록
+     */
     @PostMapping("/add")
     public String addPost(@Validated @ModelAttribute("postForm") PostSaveForm postForm,
                           BindingResult bindingResult,
@@ -185,6 +198,9 @@ public class PostController {
         return "posts/editForm";
     }
 
+    /**
+     * 게시물 수정
+     */
     @PostMapping("/{postId}/edit")
     public String edit(@PathVariable Long postId,
                        @ModelAttribute("postForm") PostSaveForm postSaveForm,
@@ -205,7 +221,7 @@ public class PostController {
 
 
     /**
-     * 게시물 삭제 폼
+     * 게시물 삭제
      */
     @PostMapping("/{postId}/delete")
     public String delete(@PathVariable Long postId,
