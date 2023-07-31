@@ -173,7 +173,7 @@ public class PostService {
     public void updateViews(Long postId, HttpServletRequest request, HttpServletResponse response) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않은 게시물입니다. id= " + postId));
         viewCountValidation(post, request, response);
-
+//        return PostResponseDTO.builder().post(post).build();
     }
 
     private void viewCountValidation(Post post, HttpServletRequest request, HttpServletResponse response) {
@@ -205,14 +205,21 @@ public class PostService {
                             response.addCookie(newCookie);
                         }
 
-                        isCookie = true;
-                        break;
-
 
                     } else {
-                        //1개만 조회한 경우 or 아예 조회한것이 없는 경우
-                        break;
+                        //1개만 조회한 경우 + 다른 게시물인 경우
+                        if(!oldCookie.getValue().matches(post.getId().toString())) {
+                            post.updateViewCount();
+                            oldCookie.setValue(oldCookie.getValue() + "." + post.getId());
+                            Cookie newCookie = createCookieForNotOverlap(oldCookie);
+                            response.addCookie(newCookie);
+                        }
+
                     }
+
+                    isCookie = true;
+                    break;
+
                 }
 
             }
@@ -220,21 +227,12 @@ public class PostService {
 
         if(!isCookie) {
 
-            //1개만 조회한 경우
-            if(oldCookie != null && !oldCookie.getValue().matches(post.getId().toString())) {
-                // 해당 게시글 조회수를 증가시키고, 쿠키 값에 해당 게시글 번호를 추가
-                post.updateViewCount();
-                oldCookie.setValue(oldCookie.getValue() + "." + post.getId());
-                Cookie newCookie = createCookieForNotOverlap(oldCookie);
-                response.addCookie(newCookie);
-            }else {
-                //쿠키가 없으면 처음 접속한 것이므로 새로 생성
-                post.updateViewCount();
-                Cookie cookie = new Cookie(CookieConst.VIEW_COOKIE_NAME, post.getId().toString());
+            //쿠키가 없으면 처음 접속한 것이므로 새로 생성
+            post.updateViewCount();
+            Cookie cookie = new Cookie(CookieConst.VIEW_COOKIE_NAME, post.getId().toString());
 
-                Cookie newCookie = createCookieForNotOverlap(cookie);
-                response.addCookie(newCookie);
-            }
+            Cookie newCookie = createCookieForNotOverlap(cookie);
+            response.addCookie(newCookie);
 
         }
 
