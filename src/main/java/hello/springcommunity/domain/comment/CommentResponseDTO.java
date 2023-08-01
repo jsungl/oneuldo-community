@@ -1,10 +1,7 @@
 package hello.springcommunity.domain.comment;
 
 import hello.springcommunity.domain.member.Member;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -43,4 +40,15 @@ public class CommentResponseDTO {
         return comment.getIsDeleted() ? new CommentResponseDTO(comment.getId(), "삭제된 댓글입니다", comment.getMember(), comment.getRegDate(), comment.getParent(), comment.getDepth(), comment.getIsDeleted())
                 : new CommentResponseDTO(comment.getId(), comment.getContent(), comment.getMember(), comment.getRegDate(), comment.getParent(), comment.getDepth(), comment.getIsDeleted());
     }
+
+//    @Builder
+//    public CommentResponseDTO(Comment comment) {
+//        this.id = comment.getId();
+//        this.regDate = comment.getRegDate();
+//        this.content = comment.getContent();
+//        this.depth = comment.getDepth();
+//        this.isDeleted = comment.getIsDeleted();
+//        this.member = comment.getMember();
+//        this.parent = comment.getParent();
+//    }
 }

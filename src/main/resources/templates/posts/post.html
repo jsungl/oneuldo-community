@@ -52,7 +52,7 @@
 
         <form th:action="@{/posts/{postId}/delete(postId=${post.id})}" method="post" onsubmit="return confirm('게시물을 삭제하시겠습니까?')">
 
-            <button class="btn btn-primary"
+            <button class="btn btn-primary mb-5"
                     onclick="location.href='editForm.html'"
                     th:onclick="|location.href='@{/posts/{postId}/edit(postId=${post.id})}'|"
                     type="button">
@@ -61,7 +61,7 @@
             </button>
 
 
-            <button class="btn btn-danger"
+            <button class="btn btn-danger mb-5"
                     type="submit">
                 <i class="bi bi-trash"></i>
                 삭제
@@ -71,98 +71,140 @@
     </th:block>
 
     <!-- Comment list -->
-    <div class="comment-list" th:if="${comments.size()} != 0">
-        <h6 class="card-header">댓글 [[${totalCount}]]</h6>
-        <ul class="list-group list-group-flush">
+    <div class="comment-list">
+        <th:block th:if="${totalCount} != 0">
+            <h6 class="card-header">댓글 [[${totalCount}]]</h6>
+            <ul class="list-group list-group-flush">
+                <th:block th:each="comment:${comments}">
+                    <!-- 템플릿 조각이 들어갈 곳 -->
+                    <div th:replace=":: comments(${comment})"></div>
+                </th:block>
 
-            <th:block th:each="comment:${comments}">
-                <!-- 템플릿 조각이 들어갈 곳 -->
-                <div th:replace=":: comments(${comment})"></div>
-            </th:block>
+                <!-- 템플릿 조각 -->
+                <th:block th:if="${false}">
+                    <li class="list-group-item" th:fragment="comments(comment)"
+                        th:classappend="${comment.parent != null} ? 're' : ''"
+                        th:id="'comment_' + ${comment.id}"
+                        th:style="|margin-left: ${comment.depth * 2}%|">
+                        <div>
+                            <i class="bi bi-arrow-return-right" th:if="${comment.parent} != null"></i>
+                            <span th:text="${comment.member.name}">nickname</span>
+                            <small class="text-muted" th:text="${comment.regDate}">registerDate</small>
+                            <th:block th:if="${session.loginMember} != null">
+                                <!-- 자기 댓글 수정/삭제 -->
+                                <th:block th:if="${comment.member.loginId == session.loginMember.loginId} and ${comment.isDeleted} == false">
+                                    <a href="javascript:;" class="text-decoration-none" th:onclick="editComment([[${comment.id}]]);">
+                                        수정
+                                    </a>
+                                    <a href="javascript:;" class="text-decoration-none text-danger" th:onclick="deleteComment([[${comment.id}]], [[${postId}]]);">
+                                        삭제
+                                    </a>
+                                </th:block>
 
-            <!-- 템플릿 조각 -->
-            <th:block th:if="${false}">
-                <li class="list-group-item" th:fragment="comments(comment)"
-                    th:classappend="${comment.parent != null} ? 're' : ''"
-                    th:id="'comment_' + ${comment.id}"
-                    th:style="|margin-left: ${comment.depth * 2}%|">
-                    <div>
-                        <i class="bi bi-arrow-return-right" th:if="${comment.parent} != null"></i>
-                        <span th:text="${comment.member.name}">nickname</span>
-                        <small class="text-muted" th:text="${comment.regDate}">registerDate</small>
-                        <th:block th:if="${session.loginMember} != null">
-                            <!-- 자기 댓글 수정/삭제 -->
-                            <th:block th:if="${comment.member.loginId == session.loginMember.loginId} and ${comment.isDeleted} == false">
-                                <a href="javascript:;" class="text-decoration-none" th:onclick="editComment([[${comment.id}]]);">
-                                수정
-                                </a>
-                                <a href="javascript:;" class="text-decoration-none text-danger" th:onclick="deleteComment([[${comment.id}]], [[${postId}]]);">
-                                    삭제
-                                </a>
+                                <!-- 다른사람 댓글 답글달기 -->
+                                <th:block th:unless="${comment.member.loginId == session.loginMember.loginId}">
+                                    <a href="javascript:;" class="text-decoration-none text-secondary" th:onclick="replyComment([[${comment.id}]]);">
+                                        답글
+                                        <i class="bi bi-chat-dots"></i>
+                                    </a>
+                                </th:block>
                             </th:block>
-
-                            <!-- 다른사람 댓글 답글달기 -->
-                            <th:block th:unless="${comment.member.loginId == session.loginMember.loginId}">
-                                <a href="javascript:;" class="text-decoration-none text-secondary" th:onclick="replyComment([[${comment.id}]]);">
-                                    답글
-                                    <i class="bi bi-chat-dots"></i>
-                                </a>
-                            </th:block>
-                        </th:block>
-                    </div>
-
-                    <input type="hidden" th:id="commentId" th:value="${comment.id}">
-
-                    <div class="content-wrapper my-3" th:id="'commentContent' + ${comment.id}">[[${comment.content}]]</div>
-
-                    <!-- 댓글 수정 폼 -->
-                    <form class="collapse multi-collapse my-3" th:id="'commentUpdateForm' + ${comment.id}" style="display:none;">
-                        <input type="hidden" name="commentId" th:value="${comment.id}">
-                        <input type="hidden" name="postId" th:value="${postId}">
-                        <div class="form-group mb-3">
-                            <textarea class="form-control" rows="3" id="commentUpdateContent" name="commentContent" th:text="${comment.content}"></textarea>
                         </div>
-                        <button type="button" id="btnCommentUpdateSave" class="btn btn-outline-primary" onclick="editCommentSave(this.form)">저장</button>
-                    </form>
 
-                    <!-- 답글 폼 -->
-                    <div class="reComment wrapper my-3" th:id="'replyCommentForm' + ${comment.id}" style="display:none;">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item" style="margin-left:2%;">
+                        <input type="hidden" th:id="commentId" th:value="${comment.id}">
+
+                        <div class="content-wrapper my-3" th:id="'commentContent' + ${comment.id}">[[${comment.content}]]</div>
+
+                        <!-- 댓글 수정 폼 -->
+                        <form class="collapse multi-collapse my-3" th:id="'commentUpdateForm' + ${comment.id}" style="display:none;">
+                            <input type="hidden" name="commentId" th:value="${comment.id}">
+                            <input type="hidden" name="postId" th:value="${postId}">
+                            <div class="form-group mb-3">
+                                <textarea class="form-control" rows="3" id="commentUpdateContent" name="commentContent" th:text="${comment.content}"></textarea>
+                            </div>
+                            <button type="button" id="btnCommentUpdateSave" class="btn btn-outline-primary" onclick="editCommentSave(this.form)">저장</button>
+                        </form>
+
+                        <!-- 답글 폼 -->
+                        <div class="reComment wrapper my-3" th:id="'replyCommentForm' + ${comment.id}" style="display:none;">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item" style="margin-left:2%;">
                                 <span>
                                     <i class="bi bi-arrow-return-right"></i>
                                     <span>답글달기</span>
                                 </span>
-                                <form>
-                                    <input type="hidden" name="parentId" th:value="${comment.id}">
-                                    <input type="hidden" name="postId" th:value="${postId}">
-                                    <input type="hidden" name="depth" th:value="${comment.depth}">
-                                    <div class="form-group mb-3">
-                                        <textarea class="form-control" rows="3" id="replyCommentContent" name="commentContent"></textarea>
-                                    </div>
-                                    <button type="button" id="btnReplyCommentSave" class="btn btn-outline-primary" onclick="replyCommentSave(this.form)">등록</button>
-                                    <button type="button" class="btn btn-outline-secondary" th:onclick="replyComment([[${comment.id}]]);">
-                                        닫기
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
+                                    <form>
+                                        <input type="hidden" name="parentId" th:value="${comment.id}">
+                                        <input type="hidden" name="postId" th:value="${postId}">
+                                        <input type="hidden" name="depth" th:value="${comment.depth}">
+                                        <div class="form-group mb-3">
+                                            <textarea class="form-control" rows="3" id="replyCommentContent" name="commentContent"></textarea>
+                                        </div>
+                                        <button type="button" id="btnReplyCommentSave" class="btn btn-outline-primary" onclick="replyCommentSave(this.form)">등록</button>
+                                        <button type="button" class="btn btn-outline-secondary" th:onclick="replyComment([[${comment.id}]]);">
+                                            닫기
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
 
-                    <!-- 자식 댓글이 있는지 확인 -->
-                    <th:block th:unless="${#lists.isEmpty(comment.children)}" th:each="child:${comment.children}">
-                        <div th:replace=":: comments(${child})" />
-                    </th:block>
-                </li>
-            </th:block>
+                        <!-- 자식 댓글이 있는지 확인 -->
+                        <th:block th:unless="${#lists.isEmpty(comment.children)}" th:each="child:${comment.children}">
+                            <div th:replace=":: comments(${child})" />
+                        </th:block>
+                    </li>
+                </th:block>
 
-            <div class="paging my-4"></div>
+                <!-- 페이징 -->
+                <div class="paging my-4">
+                    <ul class="pagination justify-content-center"
+                        th:with=
+                                "pageNumber = ${comments.pageable.pageNumber},
+                                pageSize = ${comments.pageable.pageSize},
+                                totalPages = ${comments.totalPages},
+                                startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+                                tempEndPage = ${startPage + pageSize - 1},
+                                endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})">
 
-        </ul>
+                        <!-- 이전으로 이동 -->
+                        <!-- 첫 페이지인 경우 비활성화, 첫 페이지가 아니라면 현재 페이지 인덱스(0부터 시작) - 1 -->
+                        <li th:classappend="${comments.first} ? 'disabled'" class="page-item">
+<!--                            <a class="page-link" th:href="${comments.first} ? '#' : @{/posts/detail(postId=${postId}, page=${pageNumber - 1})}" aria-label="Previous">-->
+<!--                                <span aria-hidden="true">&lt;</span>-->
+<!--                            </a>-->
+                            <a class="page-link" href="javascript:;" th:onclick="moveToPage([[${postId}]], [[${pageNumber - 1}]]);" aria-label="Previous">
+                                <span aria-hidden="true">&lt;</span>
+                            </a>
+                        </li>
+
+                        <!-- 페이지 리스트 루프(5페이지씩 분리)로 startPage 부터 endPage까지 반복 -->
+                        <!-- 페이지 번호 누르면 해당 페이지로 이동 -->
+                        <!-- page(페이지 번호) 와 현재 페이지 인덱스(0부터 시작) + 1 이 같으면 현재 보고있는 페이지이므로 활성화 -->
+                        <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
+<!--                            <a th:text="${page}" class="page-link" th:href="@{/posts/detail(postId=${postId}, page=${page - 1})}"></a>-->
+                            <a th:text="${page}" class="page-link" href="javascript:;" th:onclick="moveToPage([[${postId}]], [[${page - 1}]]);"></a>
+                        </li>
+
+                        <!-- 다음으로 이동 -->
+                        <li th:classappend="${comments.last} ? 'disabled'" class="page-item">
+<!--                            <a class="page-link" th:href="${comments.last} ? '#' : @{/posts/detail(postId=${postId}, page=${pageNumber + 1})}" aria-label="Next">-->
+<!--                                <span aria-hidden="true">&gt;</span>-->
+<!--                            </a>-->
+                            <a class="page-link" href="javascript:;" th:onclick="moveToPage([[${postId}]], [[${pageNumber + 1}]]);" aria-label="Next">
+                                <span aria-hidden="true">&gt;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+            </ul>
+        </th:block>
+
     </div>
 
-    <!-- 댓글을 처음 등록하는 경우, 비동기 통신으로 가져온 갱신된 댓글 리스트를 보여주기 위해 -->
-<!--    <div class="comment-list my-5" th:unless="${comments.size()} != 0"></div>-->
+<!--   댓글을 처음 등록하는 경우, 비동기 통신으로 가져온 갱신된 댓글 리스트를 보여주기 위해 -->
+<!--    <div class="comment-list" th:unless="${totalCount} != 0"></div>-->
 
     <!-- Comment Form -->
     <div class="card my-4">

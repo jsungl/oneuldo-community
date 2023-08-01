@@ -35,6 +35,10 @@ public class CommentController {
                       @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember) {
 
         Comment comment = commentService.add(commentRequestDTO, postId, loginMember.getId());
+        Long groupId = commentService.updateGroupId(comment, comment.getId());
+        log.info("groupId={}", groupId);
+
+
 
 
         //dataType 이 JSON이 아니여야 한다

@@ -56,12 +56,10 @@ public class Comment {
     @Builder.Default
     private int depth = 0;
 
-//    @Builder
-//    public Comment(String content, Post post, Member member) {
-//        this.content = content;
-//        this.post = post;
-//        this.member = member;
-//    }
+    private Long groupId;
+
+    @Builder.Default
+    private Integer step = 0;
 
     /**
      * 댓글 수정
@@ -82,6 +80,20 @@ public class Comment {
      */
     public void updateDepth(int depth) {
         this.depth = depth;
+    }
+
+    /**
+     * 그룹 내 순서 정하기
+     */
+    public void updateStep(Integer step) {
+        this.step = step;
+    }
+
+    /**
+     * 댓글 그룹 연결
+     */
+    public void updateGroupId(Long id) {
+        this.groupId = id;
     }
 
     /**

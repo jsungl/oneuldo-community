@@ -112,20 +112,27 @@ public class PostController {
 
 
     /**
-     * 게시물 상세
+     * 게시물 상세 + 댓글 조회
      */
     //Path Variable : localhost:8080/posts/1 -> @PathVariable
     //Query Param(Query String) : localhost:8080/posts/detail?postId=1 -> @RequestParam
     @GetMapping("/detail")
-    public String post(@RequestParam Long postId, Model model, HttpServletRequest request, HttpServletResponse response) {
+    public String post(@RequestParam Long postId,
+                       Model model,
+                       HttpServletRequest request, HttpServletResponse response,
+                       @PageableDefault(size = 5) Pageable pageable) {
 
+        //해당 게시물 내용 조회
         PostResponseDTO post = postService.findOne(postId);
-        //해당 게시물의 댓글조회
-        List<CommentResponseDTO> commentList = commentService.getCommentList(postId);
-        for (CommentResponseDTO commentResponseDTO : commentList) {
-            log.info("comment id={}", commentResponseDTO.getId());
-        }
 
+        //해당 게시물의 댓글조회
+//        List<CommentResponseDTO> commentList = commentService.getCommentList(postId);
+//        for (CommentResponseDTO commentResponseDTO : commentList) {
+//            log.info("comment id={}", commentResponseDTO.getId());
+//        }
+
+        //해당 게시물의 댓글조회 - 페이징
+        Page<CommentResponseDTO> commentList = commentService.getCommentListPaging(postId, pageable);
 
         //해당 게시물 댓글 총 갯수(대댓글 포함)
         Long totalCount = commentService.getCommentTotalCount(postId);

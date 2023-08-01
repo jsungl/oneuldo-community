@@ -168,3 +168,15 @@ function replyCommentSave(form) {
     });
 
 }
+
+//페이지 이동
+function moveToPage(postId, page) {
+
+    let origin = window.location.origin;
+    let pathname = window.location.pathname;
+    let contextPath = origin + pathname + "?postId=" + postId + "&page=" + page;
+
+    //가져온 댓글로 교체
+    $(".comment-list").load(contextPath + " .comment-list");
+
+}
