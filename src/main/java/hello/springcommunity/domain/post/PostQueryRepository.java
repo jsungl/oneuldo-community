@@ -39,12 +39,17 @@ public class PostQueryRepository {
 //                    .fetch();
 //    }
 
+    /**
+     * 전체 조회
+     * 파라미터로 넘어온 검색조건으로 사용하여 조회한다
+     * 만약 검색조건이 없다면 전체 조회한다
+     */
     public Page<Post> findAll(PostSearchCond cond, Pageable pageable) {
         List<Post> postList = query.select(post)
                 .from(post)
                 .where(likePostTitle(cond.getTitle()), likePostContent(cond.getContent()), likePostByLoginId(cond.getLoginId()))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset()) //시작지점(0부터 시작)
+                .limit(pageable.getPageSize()) //페이지 사이즈(한 페이지당 몇개의 로우를 가져올지)
                 .fetch();
 
         Long count = query.select(post.count())
