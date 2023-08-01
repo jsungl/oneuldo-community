@@ -29,6 +29,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @EntityGraph(attributePaths = {"member"})
     Optional<Post> findById(Long aLong);
 
+    @Override
+    @EntityGraph(attributePaths = {"member"})
+    Page<Post> findAll(Pageable pageable);
+
     //제목으로 검색
 //    Page<Post> findByTitleContaining(String keyword, Pageable pageable);
 
