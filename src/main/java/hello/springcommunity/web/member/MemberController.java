@@ -1,18 +1,16 @@
 package hello.springcommunity.web.member;
 
 import hello.springcommunity.domain.member.Member;
-import hello.springcommunity.domain.member.MemberService;
-import hello.springcommunity.domain.member.MemberRepositoryOld;
-import hello.springcommunity.domain.validation.ValidationSequence;
-import hello.springcommunity.web.member.form.MemberNameUpdateForm;
-import hello.springcommunity.web.member.form.MemberPwdUpdateForm;
-import hello.springcommunity.web.member.form.MemberResponseDTO;
-import hello.springcommunity.web.member.form.MemberSaveForm;
-import hello.springcommunity.web.validator.CheckIdValidator;
-import hello.springcommunity.web.validator.CheckNameValidator;
+import hello.springcommunity.service.member.MemberService;
+import hello.springcommunity.common.validation.ValidationSequence;
+import hello.springcommunity.dto.member.MemberNameUpdateForm;
+import hello.springcommunity.dto.member.MemberPwdUpdateForm;
+import hello.springcommunity.dto.member.MemberResponseDTO;
+import hello.springcommunity.dto.member.MemberSaveForm;
+import hello.springcommunity.common.validation.CheckIdValidator;
+import hello.springcommunity.common.validation.CheckNameValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

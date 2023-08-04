@@ -1,8 +1,9 @@
 package hello.springcommunity.web.login;
 
-import hello.springcommunity.domain.login.LoginService;
+import hello.springcommunity.dto.login.LoginForm;
+import hello.springcommunity.service.login.LoginService;
 import hello.springcommunity.domain.member.Member;
-import hello.springcommunity.web.SessionConst;
+import hello.springcommunity.common.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -13,9 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -75,9 +74,9 @@ public class LoginController {
 
     /**
      * 기존 로그아웃 요청 처리
-     * 세션에 있던 회원 데이터가 삭제되지만, 브라우저에서는 세션이 삭제되지는 않는다
+     * 세션에 있던 회원 데이터 초기화(무효화) -> 삭제하는것이 아니므로 브라우저에서는 세션 객체가 남아있다
      */
-//    @PostMapping("/logout")
+    //@PostMapping("/logout")
     public String logout(HttpServletRequest request) {
 
         log.info("로그아웃 요청");

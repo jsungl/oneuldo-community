@@ -1,13 +1,13 @@
 package hello.springcommunity.web.post;
 
-import hello.springcommunity.domain.comment.CommentResponseDTO;
-import hello.springcommunity.domain.comment.CommentService;
+import hello.springcommunity.dto.comment.CommentResponseDTO;
+import hello.springcommunity.service.comment.CommentService;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.post.Post;
-import hello.springcommunity.domain.post.PostResponseDTO;
-import hello.springcommunity.domain.post.PostService;
-import hello.springcommunity.web.SessionConst;
-import hello.springcommunity.web.post.form.PostSaveForm;
+import hello.springcommunity.dto.post.PostResponseDTO;
+import hello.springcommunity.service.post.PostService;
+import hello.springcommunity.common.SessionConst;
+import hello.springcommunity.dto.post.PostSaveForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,7 +23,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 import java.util.Objects;
 
 @Slf4j

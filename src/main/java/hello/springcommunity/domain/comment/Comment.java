@@ -2,7 +2,6 @@ package hello.springcommunity.domain.comment;
 
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.post.Post;
-import hello.springcommunity.domain.reply.Reply;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;

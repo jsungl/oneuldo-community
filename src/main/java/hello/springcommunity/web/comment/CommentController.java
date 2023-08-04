@@ -1,15 +1,13 @@
 package hello.springcommunity.web.comment;
 
 import hello.springcommunity.domain.comment.Comment;
-import hello.springcommunity.domain.comment.CommentRequestDTO;
-import hello.springcommunity.domain.comment.CommentService;
+import hello.springcommunity.dto.comment.CommentRequestDTO;
+import hello.springcommunity.service.comment.CommentService;
 import hello.springcommunity.domain.member.Member;
-import hello.springcommunity.web.SessionConst;
+import hello.springcommunity.common.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**

@@ -1,7 +1,6 @@
 package hello.springcommunity;
 
-import hello.springcommunity.domain.item.ItemRepository;
-import hello.springcommunity.domain.member.MemberRepositoryOld;
+import hello.springcommunity.dao.member.MemberRepositoryOld;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
