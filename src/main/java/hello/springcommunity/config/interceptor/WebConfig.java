@@ -1,4 +1,4 @@
-package hello.springcommunity.config;
+package hello.springcommunity.config.interceptor;
 
 import hello.springcommunity.common.interceptor.LoginCheckInterceptor;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * 홈, 회원가입, 로그인, 로그아웃, 게시물 목록, 게시물 상세조회, 리소스 조회, 오류 등은 인터셉터를 적용하지 않는다
  */
 
-@Configuration
+//@Configuration
 public class WebConfig implements WebMvcConfigurer {
 
     /**

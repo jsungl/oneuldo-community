@@ -12,7 +12,7 @@
         <h2>회원 가입</h2>
     </div>
     <h4 class="mb-3">회원 정보 입력</h4>
-    <form action="" th:action th:object="${memberSaveForm}" method="post">
+    <form action="" th:action th:object="${memberSaveRequestDTO}" method="post">
         <div th:if="${#fields.hasGlobalErrors()}">
             <p class="field-error" th:each="err : ${#fields.globalErrors()}"
                th:text="${err}">전체 오류 메시지</p>
@@ -33,11 +33,12 @@
             <div class="field-error" th:errors="*{password}" />
         </div>
         <div>
-            <label for="name">닉네임</label>
-            <input type="text" id="name" th:field="*{name}" class="form-control"
+            <label for="nickname">닉네임</label>
+            <input type="text" id="nickname" th:field="*{nickname}" class="form-control"
                    th:errorclass="field-error" placeholder="닉네임은 특수문자를 포함하지 않은 2~10자리여야 합니다">
-            <div class="field-error" th:errors="*{name}" />
+            <div class="field-error" th:errors="*{nickname}" />
         </div>
+
         <hr class="my-4">
         <div class="row">
             <div class="col">

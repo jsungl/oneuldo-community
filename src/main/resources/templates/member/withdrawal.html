@@ -29,8 +29,7 @@
             </div>
             <div class="col">
                 <button class="w-100 btn btn-secondary btn-lg"
-                        onclick="location.href='info.html'"
-                        th:onclick="|location.href='@{/members/{memberId}/info(memberId=${memberId})}'|"
+                        th:onclick="|location.href='@{/member/{loginId}/info(loginId=${loginId})}'|"
                         type="button">취소</button>
             </div>
         </div>

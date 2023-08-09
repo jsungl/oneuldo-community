@@ -6,7 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
   <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   <title>마이페이지</title>
 </head>
 <body>
@@ -18,7 +19,7 @@
   <p class="row">
   <p class="col">
     <button class="w-100 btn btn-lg btn-primary" type="button"
-            th:onclick="|location.href='@{/members/{memberId}/detail(memberId=${memberId})}'|">
+            th:onclick="|location.href='@{/member/{loginId}/detail(loginId=${loginId})}'|">
       회원 정보
     </button>
   </p>
@@ -27,7 +28,7 @@
   <div class="row">
     <div class="col">
       <button class="w-100 btn btn-danger btn-lg" type="button"
-              th:onclick="|location.href='@{/members/{memberId}/withdrawal(memberId=${memberId})}'|">
+              th:onclick="|location.href='@{/member/{loginId}/withdrawal(loginId=${loginId})}'|">
         회원 탈퇴
       </button>
     </div>
