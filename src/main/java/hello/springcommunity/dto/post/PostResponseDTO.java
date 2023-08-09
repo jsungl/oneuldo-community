@@ -1,6 +1,7 @@
 package hello.springcommunity.dto.post;
 
 import hello.springcommunity.domain.post.Post;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,7 @@ public class PostResponseDTO {
     private LocalDate regDate;
     private int viewCount;
     private String loginId;
-    private String name;
+    private String nickname;
 
     // Entity -> DTO
     @Builder
@@ -34,6 +35,6 @@ public class PostResponseDTO {
         this.regDate = post.getRegDate();
         this.viewCount = post.getViewCount();
         this.loginId = post.getMember().getLoginId();
-        this.name = post.getMember().getName();
+        this.nickname = post.getMember().getNickname();
     }
 }

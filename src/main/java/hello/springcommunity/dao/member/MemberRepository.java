@@ -18,7 +18,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      * 중복이 아니면 false
      */
     boolean existsByLoginId(String loginId);
-    boolean existsByName(String name);
+    boolean existsByNickname(String nickname);
 
     /**
      * 로그인 아이디로 회원 조회

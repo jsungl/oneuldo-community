@@ -6,14 +6,15 @@ import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.dao.member.MemberRepository;
 import hello.springcommunity.domain.post.Post;
 import hello.springcommunity.dto.post.PostResponseDTO;
-import hello.springcommunity.domain.post.PostSearchCond;
+import hello.springcommunity.dto.post.PostSearchCond;
 import hello.springcommunity.common.CookieConst;
-import hello.springcommunity.dto.post.PostSaveForm;
+import hello.springcommunity.dto.post.PostSaveRequestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,6 @@ import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -41,12 +41,14 @@ public class PostService {
     /**
      * 게시물 등록
      */
-    public Post save(PostSaveForm postSaveForm, Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("member is not exist"));
-//        Post post = Post.savePost(postSaveForm, member);
+    public Post save(PostSaveRequestDTO postSaveRequestDTO, String loginId) {
+//        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("member is not exist"));
+        Member member = memberRepository.findByLoginId(loginId).orElseThrow(() -> new UsernameNotFoundException("해당 유저가 존재하지 않습니다. loginId=" + loginId));
+
+        //DTO -> Entity
         Post post = Post.builder()
-                .title(postSaveForm.getTitle())
-                .content(postSaveForm.getContent())
+                .title(postSaveRequestDTO.getTitle())
+                .content(postSaveRequestDTO.getContent())
                 .member(member)
                 .build();
 
@@ -57,18 +59,13 @@ public class PostService {
     /**
      * 게시물 수정
      */
-    public Long update(Long id, PostSaveForm postSaveForm) {
+    public Long update(Long id, PostSaveRequestDTO postSaveRequestDTO) {
         Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다. id= " + id));
-        post.updatePost(postSaveForm.getTitle(), postSaveForm.getContent());
-        postRepository.save(post);
+        post.updatePost(postSaveRequestDTO.getTitle(), postSaveRequestDTO.getContent());
+        //postRepository.save(post);
 
         return post.getId();
     }
-//    public void update(Long postId, PostUpdateDto updateParam) {
-//        Post findPost = findById(postId).orElseThrow();
-//        findPost.setPostTitle(updateParam.getPostTitle());
-//        findPost.setPostBody(updateParam.getPostBody());
-//    }
 
 
     /**
@@ -94,6 +91,7 @@ public class PostService {
          * 파라미터로 전달받은 id 로 게시물을 찾은 뒤 Entity로 바로 넘겨주지 않고 DTO에서 한번 감싼후
          * DTO 값을 넘겨준다
          */
+        //Entity -> DTO
         PostResponseDTO result = PostResponseDTO.builder()
                 .post(post)
                 .build();
@@ -112,10 +110,6 @@ public class PostService {
     /**
      * 게시물 전체 조회 - 페이징
      */
-//    public Page<Post> findAllV1(Pageable pageable) {
-//        return postRepository.findAll(pageable);
-//    }
-
     public Page<PostResponseDTO> findAll(Pageable pageable) {
         Page<Post> posts = postRepository.findAll(pageable);
         List<PostResponseDTO> list = new ArrayList<>();
@@ -149,13 +143,13 @@ public class PostService {
 //        }
 //    }
 
-    public Page<PostResponseDTO> findPostBySearch(String searchType, String keyword, Pageable pageable) {
+    public Page<PostResponseDTO> getSearchedPost(String searchType, String keyword, Pageable pageable) {
         switch (searchType) {
             case "title":
                 return getPostResponseDto(postQueryRepository.findAll(new PostSearchCond(keyword, null, null), pageable), pageable);
             case "content" :
                 return getPostResponseDto(postQueryRepository.findAll(new PostSearchCond(null, keyword, null), pageable), pageable);
-            case "loginId" :
+            case "nickname" :
                 return getPostResponseDto(postQueryRepository.findAll(new PostSearchCond(null, null, keyword), pageable), pageable);
             default:
                 return getPostResponseDto(postQueryRepository.findAll(new PostSearchCond(null, null, null), pageable), pageable);
@@ -166,6 +160,7 @@ public class PostService {
     private Page<PostResponseDTO> getPostResponseDto(Page<Post> posts, Pageable pageable) {
         List<PostResponseDTO> list = new ArrayList<>();
 
+        //Entity -> DTO
         for(Post post : posts) {
             PostResponseDTO result = PostResponseDTO.builder()
                                                     .post(post)

@@ -25,6 +25,7 @@ public class Post {
     @Column(name = "post_id")
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
     private String content;
@@ -45,16 +46,6 @@ public class Post {
 //    @OrderBy("id asc")
 //    private List<Comment> comments;
 
-    
-    //생성 메서드
-    //게시물 등록
-//    public static Post savePost(PostSaveForm postSaveForm, Member member) {
-//        return Post.builder()
-//                .title(postSaveForm.getTitle())
-//                .content(postSaveForm.getContent())
-//                .member(member)
-//                .build();
-//    }
     
     //비즈니스 메서드
     //게시물 수정

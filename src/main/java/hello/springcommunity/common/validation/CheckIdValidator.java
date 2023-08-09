@@ -1,7 +1,7 @@
 package hello.springcommunity.common.validation;
 
 import hello.springcommunity.dao.member.MemberRepository;
-import hello.springcommunity.dto.member.MemberSaveForm;
+import hello.springcommunity.dto.member.MemberSaveRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -26,20 +26,17 @@ public class CheckIdValidator implements Validator {
     @Override
     public boolean supports(Class<?> clazz) {
 //        return true;
-        return MemberSaveForm.class.isAssignableFrom(clazz);
+        return MemberSaveRequestDTO.class.isAssignableFrom(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
 
-        MemberSaveForm memberSaveForm = (MemberSaveForm) target;
-//        MemberSaveRequestDTO memberDTO = (MemberSaveRequestDTO) target;
+        MemberSaveRequestDTO memberSaveForm = (MemberSaveRequestDTO) target;
 
         if(memberRepository.existsByLoginId(memberSaveForm.getLoginId())) {
             errors.rejectValue("loginId", "아이디 중복 오류", "이미 사용중인 아이디입니다.");
         }
-//        if(memberRepository.existsByLoginId(memberDTO.getLoginId())) {
-//            errors.rejectValue("loginId", "아이디 중복 오류", "이미 사용중인 아이디입니다.");
-//        }
+
     }
 }

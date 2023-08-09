@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
 <head>
-    <title>게시물 상세</title>
+    <title>[[${post.title}]]</title>
 </head>
 <!--<body>-->
 <th:block layout:fragment="content">
@@ -32,7 +32,7 @@
     </div>
     <div>
         <label for="author">작성자</label>
-        <input type="text" id="author" name="author" class="form-control" value="작성자" th:value="${post.name}" readonly>
+        <input type="text" id="author" name="author" class="form-control" value="작성자" th:value="${post.nickname}" readonly>
     </div>
     <div>
         <label for="regDate">작성일</label>
@@ -48,13 +48,12 @@
     <hr class="my-4">
 
     <!-- 게시물 수정 삭제 버튼 -->
-    <th:block th:if="${session.loginMember} != null and ${post.loginId == session.loginMember.loginId}">
-
-        <form th:action="@{/posts/{postId}/delete(postId=${post.id})}" method="post" onsubmit="return confirm('게시물을 삭제하시겠습니까?')">
+    <th:block sec:authorize="isAuthenticated()" th:if="${#authentication.name == post.loginId}">
+        <form th:action="@{/post/{postId}/delete(postId=${post.id})}" method="post" onsubmit="return confirm('게시물을 삭제하시겠습니까?')">
 
             <button class="btn btn-primary mb-5"
                     onclick="location.href='editForm.html'"
-                    th:onclick="|location.href='@{/posts/{postId}/edit(postId=${post.id})}'|"
+                    th:onclick="|location.href='@{/post/{postId}/edit(postId=${post.id})}'|"
                     type="button">
                 <i class="bi bi-pencil-square"></i>
                 수정
@@ -67,8 +66,9 @@
                 삭제
             </button>
         </form>
-
     </th:block>
+
+
 
     <!-- Comment list -->
     <div class="comment-list">
@@ -88,11 +88,12 @@
                         th:style="|margin-left: ${comment.depth * 2}%|">
                         <div>
                             <i class="bi bi-arrow-return-right" th:if="${comment.parent} != null"></i>
-                            <span th:text="${comment.member.name}">nickname</span>
+                            <span th:text="${comment.member.nickname}">nickname</span>
                             <small class="text-muted" th:text="${comment.regDate}">registerDate</small>
-                            <th:block th:if="${session.loginMember} != null">
+
+                            <th:block sec:authorize="isAuthenticated()">
                                 <!-- 자기 댓글 수정/삭제 -->
-                                <th:block th:if="${comment.member.loginId == session.loginMember.loginId} and ${comment.isDeleted} == false">
+                                <th:block th:if="${comment.member.loginId == #authentication.name} and ${comment.isDeleted} == false">
                                     <a href="javascript:;" class="text-decoration-none" th:onclick="editComment([[${comment.id}]]);">
                                         수정
                                     </a>
@@ -102,13 +103,14 @@
                                 </th:block>
 
                                 <!-- 다른사람 댓글 답글달기 -->
-                                <th:block th:unless="${comment.member.loginId == session.loginMember.loginId}">
+                                <th:block th:unless="${comment.member.loginId == #authentication.name}">
                                     <a href="javascript:;" class="text-decoration-none text-secondary" th:onclick="replyComment([[${comment.id}]]);">
                                         답글
                                         <i class="bi bi-chat-dots"></i>
                                     </a>
                                 </th:block>
                             </th:block>
+
                         </div>
 
                         <input type="hidden" th:id="commentId" th:value="${comment.id}">
@@ -170,9 +172,6 @@
                         <!-- 이전으로 이동 -->
                         <!-- 첫 페이지인 경우 비활성화, 첫 페이지가 아니라면 현재 페이지 인덱스(0부터 시작) - 1 -->
                         <li th:classappend="${comments.first} ? 'disabled'" class="page-item">
-<!--                            <a class="page-link" th:href="${comments.first} ? '#' : @{/posts/detail(postId=${postId}, page=${pageNumber - 1})}" aria-label="Previous">-->
-<!--                                <span aria-hidden="true">&lt;</span>-->
-<!--                            </a>-->
                             <a class="page-link" href="javascript:;" th:onclick="moveToPage([[${postId}]], [[${pageNumber - 1}]]);" aria-label="Previous">
                                 <span aria-hidden="true">&lt;</span>
                             </a>
@@ -182,15 +181,11 @@
                         <!-- 페이지 번호 누르면 해당 페이지로 이동 -->
                         <!-- page(페이지 번호) 와 현재 페이지 인덱스(0부터 시작) + 1 이 같으면 현재 보고있는 페이지이므로 활성화 -->
                         <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
-<!--                            <a th:text="${page}" class="page-link" th:href="@{/posts/detail(postId=${postId}, page=${page - 1})}"></a>-->
                             <a th:text="${page}" class="page-link" href="javascript:;" th:onclick="moveToPage([[${postId}]], [[${page - 1}]]);"></a>
                         </li>
 
                         <!-- 다음으로 이동 -->
                         <li th:classappend="${comments.last} ? 'disabled'" class="page-item">
-<!--                            <a class="page-link" th:href="${comments.last} ? '#' : @{/posts/detail(postId=${postId}, page=${pageNumber + 1})}" aria-label="Next">-->
-<!--                                <span aria-hidden="true">&gt;</span>-->
-<!--                            </a>-->
                             <a class="page-link" href="javascript:;" th:onclick="moveToPage([[${postId}]], [[${pageNumber + 1}]]);" aria-label="Next">
                                 <span aria-hidden="true">&gt;</span>
                             </a>
@@ -217,12 +212,25 @@
 <!--                <button type="submit" class="btn btn-outline-primary">등록</button>-->
 <!--            </form>-->
             <form th:id="commentSaveForm" th:onsubmit="return addComment(this, event)">
-                <div class="form-group mb-3">
-                    <input type="hidden" name="postId" th:value="${postId}">
-                    <input type="hidden" name="contextPath" th:value="${#httpServletRequest.getContextPath()}">
-                    <textarea name="content" class="form-control" id="commentTextarea" rows="3" placeholder="댓글을 입력하세요"></textarea>
-                </div>
-                <button type="submit" class="btn btn-outline-primary">등록</button>
+                <th:block sec:authorize="isAuthenticated()">
+                    <div class="form-group mb-3">
+                        <input type="hidden" name="postId" th:value="${postId}">
+                        <input type="hidden" name="contextPath" th:value="${#httpServletRequest.getContextPath()}">
+    <!--                    <input type="hidden" name="authenticated" th:value="${#authentication.principal} == anonymousUser ? 'true' : 'false'">-->
+    <!--                    <textarea name="content" class="form-control" id="commentTextarea" rows="3" placeholder="댓글을 입력하세요"-->
+    <!--                              th:disabled="${#authentication.principal} == anonymousUser ? 'disabled'"></textarea>-->
+    <!--                    -->
+
+                        <textarea name="content" class="form-control" id="commentTextarea" rows="3" placeholder="댓글을 입력하세요"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary">등록</button>
+                </th:block>
+                <th:block sec:authorize="isAnonymous()">
+                    <div class="fake_textarea"
+                         style="width: 500px;height: 100px;border: 1px solid #dcdcdc;overflow-y: auto;background-color: #e9ecef;opacity: 1;">
+                        <a href="/login" class="text-decoration-none">댓글을 작성하려면 로그인을 해주세요. 로그인 하시겠습니까?</a>
+                    </div>
+                </th:block>
             </form>
         </div>
     </div>

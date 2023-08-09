@@ -1,4 +1,4 @@
-package hello.springcommunity.domain.post;
+package hello.springcommunity.dto.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +15,6 @@ public class PostSearchCond {
 
     private String title;
     private String content;
-    private String loginId;
+    private String nickname;
 
 }

@@ -19,7 +19,7 @@ import static hello.springcommunity.common.validation.ValidationGroups.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MemberSaveForm {
+public class MemberSaveRequestDTO {
 
     @NotBlank(groups = NotBlankGroup.class) //groups 속성으로 해당 검증에 해당하는 인터페이스를 설정
     @Pattern(regexp = "^[a-z0-9]{4,15}$", message = "아이디는 영어 소문자와 숫자만 사용하여 4~15자리여야 합니다.", groups = PatternGroup.class)
@@ -31,7 +31,7 @@ public class MemberSaveForm {
 
     @NotBlank(groups = NotBlankGroup.class)
     @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$", message = "닉네임은 특수문자를 포함하지 않은 2~10자리여야 합니다.", groups = PatternGroup.class)
-    private String name;
+    private String nickname;
 
 //    @NotBlank(message = "이메일은 필수 입력사항입니다")
 //    @Email(message = "이메일 형식에 맞지 않습니다")

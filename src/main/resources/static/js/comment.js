@@ -2,12 +2,15 @@
 //댓글 등록
 function addComment(form, event) {
     event.preventDefault();
+
     let data = form.content.value;
     let postId = form.postId.value;
 
     let pathname = window.location.pathname;
     let origin = window.location.origin;
-    let contextPath = origin + pathname + "?postId=" + postId;
+
+    //let contextPath = origin + pathname + "?postId=" + postId;
+    let contextPath = origin + pathname; //http://localhost:8081/post/1/detail
 
     if(!data || data.trim() === "") {
         alert("공백 또는 입력하지 않은 부분이 있습니다");
@@ -21,7 +24,7 @@ function addComment(form, event) {
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify({content:data})
     }).done(function(result) {
-        console.log(result);
+        //console.log(result);
         //window.location.reload();
         $(".comment-list").load(contextPath + " .comment-list");
         $("#commentTextarea").val('');
@@ -63,7 +66,8 @@ function editCommentSave(form) {
 
     let origin = window.location.origin;
     let pathname = window.location.pathname;
-    let contextPath = origin + pathname + "?postId=" + postId;
+    //let contextPath = origin + pathname + "?postId=" + postId;
+    let contextPath = origin + pathname;
 
     if(!newContent || newContent.trim() === "") {
         alert("공백 또는 입력하지 않은 부분이 있습니다");
@@ -82,7 +86,7 @@ function editCommentSave(form) {
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify({content: newContent})
         }).done(function(result) {
-            console.log("updated commentId = " + result);
+            //console.log("updated commentId = " + result);
             //window.location.reload();
             $(".comment-list").load(contextPath + " .comment-list");
         }).fail(function(error) {
@@ -101,7 +105,8 @@ function deleteComment(commentId, postId) {
 
     let origin = window.location.origin;
     let pathname = window.location.pathname;
-    let contextPath = origin + pathname + "?postId=" + postId;
+    //let contextPath = origin + pathname + "?postId=" + postId;
+    let contextPath = origin + pathname;
 
     const check = confirm("댓글을 삭제하시겠습니까?");
     if(check) {
@@ -110,7 +115,7 @@ function deleteComment(commentId, postId) {
             url: '/api/post/' + postId + '/comment/' + commentId + '/delete',
             dataType: 'JSON'
         }).done(function(result) {
-            console.log("deleted commentId = " + result);
+            //console.log("deleted commentId = " + result);
             //window.location.reload();
             $(".comment-list").load(contextPath + " .comment-list");
         }).fail(function(error) {
@@ -146,7 +151,8 @@ function replyCommentSave(form) {
 
     let origin = window.location.origin;
     let pathname = window.location.pathname;
-    let contextPath = origin + pathname + "?postId=" + postId;
+    //let contextPath = origin + pathname + "?postId=" + postId;
+    let contextPath = origin + pathname;
 
     if(!data || data.trim() === "") {
         alert("공백 또는 입력하지 않은 부분이 있습니다");
@@ -160,7 +166,7 @@ function replyCommentSave(form) {
         data: JSON.stringify({content:data, parentId:parentId, depth:depth})
         //dataType: 'JSON'
     }).done(function(result) {
-        console.log(result);
+        //console.log(result);
         //window.location.reload();
         $(".comment-list").load(contextPath + " .comment-list");
     }).fail(function(error) {
@@ -169,12 +175,13 @@ function replyCommentSave(form) {
 
 }
 
-//페이지 이동
+//댓글 페이지 이동
 function moveToPage(postId, page) {
 
     let origin = window.location.origin;
     let pathname = window.location.pathname;
-    let contextPath = origin + pathname + "?postId=" + postId + "&page=" + page;
+    //let contextPath = origin + pathname + "?postId=" + postId + "&page=" + page;
+    let contextPath = origin + pathname + "?page=" + page;
 
     //가져온 댓글로 교체
     $(".comment-list").load(contextPath + " .comment-list");

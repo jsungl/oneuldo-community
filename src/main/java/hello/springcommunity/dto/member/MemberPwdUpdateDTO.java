@@ -12,7 +12,7 @@ import javax.validation.constraints.Pattern;
 @Setter //쿼리 스트링 또는 폼 데이터로 전송되는 데이터를 바인딩하려면 Setter가 필요하다(없으면 매핑이 안되는듯)
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberPwdUpdateForm {
+public class MemberPwdUpdateDTO {
 
     @NotBlank(message = "기존 비밀번호를 입력해주세요.")
     private String currentPassword;

@@ -5,39 +5,54 @@ import lombok.*;
 import javax.persistence.*;
 
 /**
- * MemberDTO
+ * Member Entity
  */
 
 @Getter
 @Entity
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED) //외부에서 기본 생성자를 통해 엔티티를 생성하지 못하도록 하여 객체 생성의 안전성을 높인다. 접근레벨은 protected
-public class Member {
+@AllArgsConstructor
+public class Member extends TimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
 
-//    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String loginId; //로그인 ID
 
-    private String name; //사용자 이름
+    @Column(unique = true, nullable = false)
+    private String nickname; //사용자 이름
 
+    @Column(nullable = false)
     private String password;
 
-    @Builder //빌더패턴으로 해당 생성자를 사용한다
-    public Member(String loginId, String name, String password) {
-        this.loginId = loginId;
-        this.name = name;
-        this.password = password;
+    @Enumerated(EnumType.STRING) //enum의 값을 index가 아닌 텍스트 값 그대로 저장
+    @Column(nullable = false)
+    private Role role;
+
+//    @Builder //빌더패턴으로 해당 생성자를 사용한다
+//    public Member(String loginId, String name, String password) {
+//        this.loginId = loginId;
+//        this.name = name;
+//        this.password = password;
+//    }
+
+    public String getRoleValue() {
+        return this.role.getValue();
     }
 
     /**
      * repository를 제외한 다른 영역에서 Entity를 수정할 수 있게 만들고 싶지 않아서
      */
-    public void updateName(String name) {
-        this.name = name;
+    
+    //닉네임 수정
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
     }
 
+    //비밀번호 수정
     public void updatePassword(String newPassword) {
         this.password = newPassword;
     }

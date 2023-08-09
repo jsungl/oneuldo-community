@@ -1,6 +1,6 @@
 package hello.springcommunity.dto.post;
 
-import lombok.Data;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,7 +19,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PostSaveForm {
+public class PostSaveRequestDTO {
 
     @NotBlank(message = "제목을 입력해주세요")
     private String title;

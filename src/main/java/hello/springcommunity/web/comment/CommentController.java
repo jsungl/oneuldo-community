@@ -2,12 +2,12 @@ package hello.springcommunity.web.comment;
 
 import hello.springcommunity.domain.comment.Comment;
 import hello.springcommunity.dto.comment.CommentRequestDTO;
+import hello.springcommunity.dto.security.UserDetailsDTO;
 import hello.springcommunity.service.comment.CommentService;
-import hello.springcommunity.domain.member.Member;
-import hello.springcommunity.common.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -29,19 +29,17 @@ public class CommentController {
      */
     @PostMapping("/{postId}/comment/add")
     public ResponseEntity<String> addComment(@PathVariable Long postId,
-                      @RequestBody CommentRequestDTO commentRequestDTO,
-                      @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember) {
+                                            @RequestBody CommentRequestDTO commentRequestDTO,
+                                             @AuthenticationPrincipal UserDetailsDTO dto) {
 
-        Comment comment = commentService.add(commentRequestDTO, postId, loginMember.getId());
+        //Comment comment = commentService.add(commentRequestDTO, postId, loginMember.getId());
+        Comment comment = commentService.add(commentRequestDTO, postId, dto.getUsername());
+
         Long groupId = commentService.updateGroupId(comment, comment.getId());
-        log.info("groupId={}", groupId);
-
-
-
+        log.info("comment groupId={}", groupId);
 
         //dataType 이 JSON이 아니여야 한다
         //return "ok";
-
         return ResponseEntity.ok("ok");
     }
 

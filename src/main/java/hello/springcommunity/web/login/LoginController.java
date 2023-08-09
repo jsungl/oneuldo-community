@@ -1,12 +1,14 @@
 package hello.springcommunity.web.login;
 
 import hello.springcommunity.dto.login.LoginForm;
+import hello.springcommunity.dto.login.LoginRequestDTO;
 import hello.springcommunity.service.login.LoginService;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.common.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,13 +35,27 @@ public class LoginController {
     /**
      * 로그인
      */
-
     @GetMapping("/login")
-    public String loginForm(@ModelAttribute("loginForm") LoginForm form) {
+    public String loginForm(@ModelAttribute("loginForm") LoginRequestDTO form,
+                            @RequestParam(value = "error", required = false) String error,
+                            @RequestParam(value = "message", required = false) String message,
+                            HttpServletRequest request,
+                            Model model) {
+
+        // 요청 시점의 사용자 URI 정보를 Session의 Attribute에 담아서 전달(잘 지워줘야함)
+        // 로그인이 틀려서 다시 하면 요청 시점의 URI가 로그인 페이지가 되므로 조건문 설정
+        String uri = request.getHeader("Referer");
+        if(!uri.contains("/login")){
+            request.getSession().setAttribute("prevPage", uri);
+        }
+
+        model.addAttribute("error", error);
+        model.addAttribute("message", message);
+
         return "login/loginForm";
     }
 
-    @PostMapping("/login")
+    //@PostMapping("/login")
     public String login(@Validated @ModelAttribute("loginForm") LoginForm form,
                         BindingResult bindingResult,
                         HttpServletRequest request,

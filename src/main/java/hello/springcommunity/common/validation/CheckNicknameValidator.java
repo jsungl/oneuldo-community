@@ -1,7 +1,7 @@
 package hello.springcommunity.common.validation;
 
 import hello.springcommunity.dao.member.MemberRepository;
-import hello.springcommunity.dto.member.MemberSaveForm;
+import hello.springcommunity.dto.member.MemberSaveRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -15,7 +15,7 @@ import org.springframework.validation.Validator;
 
 @Component
 @RequiredArgsConstructor
-public class CheckNameValidator implements Validator {
+public class CheckNicknameValidator implements Validator {
 
     private final MemberRepository memberRepository;
 
@@ -26,20 +26,17 @@ public class CheckNameValidator implements Validator {
     @Override
     public boolean supports(Class<?> clazz) {
 //        return true;
-        return MemberSaveForm.class.isAssignableFrom(clazz);
+        return MemberSaveRequestDTO.class.isAssignableFrom(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
 
-        MemberSaveForm memberSaveForm = (MemberSaveForm) target;
-//        MemberSaveRequestDTO memberDTO = (MemberSaveRequestDTO) target;
+        MemberSaveRequestDTO memberSaveForm = (MemberSaveRequestDTO) target;
 
-        if(memberRepository.existsByName(memberSaveForm.getName())) {
+        if(memberRepository.existsByNickname(memberSaveForm.getNickname())) {
             errors.rejectValue("name", "닉네임 중복 오류", "이미 사용중인 닉네임입니다.");
         }
-//        if(memberRepository.existsByName(memberDTO.getName())) {
-//            errors.rejectValue("name", "닉네임 중복 오류", "이미 사용중인 닉네임입니다.");
-//        }
+
     }
 }

@@ -70,7 +70,7 @@ public class CommentService {
     /**
      * 댓글 총 갯수 조회
      */
-    public Long getCommentTotalCount(Long id) {
+    public Long getTotalCount(Long id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다. id= " + id));
         return commentQueryRepository.getTotalCount(post.getId());
     }
@@ -79,8 +79,10 @@ public class CommentService {
     /**
      * 댓글 등록
      */
-    public Comment add(CommentRequestDTO commentRequestDTO, Long postId, Long id) {
-        Member findMember = memberRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("해당 유저가 존재하지 않습니다. id=" + id));
+    public Comment add(CommentRequestDTO commentRequestDTO, Long postId, String loginId) {
+        //Member findMember = memberRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("해당 유저가 존재하지 않습니다. id=" + id));
+        Member findMember = memberRepository.findByLoginId(loginId).orElseThrow(() -> new UsernameNotFoundException("해당 유저가 존재하지 않습니다. loginId=" + loginId));
+
         Post findPost = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다. id=" + postId));
 
         // DTO -> Entity
@@ -96,7 +98,7 @@ public class CommentService {
          */
         if(commentRequestDTO.getParentId() != null) {
             Comment parent = commentRepository.findById(commentRequestDTO.getParentId()).orElseThrow(
-                    () -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다. id= " + commentRequestDTO.getParentId()));
+                    () -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다. parentId= " + commentRequestDTO.getParentId()));
 
             //저장하려는 대댓글의 부모 댓글을 찾아 연결
             comment.updateParent(parent);
@@ -106,13 +108,14 @@ public class CommentService {
             Integer stepResult = CommentStepUpdate(parent);
             // null이면 대댓글 작성 오류
             if(stepResult == null) {
-                return null;
+                //return null;
+                throw new RuntimeException("대댓글 작성 오류");
             }
+
             log.info("현재 등록하는 대댓글의 step={}", stepResult);
 
-            comment.updateDepth(parent.getDepth() + 1);
-            comment.updateStep(stepResult);
-
+            comment.updateDepth(parent.getDepth() + 1); //댓글 깊이 설정
+            comment.updateStep(stepResult); //댓글 그룹내 순서 설정
 
         }
 
@@ -205,7 +208,7 @@ public class CommentService {
         }else {
             //자식 댓글이 없으면 삭제 가능한 부모 댓글이 있는지 확인 후 삭제
             Comment deletableComment = getDeletableParentComment(comment);
-            //삭제 하려는 댓글의 step 보다 큰 step 의 댓글들은 모두 -1
+            //댓글 그룹에서 삭제 하려는 댓글의 step 보다 큰 step 의 댓글들은 모두 -1
             commentRepository.updateCommentStepMinus(deletableComment.getGroupId(), deletableComment.getStep());
             commentRepository.delete(deletableComment);
         }

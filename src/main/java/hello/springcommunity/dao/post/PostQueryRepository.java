@@ -3,7 +3,7 @@ package hello.springcommunity.dao.post;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import hello.springcommunity.domain.post.Post;
-import hello.springcommunity.domain.post.PostSearchCond;
+import hello.springcommunity.dto.post.PostSearchCond;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -49,14 +49,14 @@ public class PostQueryRepository {
     public Page<Post> findAll(PostSearchCond cond, Pageable pageable) {
         List<Post> postList = query.select(post)
                 .from(post)
-                .where(likePostTitle(cond.getTitle()), likePostContent(cond.getContent()), likePostByLoginId(cond.getLoginId()))
+                .where(likePostTitle(cond.getTitle()), likePostContent(cond.getContent()), likePostByNickname(cond.getNickname()))
                 .offset(pageable.getOffset()) //시작지점(0부터 시작)
                 .limit(pageable.getPageSize()) //페이지 사이즈(한 페이지당 몇개의 로우를 가져올지)
                 .fetch();
 
         Long count = query.select(post.count())
                 .from(post)
-                .where(likePostTitle(cond.getTitle()), likePostContent(cond.getContent()), likePostByLoginId(cond.getLoginId()))
+                .where(likePostTitle(cond.getTitle()), likePostContent(cond.getContent()), likePostByNickname(cond.getNickname()))
                 .fetchOne();
 
 
@@ -66,10 +66,10 @@ public class PostQueryRepository {
     }
 
 
-    // 작성자 이름으로 검색
-    private BooleanExpression likePostByLoginId(String loginId) {
-        if(StringUtils.hasText(loginId)) {
-            return post.member.loginId.eq(loginId);
+    // 작성자 닉네임으로 검색
+    private BooleanExpression likePostByNickname(String nickname) {
+        if(StringUtils.hasText(nickname)) {
+            return post.member.nickname.eq(nickname);
         }
         return null;
     }
