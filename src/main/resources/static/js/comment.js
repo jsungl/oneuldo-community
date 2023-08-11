@@ -39,16 +39,19 @@ function addComment(form, event) {
 function editComment(commentId) {
     const form = document.getElementById('commentUpdateForm' + commentId);
     const comment = document.getElementById('commentContent' + commentId);
+    const isModified = document.getElementById('commentIsModified' + commentId);
 
     // 숨기기 (display: none)
     if(form.style.display !== 'none') {
         form.style.display = 'none';
         comment.style.display = 'block';
+        isModified.style.display = 'block';
     }
     // 보이기 (display: block)
     else {
         form.style.display = 'block';
         comment.style.display = 'none';
+        isModified.style.display = 'none';
     }
 
 

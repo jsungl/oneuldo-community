@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  * 게시물 정보를 리턴한 응답 클래스
@@ -21,7 +22,7 @@ public class PostResponseDTO {
     private Long id;
     private String title;
     private String content;
-    private LocalDate regDate;
+    private String createdDate;
     private int viewCount;
     private String loginId;
     private String nickname;
@@ -32,7 +33,7 @@ public class PostResponseDTO {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
-        this.regDate = post.getRegDate();
+        this.createdDate = post.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         this.viewCount = post.getViewCount();
         this.loginId = post.getMember().getLoginId();
         this.nickname = post.getMember().getNickname();

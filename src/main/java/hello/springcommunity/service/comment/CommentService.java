@@ -85,6 +85,8 @@ public class CommentService {
 
         Post findPost = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다. id=" + postId));
 
+        log.info("content={}", commentRequestDTO.getContent());
+
         // DTO -> Entity
         Comment comment = Comment.builder()
                 .content(commentRequestDTO.getContent())

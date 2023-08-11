@@ -1,5 +1,6 @@
 package hello.springcommunity.domain.post;
 
+import hello.springcommunity.domain.TimeEntity;
 import hello.springcommunity.domain.member.Member;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -18,8 +19,7 @@ import java.time.LocalDate;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
-public class Post {
+public class Post extends TimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
@@ -34,9 +34,9 @@ public class Post {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(name = "reg_date")
-    @CreatedDate
-    private LocalDate regDate;
+//    @Column(name = "reg_date")
+//    @CreatedDate
+//    private LocalDate regDate;
 
     //@Column(columnDefinition = "integer default 0", nullable = false)
     @Column(name = "view_count")
