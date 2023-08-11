@@ -10,8 +10,8 @@ import static hello.springcommunity.common.validation.ValidationGroups.*;
  *
  * @GroupSequence의 파라미터 배열 순서로 검증 어노테이션이 차례대로 실행되고,
  * 하나의 그룹 검증이 성공하면 그 다음 파라미터의 그룹 검증으로 이어진다.
- * 검증순서는 @NotBlank → @Pattern
+ * 검증순서는 @NotBlank → @Pattern 또는 @NotBlank → @Email
  */
-@GroupSequence({NotBlankGroup.class, PatternGroup.class})
+@GroupSequence({NotBlankGroup.class, PatternGroup.class, EmailCheckGroup.class})
 public interface ValidationSequence {
 }

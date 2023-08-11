@@ -8,6 +8,7 @@ package hello.springcommunity.common.validation;
 public class ValidationGroups {
     public interface NotBlankGroup {}
     public interface PatternGroup {}
+    public interface EmailCheckGroup {}
 //    public interface SizeGroup {}
-//    public interface EmailCheckGroup {}
+
 }

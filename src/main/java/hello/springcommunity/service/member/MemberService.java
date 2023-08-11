@@ -42,6 +42,7 @@ public class MemberService {
                 .loginId(memberSaveRequestDTO.getLoginId())
                 .password(memberSaveRequestDTO.getPassword())
                 .nickname(memberSaveRequestDTO.getNickname())
+                .email(memberSaveRequestDTO.getEmail())
                 .role(Role.USER)
                 .build();
 

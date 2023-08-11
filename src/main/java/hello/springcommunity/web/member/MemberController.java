@@ -98,11 +98,11 @@ public class MemberController {
     /**
      * 회원 정보 상세 - 아이디, 닉네임
      */
-    @GetMapping("/{loginId}/detail")
-    public String memberDetail(@PathVariable String loginId, Model model) {
+    @GetMapping("/{loginId}/profile")
+    public String profile(@PathVariable String loginId, Model model) {
         MemberResponseDTO member = memberService.getMemberByLoginId(loginId);
         model.addAttribute("member", member);
-        return "member/detail";
+        return "member/profile";
     }
 
     /**
@@ -151,7 +151,7 @@ public class MemberController {
         redirectAttributes.addAttribute("loginId", loginId);
 
         log.info("닉네임 수정 완료");
-        return "redirect:/member/{loginId}/detail";
+        return "redirect:/member/{loginId}/profile";
     }
 
 
@@ -204,7 +204,7 @@ public class MemberController {
         }
 
         log.info("비밀번호 수정 완료");
-        return "redirect:/member/{loginId}/detail";
+        return "redirect:/member/{loginId}/profile";
 
     }
 

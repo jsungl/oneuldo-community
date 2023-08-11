@@ -1,5 +1,6 @@
 package hello.springcommunity.domain.comment;
 
+import hello.springcommunity.domain.TimeEntity;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.post.Post;
 import lombok.*;
@@ -19,8 +20,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class Comment {
+public class Comment extends TimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
@@ -37,9 +37,8 @@ public class Comment {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    //@Column(updatable = false) : 생성시각은 수정되어서는 안되므로
-    @CreatedDate
-    private LocalDate regDate;
+//    @CreatedDate
+//    private LocalDate regDate;
 
     @ColumnDefault("FALSE")
     @Column(nullable = false)

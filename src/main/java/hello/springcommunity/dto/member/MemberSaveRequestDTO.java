@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
@@ -33,8 +34,8 @@ public class MemberSaveRequestDTO {
     @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$", message = "닉네임은 특수문자를 포함하지 않은 2~10자리여야 합니다.", groups = PatternGroup.class)
     private String nickname;
 
-//    @NotBlank(message = "이메일은 필수 입력사항입니다")
-//    @Email(message = "이메일 형식에 맞지 않습니다")
-//    private String userEmail;
+    @NotBlank(groups = NotBlankGroup.class)
+    @Email(message = "이메일 형식에 맞지 않습니다", groups = EmailCheckGroup.class)
+    private String email;
 
 }

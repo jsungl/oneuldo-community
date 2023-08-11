@@ -40,7 +40,7 @@ public class CommentQueryRepository {
                 .leftJoin(comment.parent).fetchJoin()
                 .join(comment.member).fetchJoin() //n+1 문제를 해결하기위해 fetchJoin
                 .where(comment.post.id.eq(id))
-                .orderBy(comment.parent.id.asc().nullsFirst(), comment.regDate.asc()) //부모댓글 내림차순, 작성일자 내림차순 정렬
+                .orderBy(comment.parent.id.asc().nullsFirst(), comment.createdDate.asc()) //부모댓글 내림차순, 작성일자 내림차순 정렬
                 .fetch();
 
         Map<Long, CommentResponseDTO> commentResponseDTOMap = new HashMap<>();
@@ -87,9 +87,9 @@ public class CommentQueryRepository {
         List<CommentResponseDTO> commentResponseDTOList = new ArrayList<>();
 
         // 조회결과
-        for (Comment comment1 : commentList) {
-            log.info("comment id={} content={} parent={} children={}", comment1.getId(), comment1.getContent(), comment1.getParent(), comment1.getChildren());
-        }
+//        for (Comment comment1 : commentList) {
+//            log.info("comment id={} content={} parent={} children={}", comment1.getId(), comment1.getContent(), comment1.getParent(), comment1.getChildren());
+//        }
 
         commentList.forEach(comment -> {
             CommentResponseDTO commentResponseDTO = entityToDto(comment);
@@ -109,10 +109,10 @@ public class CommentQueryRepository {
         });
 
         //DTO로 변환 후 결과
-        for (CommentResponseDTO commentResponseDTO : commentResponseDTOList) {
-            log.info("commentResponseDTO id={} content={} parent={} children={}", commentResponseDTO.getId(), commentResponseDTO.getContent(),
-                    commentResponseDTO.getParent(), commentResponseDTO.getChildren());
-        }
+//        for (CommentResponseDTO commentResponseDTO : commentResponseDTOList) {
+//            log.info("commentResponseDTO id={} content={} parent={} children={}", commentResponseDTO.getId(), commentResponseDTO.getContent(),
+//                    commentResponseDTO.getParent(), commentResponseDTO.getChildren());
+//        }
 
         return new PageImpl<>(commentResponseDTOList, pageable, getTotalCount(id));
     }

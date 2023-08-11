@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * repository에서 모든 정보를 찾아와 바로 member를 보내줄 수 있지만 그렇게 되면 전달하고 싶지 않은 내용도
@@ -21,7 +23,7 @@ public class MemberResponseDTO {
     private String password;
     private String nickname;
     private String role;
-    private LocalDate createdDate;
+    private String createdDate;
 
     @Builder
     public MemberResponseDTO(Member member) {
@@ -30,6 +32,6 @@ public class MemberResponseDTO {
         this.password = member.getPassword();
         this.nickname = member.getNickname();
         this.role = member.getRoleValue();
-        this.createdDate = member.getCreatedDate();
+        this.createdDate = member.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }
