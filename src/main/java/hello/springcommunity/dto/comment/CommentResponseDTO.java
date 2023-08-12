@@ -56,9 +56,11 @@ public class CommentResponseDTO {
          */
         LocalDateTime createdTime = comment.getCreatedDate().truncatedTo(ChronoUnit.MINUTES);
         LocalDateTime modifiedTime = comment.getModifiedDate().truncatedTo(ChronoUnit.MINUTES);
+        Boolean displayModification = false;
         log.info("createdTime={}", createdTime);
         log.info("modifiedTime={}", modifiedTime);
 
+        //댓글 삭제 유무
         if(comment.getIsDeleted()) {
             return new CommentResponseDTO(
                     comment.getId(),
@@ -69,11 +71,13 @@ public class CommentResponseDTO {
                     comment.getParent(),
                     comment.getDepth(),
                     comment.getIsDeleted(),
-                    false);
+                    displayModification);
         }else {
 
-//            createdTime.compareTo(modifiedTime) < 0 ? comment.getContent() + System.lineSeparator() + "[수정된 댓글입니다. 수정시각 : " +  modifiedTime + "]" : comment.getContent(),
-
+            //자식댓글이 있는경우
+            if(createdTime.compareTo(modifiedTime) < 0 && comment.getChildren().size() != 0) {
+                displayModification = true;
+            }
 
             return new CommentResponseDTO(
                     comment.getId(),
@@ -84,7 +88,7 @@ public class CommentResponseDTO {
                     comment.getParent(),
                     comment.getDepth(),
                     comment.getIsDeleted(),
-                    createdTime.compareTo(modifiedTime) < 0 ? true : false);
+                    displayModification);
         }
 
     }
