@@ -50,7 +50,7 @@
     <div class="row">
       <div class="col">
         <button class="w-100 btn btn-primary btn-lg" type="button"
-                th:onclick="|location.href='@{/member/{loginId}/info(loginId=${#authentication.name})}'|">
+                th:onclick="|location.href='@{/member/{loginId}(loginId=${#authentication.name})}'|">
           마이페이지
         </button>
       </div>

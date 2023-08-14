@@ -59,7 +59,7 @@
           <tr th:each="post:${posts}">
             <td th:text="${post.id}">1</a></td>
             <td>
-              <a th:href="@{/post/{postId}/detail(postId=${post.id})}" th:text="${post.title}">제목</a>
+              <a th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
             </td>
             <td th:text="${post.nickname}">작성자</td>
             <td th:text="${post.createdDate}">작성일</td>
