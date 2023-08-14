@@ -65,6 +65,7 @@ public class Comment extends TimeEntity {
      */
     public void updateComment(String content) {
         this.content = content;
+        this.onPreUpdate();
     }
 
     /**

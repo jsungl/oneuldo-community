@@ -34,10 +34,6 @@ public class Post extends TimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-//    @Column(name = "reg_date")
-//    @CreatedDate
-//    private LocalDate regDate;
-
     //@Column(columnDefinition = "integer default 0", nullable = false)
     @Column(name = "view_count")
     private int viewCount;
@@ -52,6 +48,7 @@ public class Post extends TimeEntity {
     public void updatePost(String title, String content) {
         this.title = title;
         this.content = content;
+        this.onPreUpdate();
     }
 
     //조회수 증가

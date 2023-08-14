@@ -93,7 +93,7 @@ public class PostController {
      * Query Param(Query String) : localhost:8080/posts/detail?postId=1 -> @RequestParam
      *
      */
-    @GetMapping("/{postId}/detail")
+    @GetMapping("/{postId}")
     public String post(@PathVariable Long postId,
                        Model model,
                        HttpServletRequest request, HttpServletResponse response,
@@ -117,10 +117,15 @@ public class PostController {
         //조회수 증가
         postService.updateViews(postId, request, response);
 
+//        개행문자
+//        String nlString = System.lineSeparator();
+//        String nlString2 = System.getProperty("line.separator");
+
         model.addAttribute("post", post);
         model.addAttribute("postId", postId);
         model.addAttribute("comments", commentList);
         model.addAttribute("totalCount", totalCount);
+        model.addAttribute("nlString", "\r\n");
 
         return "post/post";
 
@@ -158,7 +163,7 @@ public class PostController {
 
         //해당 게시물의 상세페이지로 바로 이동
 //        return "redirect:/posts/{postId}";
-        return "redirect:/post/{postId}/detail";
+        return "redirect:/post/{postId}";
     }
 
 
@@ -206,7 +211,7 @@ public class PostController {
 
         //상세페이지로 이동
 //        return "redirect:/posts/detail?postId=" + id;
-        return "redirect:/post/{postId}/detail";
+        return "redirect:/post/{postId}";
 
     }
 

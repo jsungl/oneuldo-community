@@ -19,7 +19,6 @@ import java.util.List;
 @Slf4j
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-//@AllArgsConstructor
 public class CommentResponseDTO {
 
     private Long id;
@@ -54,8 +53,8 @@ public class CommentResponseDTO {
         /**
          * truncatedTo() 메소드를 사용하여 LocalDateTime 객체를 원하는 단위(일, 시간, 분)로 변환한 후 비교
          */
-        LocalDateTime createdTime = comment.getCreatedDate().truncatedTo(ChronoUnit.MINUTES);
-        LocalDateTime modifiedTime = comment.getModifiedDate().truncatedTo(ChronoUnit.MINUTES);
+        LocalDateTime createdTime = comment.getCreatedDate().truncatedTo(ChronoUnit.SECONDS);
+        LocalDateTime modifiedTime = comment.getModifiedDate().truncatedTo(ChronoUnit.SECONDS);
         Boolean displayModification = false;
         log.info("createdTime={}", createdTime);
         log.info("modifiedTime={}", modifiedTime);

@@ -242,7 +242,8 @@ public class CommentService {
         }
 
         comment.updateGroupId(findComment.getId());
-        //Comment savedComment = commentRepository.save(comment);
+        //commentRepository.updateGroupId(findComment.getId());
+
         return findComment.getId();
     }
 }
