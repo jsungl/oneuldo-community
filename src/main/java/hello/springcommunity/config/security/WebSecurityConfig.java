@@ -1,7 +1,10 @@
 package hello.springcommunity.config.security;
 
 
+import hello.springcommunity.config.oauth.CustomOauth2UserService;
+import hello.springcommunity.config.oauth.PrincipalOauth2UserService;
 import hello.springcommunity.service.security.UserDetailsServiceImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +28,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
@@ -38,12 +42,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
+
+    //private final CustomOauth2UserService customOauth2UserService;
+    private final PrincipalOauth2UserService principalOauth2UserService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -138,10 +145,19 @@ public class WebSecurityConfig {
          * .antMatchers() → .requestMatchers()
          * .access("hasAnyRole('ROLE_A','ROLE_B')") → .hasAnyRole("A", "B")
          */
-        http.authorizeRequests() // 요청에 의한 보안검사 시작
-            .antMatchers("/", "/member/add", "/login", "/logout", "/posts", "/post/{postId}/detail", "/post/search").permitAll()
-            .antMatchers("/admin/**").hasRole("ADMIN") //Spring Security에서 prefix를 자동으로 "ROLE_"을 넣어주므로 이 때 hasRole에는 ROLE을 제외하고 뒷 부분인 ADMIN만 써주면 된다
-            .anyRequest().authenticated(); //그 외 요청들은 인증필요
+//        http.authorizeRequests() // 요청에 의한 보안검사 시작
+//                        .antMatchers("/", "/posts", "/post/{postId}", "/post/search").permitAll()
+//                        .antMatchers("/member/add", "/login").anonymous()
+//                        .antMatchers("/admin/**").hasRole("ADMIN") //Spring Security에서 prefix를 자동으로 "ROLE_"을 넣어주므로 이 때 hasRole에는 ROLE을 제외하고 뒷 부분인 ADMIN만 써주면 된다
+//                        .anyRequest().authenticated(); //그 외 요청들은 인증필요
+
+        http.authorizeRequests() //요청에 의한 보안검사 시작
+                .antMatchers("/member/add", "/login").anonymous()
+                .antMatchers("/post/add").hasAnyRole("USER", "SOCIAL", "ADMIN") //Spring Security에서 prefix를 자동으로 "ROLE_"을 넣어주므로 이 때 hasRole에는 ROLE을 제외하고 뒷 부분인 USER만 써주면 된다
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/", "/posts", "/post/{postId}", "/post/search").permitAll()
+                .anyRequest().authenticated(); //그 외 요청들은 인증필요
+
 
         //로그인 설정
         http.formLogin() //보안 검증방식은 form login 방식
@@ -248,7 +264,7 @@ public class WebSecurityConfig {
                 public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
                     log.info("accessDeniedHandler 실행!");
                     log.error("AccessDeniedException ",accessDeniedException);
-                    response.sendRedirect("/denied");
+                    response.sendRedirect("/");
                 }
             });
 
@@ -276,6 +292,19 @@ public class WebSecurityConfig {
             .deleteCookies("JSESSIONID");
 
 //        http.authenticationProvider(authenticationProvider());
+        
+        /**
+         * OAuth2 로그인 설정
+         * userInfoEndpoint() : OAuth2 로그인 성공 후 가져올 설정들
+         * userService(customOauth2UserService) : 소셜 로그인 성공 시 후속 조치를 진행할 UserService 인터페이스 구현체 등록, 서버에서 사용자 정보를 가져온 상태에서 추가로 진행하고자 하는 기능 명시
+         */
+        http.oauth2Login()
+                .defaultSuccessUrl("/")
+                .userInfoEndpoint()
+                .userService(principalOauth2UserService);
+//                .and()
+//                .successHandler()
+//                .failureHandler();
 
         return http.build();
 

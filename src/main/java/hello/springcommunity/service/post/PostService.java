@@ -206,6 +206,7 @@ public class PostService {
 
                         if (!chk) {
                             post.updateViewCount();
+                            //postQueryRepository.updateViewCount(post.getId());
                             oldCookie.setValue(oldCookie.getValue() + "." + post.getId());
                             Cookie newCookie = createCookieForNotOverlap(oldCookie);
                             response.addCookie(newCookie);
@@ -216,6 +217,7 @@ public class PostService {
                         //1개만 조회한 경우 + 다른 게시물인 경우
                         if(!oldCookie.getValue().matches(post.getId().toString())) {
                             post.updateViewCount();
+                            //postQueryRepository.updateViewCount(post.getId());
                             oldCookie.setValue(oldCookie.getValue() + "." + post.getId());
                             Cookie newCookie = createCookieForNotOverlap(oldCookie);
                             response.addCookie(newCookie);
@@ -235,6 +237,7 @@ public class PostService {
 
             //쿠키가 없으면 처음 접속한 것이므로 새로 생성
             post.updateViewCount();
+            //postQueryRepository.updateViewCount(post.getId());
             Cookie cookie = new Cookie(CookieConst.VIEW_COOKIE_NAME, post.getId().toString());
 
             Cookie newCookie = createCookieForNotOverlap(cookie);

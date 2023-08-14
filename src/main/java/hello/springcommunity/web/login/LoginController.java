@@ -45,7 +45,7 @@ public class LoginController {
         // 요청 시점의 사용자 URI 정보를 Session의 Attribute에 담아서 전달(잘 지워줘야함)
         // 로그인이 틀려서 다시 하면 요청 시점의 URI가 로그인 페이지가 되므로 조건문 설정
         String uri = request.getHeader("Referer");
-        if(!uri.contains("/login")){
+        if(uri != null && !uri.contains("/login")){
             request.getSession().setAttribute("prevPage", uri);
         }
 

@@ -22,6 +22,7 @@ public class MemberResponseDTO {
     private String loginId;
     private String password;
     private String nickname;
+    private String email;
     private String role;
     private String createdDate;
 
@@ -31,6 +32,7 @@ public class MemberResponseDTO {
         this.loginId = member.getLoginId();
         this.password = member.getPassword();
         this.nickname = member.getNickname();
+        this.email = member.getEmail();
         this.role = member.getRoleValue();
         this.createdDate = member.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }

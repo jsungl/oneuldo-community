@@ -26,7 +26,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByLoginId(String loginId);
 
     /**
-     * 이메일로 회원 조회
+     * 이메일로 회원 조회 - oauth2 로그인
      */
     Optional<Member> findByEmail(String email);
 }

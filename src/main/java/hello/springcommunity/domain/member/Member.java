@@ -36,12 +36,6 @@ public class Member extends TimeEntity {
     @Column(nullable = false)
     private Role role;
 
-//    @Builder //빌더패턴으로 해당 생성자를 사용한다
-//    public Member(String loginId, String name, String password) {
-//        this.loginId = loginId;
-//        this.name = name;
-//        this.password = password;
-//    }
 
     public String getRoleValue() {
         return this.role.getValue();
@@ -51,17 +45,20 @@ public class Member extends TimeEntity {
      * repository를 제외한 다른 영역에서 Entity를 수정할 수 있게 만들고 싶지 않아서
      */
     
-    //닉네임 수정
-    public void updateNickname(String nickname) {
+    //닉네임, 이메일 수정
+    public void updateNickname(String nickname, String email) {
         this.nickname = nickname;
+        this.email = email;
+        this.onPreUpdate();
     }
 
     //비밀번호 수정
     public void updatePassword(String newPassword) {
         this.password = newPassword;
+        this.onPreUpdate();
     }
 
-    //소셜 로그인시 이미 등록된 회원인 경우 수정 날짜만 변경
+    //소셜 로그인시 이미 등록된 회원인 경우 닉네임이 변경되지 않은경우 수정 날짜만 업데이트
     //기존 데이터는 유지
     public Member updateModifiedDate() {
         this.onPreUpdate();

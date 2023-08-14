@@ -28,6 +28,12 @@ dependencies {
 	//spring-security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
+	//타임리프에서 스프링시큐리티의 문법이나 형식을 지원하는 확장팩 라이브러리
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+
+	//oauth2 로그인
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
 	//Bean Validation 사용
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
@@ -53,6 +59,9 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	//spring-security test
+	testImplementation 'org.springframework.security:spring-security-test'
 
 	//테스트에서 lombok 사용
 	testCompileOnly 'org.projectlombok:lombok'

@@ -9,26 +9,27 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+//@EntityListeners(AuditingEntityListener.class)
+
 @Getter
-@MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
+@MappedSuperclass //공통 매핑 정보가 필요할 때, 부모 클래스에 선언하고 속성만 상속 받아서 사용하고 싶을 때 사용한다. (DB 테이블과는 상관없다)
 public abstract class TimeEntity {
 
+    //@CreatedDate
     @Column(name = "created_date")
-    @CreatedDate
     private LocalDateTime createdDate;
 
+    //@LastModifiedDate
     @Column(name = "modified_date")
-    @LastModifiedDate
     private LocalDateTime modifiedDate;
 
     /**
      * 해당 엔티티를 저장하기 전에 실행
      */
-    //@PrePersist
+    @PrePersist
     public void onPrePersist() {
-        this.createdDate = createdDate;
-        //this.modifiedDate = this.createdDate;
+        this.createdDate = LocalDateTime.now();
+        this.modifiedDate = this.createdDate;
     }
 
     /**
@@ -36,7 +37,7 @@ public abstract class TimeEntity {
      */
     //@PreUpdate
     public void onPreUpdate() {
-        this.modifiedDate = modifiedDate;
+        this.modifiedDate = LocalDateTime.now();
     }
 
 }

@@ -1,8 +1,10 @@
 package hello.springcommunity.web;
 
 import hello.springcommunity.common.SessionConst;
+import hello.springcommunity.config.oauth.UserSessionDTO;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.dto.security.UserDetailsDTO;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,10 +13,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
+@RequiredArgsConstructor
 @Controller
 public class HomeController {
 
@@ -57,23 +61,45 @@ public class HomeController {
         }
 
         //인증 객체에 저장된 사용자의 이름(ID)
-//        log.info("authentication name={}", authentication.getName());
-//        log.info("authentication details={}", authentication.getDetails());
-//
-//        List<String> collect = authentication.getAuthorities().stream().map(a -> a.getAuthority())
-//                .collect(Collectors.toList());
-//        for (String s : collect) {
-//            //ROLE_USER, ROLE_ADMIN
-//            log.info("authentication authority={}", s);
-//        }
-//
-//        log.info("authentication authenticated={}", authentication.isAuthenticated());
-//        log.info("authentication principal={}", authentication.getPrincipal());
-//
+        /*
+        log.info("authentication name={}", authentication.getName());
+        log.info("authentication details={}", authentication.getDetails());
+
+        List<String> collect = authentication.getAuthorities().stream().map(a -> a.getAuthority())
+                .collect(Collectors.toList());
+        for (String s : collect) {
+            //ROLE_USER, ROLE_ADMIN
+            log.info("authentication authority={}", s);
+        }
+
+        log.info("authentication authenticated={}", authentication.isAuthenticated());
+        log.info("authentication principal={}", authentication.getPrincipal());
+        */
+
+        /*
+        [Principal=
+                Name: [109324193206697560890],
+                Granted Authorities: [[ROLE_SOCIAL]],
+                User Attributes: [{sub=109324193206697560890, name=js lee, given_name=js, family_name=lee, picture=https://lh3.googleusercontent.com/a/AAcHTtdRPBi6BH6JvxqnCIKZVugvl0s1bvJa5LGbIrn2ZOyH=s96-c, email=morefromjs@gmail.com, email_verified=true, locale=ko}],
+                Credentials=[PROTECTED],
+                Authenticated=true,
+                Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=A77D3C4C81BEA9F582680C6A6F037930],
+                Granted Authorities=[ROLE_SOCIAL]
+        ]*/
+
+        /*
+        OAuth2AuthenticationToken [
+                Principal=hello.springcommunity.dto.security.UserDetailsDTO@651953dd,
+                Credentials=[PROTECTED],
+                Authenticated=true,
+                Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=4FF827C196143BD9C8B6E98D00DE2852],
+                Granted Authorities=[hello.springcommunity.dto.security.UserDetailsDTO$$Lambda$1605/0x0000000800c36840@7f45a6de]
+        ]*/
+
         UserDetailsDTO userDetailsDTO = (UserDetailsDTO) authentication.getPrincipal();
-//        log.info("authentication user loginId={}", userDetailsDTO.getUsername());
-//        log.info("authentication user nickname={}", userDetailsDTO.getMember().getNickname());
-//        log.info("authentication user role={}", userDetailsDTO.getMember().getRoleValue());
+        log.info("authentication user loginId={}", userDetailsDTO.getUsername());
+        log.info("authentication user nickname={}", userDetailsDTO.getMember().getNickname());
+        log.info("authentication user role={}", userDetailsDTO.getMember().getRoleValue());
 
         /**
          * Spring Security 3.2 부터는 @AuthenticationPrincipal 어노테이션을 이용하여
