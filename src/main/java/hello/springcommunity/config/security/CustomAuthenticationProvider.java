@@ -12,12 +12,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-//@Component
+/**
+ * AuthenticationProvider 커스텀 구현체
+ * authenticate() 메서드를 통해 인증 과정이 진행된다
+ * supports(Class<?>) 메서드는 앞에서 필터를 통해 보내준 Authentication 객체를 이 AuthenticationProvider가 인증 처리가 가능한 클래스인지를 확인하는 메서드다
+ */
+
 @RequiredArgsConstructor
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
-    private final UserDetailsServiceImpl userDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final UserDetailsServiceImpl userDetailsService;
+
 
     /**
      * supports를 통과(true)해야 authenticate 메서드가 호출된다
@@ -29,7 +35,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
        String loginId = authentication.getName();
        String password = (String) authentication.getCredentials();
 
-        //UserDetailsDTO userDetailsDTO = (UserDetailsDTO) userDetailsService.loadUserByUsername(loginId);
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginId);
 
         if(userDetails == null) {
@@ -38,22 +43,23 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 인증 성공시 성공한 인증 객체를 생성 후 반환
+        /**
+         * UsernamePasswordAuthenticationToken은 Authentication 인터페이스의 구현체로
+         * 인증 성공시 최종 인증 객체(UsernamePasswordAuthenticationToken)를 생성 후 반환한다
+         * 그러면 ProviderManager 는 Authentication을 SecurityContextHolder 객체 안의 SecurityContext에 저장한다
+         */
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
-
-//        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginId, password, userDetails.getAuthorities());
+                new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
 
         return authenticationToken;
     }
 
     /**
      * 전달된 파라미터(authentication)의 타입이 UsernamePasswordAuthenticationToken 과 일치하는지 검사한다
-     *
-     *
      */
     @Override
     public boolean supports(Class<?> authentication) {
         return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
+        //return authentication.equals(UsernamePasswordAuthenticationToken.class);
     }
 }
