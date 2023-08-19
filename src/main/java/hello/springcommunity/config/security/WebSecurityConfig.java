@@ -2,6 +2,7 @@ package hello.springcommunity.config.security;
 
 
 import hello.springcommunity.config.oauth.CustomOauth2UserService;
+import hello.springcommunity.config.oauth.CustomTokenResponseConverter;
 import hello.springcommunity.config.oauth.PrincipalOauth2UserService;
 import hello.springcommunity.service.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.*;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -23,6 +25,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
+import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -32,6 +39,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +47,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -47,6 +56,7 @@ import java.util.List;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
+    @Autowired
     private final UserDetailsServiceImpl userDetailsService;
 
     //private final CustomOauth2UserService customOauth2UserService;
@@ -62,10 +72,10 @@ public class WebSecurityConfig {
      * 인증시 아이디나 비밀번호가 틀리면 모두 BadCredentialsException 가 발생한다
      *
      * 인증절차에서 UserDetailsService 의 loadUserByname() 이 실행되는데, 이때 만약 UsernameNotFoundException 이 발생하면
-     * AbstractUserDetailsauthenticationProvider 의 hideUserNotFoundException(Boolean)를 확인하여 UserNotFoundException을 보여줄 건지 안 보여준다면 BadCredentialsException을 내보내게 한다
+     * AbstractUserDetailsauthenticationProvider 의 hideUserNotFoundException(Boolean)를 확인하여 UsernameNotFoundException 보여줄 건지 안 보여준다면 BadCredentialsException을 내보내게 한다
      * 아이디 체크와 비밀번호 체크를 따로 exception을 날리는 거보다 BadCredential Exception 하나만 날리는것이 보다 더 보안이 강하기 때문이라고 한다 -> 아이디가 틀린건지 비밀번호가 틀린건지 알려주지 않기 위해
      *
-     * 만약 따로 예외를 구분하여 처리하여 아이디가 틀린건지 비밀번호가 틀린건지 알려주고 싶다면
+     * 만약 따로 예외를 구분하여 처리하여 아이디가 틀린건지 비밀번호가 틀린건지 알려주고 싶다면 2가지 방법이 있다
      * 1. AuthenticationProvider의 구현체인 DaoAuthenticationProvider 에서 setHideUserNotFoundExceptions 설정을 false로 한다(기본값 true)
      *
      * 2. AuthenticationProvider 를 커스텀하여 아이디가 없는 경우에는 UsernameNotFoundException 을, 비밀번호가 틀린 경우라면 BadCredentialsException 을 발생시킨다
@@ -83,19 +93,26 @@ public class WebSecurityConfig {
     }
 
     /**
-     * AuthenticationProvider를 상속받는 CustomAuthenticationProvider를 등록
+     * 2번째 방법
+     * ProviderManager 는 AuthenticationManager의 구현체로 스프링에서 인증을 담당하는 클래스이다
+     * ProviderManager 클래스는 인증을 담당하고 있지만 실제로 직접 인증 과정을 진행하는 클래스는 AuthenticationProvider(s)에게 인증을 위임하고
+     * 그중에서 인증 처리가 가능한 AuthenticationProvider 객체가 인증 과정을 거쳐서 인증에 성공하면 요청에 대해 ProviderManager가 인증이 되었다고 알려주는 방식이다
+     * 기본적으로 AuthenticationProvider의 구현체인 DaoAuthenticationProvider 가 등록되어 있다
+     *
+     * AuthenticationProvider 는 전달받은 사용자의 아이디와 비밀번호를 기반으로 실질적으로 인증을 수행하는 클래스이다
+     * AuthenticationProvider 의 구현체인 CustomAuthenticationProvider 를 통해 AuthenticationProvider 를 커스텀한다
+     * 인증 로직이 구현된 CustomAuthenticationProvider를 ProviderManager가 알 수 있도록 ProviderManager에 등록해준다
+     * ProviderManager 의 provider.authenticate(authentication)를 디버깅해보면 CustomAuthenticationProvider 가 등록된것을 확인할 수 있다
+     *
      */
-
 //    @Bean
-//    public AuthenticationProvider authenticationProvider() {
-//        return new CustomAuthenticationProvider(userDetailsService, passwordEncoder());
+//    public AuthenticationManager authenticationManager() {
+//        return new ProviderManager(customAuthenticationProvider());
 //    }
 //
 //    @Bean
-//    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-//        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-//        authenticationManagerBuilder.authenticationProvider(authenticationProvider());
-//        return authenticationManagerBuilder.build();
+//    public CustomAuthenticationProvider customAuthenticationProvider() {
+//        return new CustomAuthenticationProvider(passwordEncoder(), userDetailsService);
 //    }
 
 
@@ -299,14 +316,39 @@ public class WebSecurityConfig {
          * userService(customOauth2UserService) : 소셜 로그인 성공 시 후속 조치를 진행할 UserService 인터페이스 구현체 등록, 서버에서 사용자 정보를 가져온 상태에서 추가로 진행하고자 하는 기능 명시
          */
         http.oauth2Login()
+                .tokenEndpoint()
+                .accessTokenResponseClient(accessTokenResponseClient())
+                .and()
                 .defaultSuccessUrl("/")
                 .userInfoEndpoint()
                 .userService(principalOauth2UserService);
 //                .and()
-//                .successHandler()
+//                .successHandler(OAuth2AuthenticationSuccessHandler)
 //                .failureHandler();
 
         return http.build();
+
+    }
+
+    /**
+     * 토큰을 요청하는데 사용되는 ResponseClient를 설정한다
+     *
+     */
+    @Bean
+    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
+        //기본적으로 사용하는 DefaultAuthorizationCodeTokenResponseClient를 생성
+        DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
+
+        //response 도 커스텀
+        OAuth2AccessTokenResponseHttpMessageConverter tokenResponseHttpMessageConverter = new OAuth2AccessTokenResponseHttpMessageConverter();
+        tokenResponseHttpMessageConverter.setTokenResponseConverter(new CustomTokenResponseConverter());
+
+        RestTemplate restTemplate = new RestTemplate(Arrays.asList(
+                new FormHttpMessageConverter(), tokenResponseHttpMessageConverter));
+        restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
+
+        accessTokenResponseClient.setRestOperations(restTemplate);
+        return accessTokenResponseClient;
 
     }
 

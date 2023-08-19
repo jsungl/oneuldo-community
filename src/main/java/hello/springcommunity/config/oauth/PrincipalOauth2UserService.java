@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -26,15 +27,14 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         log.info("access token={}", userRequest.getAccessToken().getTokenValue());
+        log.info("refresh token={}", userRequest.getAdditionalParameters().get(OAuth2ParameterNames.REFRESH_TOKEN));
+
+        String accessToken = userRequest.getAccessToken().getTokenValue();
+        String refreshToken = (String) userRequest.getAdditionalParameters().get(OAuth2ParameterNames.REFRESH_TOKEN);
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
         log.info("getAttributes : {}", oAuth2User.getAttributes());
-        /**
-         * google
-         * {sub=XXX, name=XXX, given_name=XX(이름), family_name=X(성), picture=XXX, email=XXXX@gmail.com, email_verified=true, locale=ko}
-         * naver
-         * {resultcode=00, message=success, response={id=AvMxLlwRODQIV8a35S8A6Ru-sCuz_I_HDL1YLqXgMC4, nickname=JS, email=morefromjs@gmail.com, name=이재성}}
-         */
+
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
@@ -50,8 +50,9 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         }
 
         Member member = saveOrUpdate(attributes);
-        httpSession.setAttribute("oauth2member", new UserSessionDTO(member, userRequest.getAccessToken().getTokenValue()));
+        httpSession.setAttribute("oauth2member", new UserSessionDTO(member, accessToken, refreshToken, registrationId));
 
+        //최종적으로 Spring Security 가 인증여부를 확인할 수 있도록 OAuth2User 객체를 반환한다
         return new UserDetailsDTO(member, oAuth2User.getAttributes());
 
     }

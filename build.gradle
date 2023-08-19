@@ -34,6 +34,9 @@ dependencies {
 	//oauth2 로그인
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
+	//Web Client
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 	//Bean Validation 사용
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 

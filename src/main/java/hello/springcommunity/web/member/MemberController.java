@@ -1,8 +1,10 @@
 package hello.springcommunity.web.member;
 
+import hello.springcommunity.config.oauth.UserSessionDTO;
 import hello.springcommunity.dto.member.MemberNicknameUpdateDTO;
 import hello.springcommunity.dto.member.MemberPwdUpdateDTO;
 import hello.springcommunity.dto.member.MemberSaveRequestDTO;
+import hello.springcommunity.dto.security.UserDetailsDTO;
 import hello.springcommunity.service.member.MemberService;
 import hello.springcommunity.common.validation.ValidationSequence;
 import hello.springcommunity.dto.member.MemberResponseDTO;
@@ -10,6 +12,7 @@ import hello.springcommunity.common.validation.CheckIdValidator;
 import hello.springcommunity.common.validation.CheckNicknameValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +36,7 @@ public class MemberController {
     private final MemberService memberService;
     private final CheckIdValidator checkIdValidator;
     private final CheckNicknameValidator checkNicknameValidator;
+    private final HttpSession httpSession;
 
     /**
      * InitBinder : 특정 컨트롤러에서 바인딩 또는 검증 설정을 변경하고 싶을 때 사용
@@ -88,7 +93,7 @@ public class MemberController {
     /**
      * 마이페이지 - 회원 정보 수정, 회원 탈퇴
      */
-    @GetMapping("/{loginId}/info")
+    @GetMapping("/{loginId}")
     public String info(@PathVariable String loginId, Model model) {
         model.addAttribute("loginId", loginId);
         return "member/info";
@@ -115,7 +120,7 @@ public class MemberController {
 //        MemberNameUpdateForm memberNameUpdateForm = new MemberNameUpdateForm(member.getLoginId(), member.getName());
 
         MemberResponseDTO member = memberService.getMemberByLoginId(loginId);
-        MemberNicknameUpdateDTO dto = new MemberNicknameUpdateDTO(member.getLoginId(), member.getNickname());
+        MemberNicknameUpdateDTO dto = new MemberNicknameUpdateDTO(member.getLoginId(), member.getNickname(), member.getEmail());
 
         model.addAttribute("memberNicknameUpdateDTO", dto);
         model.addAttribute("loginId", loginId);
@@ -220,9 +225,14 @@ public class MemberController {
     /**
      * 비밀번호 하나만 입력받기 때문에 따로 DTO 를 통해 받지 않고, @RequestParam 을 통해 받는다
      * 회원탈퇴에 성공하면 로그아웃 시킨다
+     *
+     * oauth2 로그인 사용자인 경우 회원탈퇴
+     * 네이버 아래 url로 요청
+     * https://nid.naver.com/oauth2.0/token?grant_type=delete&client_id=CLIENT_ID&client_secret=CLIENT_SECRET&access_token=ACCESS_TOKEN
      */
     @PostMapping("/{loginId}/withdrawal")
     public String withdrawal(@PathVariable String loginId, @RequestParam String currentPassword, Model model) {
+
         boolean result = memberService.withdrawal(loginId, currentPassword);
 
         if(result) {
@@ -234,6 +244,24 @@ public class MemberController {
             model.addAttribute("valid_currentPassword", "비밀번호가 틀렸습니다.");
             return "member/withdrawal";
         }
+    }
+
+    @PostMapping("/{loginId}/withdrawalV2")
+    public String withdrawalV2(@PathVariable String loginId, @AuthenticationPrincipal UserDetailsDTO dto) {
+        log.info("role={}", dto.getMember().getRoleValue());
+
+        if(dto.getMember().getRoleValue().equals("ROLE_SOCIAL")) {
+            UserSessionDTO userSessionDTO = (UserSessionDTO) httpSession.getAttribute("oauth2member");
+            String provider = userSessionDTO.getProvider();
+
+
+            Boolean result = memberService.disConnectOauth2User(userSessionDTO, loginId, provider);
+            if(result) {
+                log.info("회원 탈퇴 완료");
+                return "redirect:/logout";
+            }
+        }
+        return "redirect:/";
     }
 
 }
