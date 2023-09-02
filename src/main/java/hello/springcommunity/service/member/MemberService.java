@@ -15,17 +15,20 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,6 +39,8 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JavaMailSender javaMailSender;
+    private final SpringTemplateEngine templateEngine;
 
     @Value("${spring.security.oauth2.client.registration.naver.client-id}")
     private String naverClientId;
@@ -84,7 +89,7 @@ public class MemberService {
     }
 
     /**
-     * 회원 1명 조회
+     * 회원 1명 조회 - id, 로그인 아이디, 이메일
      */
     public Optional<Member> findOne(Long memberId) {
         return memberRepository.findById(memberId);
@@ -94,11 +99,33 @@ public class MemberService {
         Member member = memberRepository.findByLoginId(loginId).orElseThrow(() -> new UsernameNotFoundException("해당 유저가 존재하지 않습니다. loginId=" + loginId));
 
         //Entity -> DTO
-        MemberResponseDTO result = MemberResponseDTO.builder()
+        MemberResponseDTO dto = MemberResponseDTO.builder()
                                                     .member(member)
                                                     .build();
 
-        return result;
+        return dto;
+
+    }
+
+    public MemberResponseDTO getMemberByEmail(String email) {
+
+        //Member member = memberRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("해당 유저가 존재하지 않습니다. email=" + email));
+
+        Member member = memberRepository.findByEmail(email).orElse(null);
+
+
+        //Entity -> DTO
+        if(member != null) {
+
+            MemberResponseDTO dto = MemberResponseDTO.builder()
+                    .member(member)
+                    .build();
+
+            return dto;
+
+        }
+
+        return null;
 
     }
 
@@ -282,7 +309,7 @@ public class MemberService {
     }
 
     /**
-     * accessToken 유효성 검사\
+     * accessToken 유효성 검사
      */
     private ResponseEntity<Map> verifyAccessToken(String accessToken) {
 
@@ -352,5 +379,95 @@ public class MemberService {
                 .block();
 
         return response;
+    }
+
+    /**
+     * 아이디/비밀번호 찾기 - 아이디, 임시비밀번호 전송
+     */
+    public void sendIdPassword(MemberResponseDTO member, String to, String type) {
+
+        String data = "";
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+
+
+        if(type.equals("mail/loginId")) {
+
+            data = member.getLoginId();
+
+        } else if (type.equals("mail/password")) {
+            data = createCode();
+            //임시 비밀번호로 DB 세팅
+            //입력한 새로운 비밀번호를 암호화 후 저장
+            Member findMember = memberRepository.findByLoginId(member.getLoginId()).orElseThrow(() -> new UsernameNotFoundException("해당 유저가 존재하지 않습니다. loginId=" + member.getLoginId()));
+            findMember.updatePassword(passwordEncoder.encode(data));
+        }
+
+        try {
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+            mimeMessageHelper.setTo(to);
+            mimeMessageHelper.setSubject("아이디/비밀번호 정보입니다.");
+            mimeMessageHelper.setText(setContext(data, type), true); //메일 본문 내용, HTML 여부
+            javaMailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
+            log.error("아이디/비밀번호 찾기 실패!", e);
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    /**
+     * 회원가입 이메일 인증
+     * to : 메일 수신자
+     * subject : 메일 제목
+     * type : 메일 타입
+     */
+    public String mailConfirm(String to, String subject, String type) {
+
+        String checkcode = createCode();
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+
+        try {
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+            mimeMessageHelper.setTo(to);
+            mimeMessageHelper.setSubject(subject);
+            mimeMessageHelper.setText(setContext(checkcode, type), true); //메일 본문 내용, HTML 여부
+            javaMailSender.send(mimeMessage);
+
+            return checkcode;
+        } catch (MessagingException e) {
+            log.error("회원가입 이메일 인증 실패!", e);
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+    /**
+     * thymeleaf를 통한 html 적용
+     */
+    private String setContext(String code, String type) {
+        Context context = new Context();
+        context.setVariable("code", code);
+        return templateEngine.process(type, context);
+    }
+
+    /**
+     * 인증번호 및 임시 비밀번호 생성 메서드
+     */
+    private String createCode() {
+        Random random = new Random();
+        StringBuffer key = new StringBuffer();
+
+        for (int i = 0; i < 8; i++) {
+            int index = random.nextInt(4);
+
+            switch (index) {
+                case 0: key.append((char) ((int) random.nextInt(26) + 97)); break;
+                case 1: key.append((char) ((int) random.nextInt(26) + 65)); break;
+                default: key.append(random.nextInt(9));
+            }
+        }
+        return key.toString();
     }
 }

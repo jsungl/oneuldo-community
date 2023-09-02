@@ -1,6 +1,8 @@
 package hello.springcommunity.web.member;
 
 import hello.springcommunity.config.oauth.UserSessionDTO;
+import hello.springcommunity.dto.email.EmailDTO;
+import hello.springcommunity.dto.email.FindPasswordDTO;
 import hello.springcommunity.dto.member.MemberNicknameUpdateDTO;
 import hello.springcommunity.dto.member.MemberPwdUpdateDTO;
 import hello.springcommunity.dto.member.MemberSaveRequestDTO;
@@ -12,6 +14,7 @@ import hello.springcommunity.common.validation.CheckIdValidator;
 import hello.springcommunity.common.validation.CheckNicknameValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -59,7 +62,8 @@ public class MemberController {
      * 회원가입
      */
     @GetMapping("/add")
-    public String addForm(@ModelAttribute MemberSaveRequestDTO memberSaveRequestDTO) {
+    public String addForm(@ModelAttribute MemberSaveRequestDTO memberSaveRequestDTO, Model model) {
+        model.addAttribute("result", false);
         return "member/addMemberForm";
     }
 
@@ -128,7 +132,7 @@ public class MemberController {
     }
 
     @PostMapping("/{loginId}/updateNickname")
-    public String updateNickname(@Validated @ModelAttribute MemberNicknameUpdateDTO memberNicknameUpdateDTO,
+    public String updateNickname(@Validated(ValidationSequence.class) @ModelAttribute MemberNicknameUpdateDTO memberNicknameUpdateDTO,
                                  BindingResult result,
                                  Model model,
                                  RedirectAttributes redirectAttributes,
@@ -171,7 +175,7 @@ public class MemberController {
 
     @PostMapping("/{loginId}/updatePassword")
     public String updatePassword(@PathVariable String loginId,
-                                 @Validated @ModelAttribute MemberPwdUpdateDTO memberPwdUpdateDTO,
+                                 @Validated(ValidationSequence.class) @ModelAttribute MemberPwdUpdateDTO memberPwdUpdateDTO,
                                  BindingResult bindingResult,
                                  Model model) {
 
@@ -262,6 +266,105 @@ public class MemberController {
             }
         }
         return "redirect:/";
+    }
+
+
+    @GetMapping("/find/id")
+    public String findMemberIdForm(@ModelAttribute EmailDTO emailDTO) {
+        return "member/findId";
+    }
+
+    @PostMapping("/find/id")
+    public String findMemberId(@Validated(ValidationSequence.class) @ModelAttribute EmailDTO emailDTO,
+                               BindingResult bindingResult,
+                               RedirectAttributes redirectAttributes,
+                               Model model) {
+
+        if(bindingResult.hasErrors()) {
+
+            Map<String, String> errorMap = new HashMap<>();
+            for(FieldError error : bindingResult.getFieldErrors()) {
+                errorMap.put("valid_"+error.getField(), error.getDefaultMessage());
+                log.info("아이디 찾기 실패 ! error message : "+error.getDefaultMessage());
+            }
+
+            for(String key : errorMap.keySet()) {
+                model.addAttribute(key, errorMap.get(key));
+            }
+
+            return "member/findId";
+        }
+
+
+        String userMail = emailDTO.getEmail();
+        MemberResponseDTO member = memberService.getMemberByEmail(userMail);
+
+        if(member == null) {
+            redirectAttributes.addFlashAttribute("re_msg", "가입된 계정이 없습니다.");
+            return "redirect:/member/find/id";
+        }
+
+        //소셜 계정으로 가입한 사람인지 검사
+        if(member.getRole().equals("ROLE_SOCIAL")) {
+            redirectAttributes.addFlashAttribute("re_msg", "소셜계정으로 가입한 회원은 해당 사이트를 이용해주세요.");
+            return "redirect:/member/find/id";
+        }
+
+        memberService.sendIdPassword(member, userMail, "mail/loginId");
+        model.addAttribute("msg", "가입할 때 등록한 메일 주소로 요청한 아이디를 보냈습니다. 확인해주세요.");
+        return "member/findId";
+    }
+
+
+    @GetMapping("/find/password")
+    public String findMemberPasswordForm(@ModelAttribute FindPasswordDTO findPasswordDTO) {
+        return "member/findPassword";
+    }
+
+    @PostMapping("/find/password")
+    public String findMemberPassword(@Validated(ValidationSequence.class) @ModelAttribute FindPasswordDTO findPasswordDTO,
+                                     BindingResult bindingResult,
+                                     RedirectAttributes redirectAttributes,
+                                     Model model) {
+
+        if(bindingResult.hasErrors()) {
+
+            Map<String, String> errorMap = new HashMap<>();
+            for(FieldError error : bindingResult.getFieldErrors()) {
+                errorMap.put("valid_"+error.getField(), error.getDefaultMessage());
+                log.info("비밀번호 찾기 실패 ! error message : "+error.getDefaultMessage());
+            }
+
+            for(String key : errorMap.keySet()) {
+                model.addAttribute(key, errorMap.get(key));
+            }
+
+            return "member/findPassword";
+        }
+
+        String userMail = findPasswordDTO.getEmail();
+        MemberResponseDTO member = memberService.getMemberByEmail(userMail);
+
+        if(member == null) {
+            redirectAttributes.addFlashAttribute("re_msg", "가입된 계정이 없습니다.");
+            return "redirect:/member/find/password";
+        }
+
+        if(!member.getLoginId().equals(findPasswordDTO.getLoginId())) {
+            redirectAttributes.addFlashAttribute("re_msg", "잘못된 아이디 입력입니다. 다시 확인해주세요.");
+            return "redirect:/member/find/password";
+        }
+
+        //소셜 계정으로 가입한 사람인지 검사
+        if(member.getRole().equals("ROLE_SOCIAL")) {
+            redirectAttributes.addFlashAttribute("re_msg", "소셜계정으로 가입한 회원은 해당 사이트를 이용해주세요.");
+            return "redirect:/member/find/password";
+        }
+
+        memberService.sendIdPassword(member, userMail, "mail/password");
+        model.addAttribute("msg", "가입할 때 등록한 메일 주소로 임시 비밀번호를 보냈습니다. 확인해주세요.");
+        return "member/findPassword";
+
     }
 
 }

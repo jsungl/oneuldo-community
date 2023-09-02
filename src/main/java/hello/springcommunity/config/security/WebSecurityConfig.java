@@ -169,7 +169,7 @@ public class WebSecurityConfig {
 //                        .anyRequest().authenticated(); //그 외 요청들은 인증필요
 
         http.authorizeRequests() //요청에 의한 보안검사 시작
-                .antMatchers("/member/add", "/login").anonymous()
+                .antMatchers("/member/add", "/api/member/*", "/member/find/*", "/login").anonymous()
                 .antMatchers("/post/add").hasAnyRole("USER", "SOCIAL", "ADMIN") //Spring Security에서 prefix를 자동으로 "ROLE_"을 넣어주므로 이 때 hasRole에는 ROLE을 제외하고 뒷 부분인 USER만 써주면 된다
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/", "/posts", "/post/{postId}", "/post/search").permitAll()
