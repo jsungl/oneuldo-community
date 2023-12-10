@@ -3,9 +3,11 @@ package hello.springcommunity.common.validation;
 import hello.springcommunity.dao.member.MemberRepository;
 import hello.springcommunity.dto.member.MemberSaveRequestDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+
 
 /**
  * 로그인 아이디 중복 검사
@@ -13,6 +15,7 @@ import org.springframework.validation.Validator;
  * Validator 인터페이스를 구현한다.
  */
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CheckIdValidator implements Validator {
@@ -34,7 +37,7 @@ public class CheckIdValidator implements Validator {
 
         MemberSaveRequestDTO memberSaveForm = (MemberSaveRequestDTO) target;
 
-        if(memberRepository.existsByLoginId(memberSaveForm.getLoginId())) {
+        if(memberRepository.existsByLoginIdAndActivated(memberSaveForm.getLoginId())) {
             errors.rejectValue("loginId", "아이디 중복 오류", "이미 사용중인 아이디입니다.");
         }
 

@@ -12,14 +12,14 @@ import org.springframework.validation.Validator;
 import java.util.Optional;
 
 /**
- * 유저 닉네임 중복 검사
+ * 이메일 중복 검사
  * 필드의 중복 검사 로직을 별도의 클래스로 분리.
  * Validator 인터페이스를 구현한다.
  */
 
 @Component
 @RequiredArgsConstructor
-public class CheckNicknameValidator implements Validator {
+public class CheckMailValidator implements Validator {
 
     private final MemberRepository memberRepository;
 
@@ -32,33 +32,37 @@ public class CheckNicknameValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
 
-        String nickname = null;
+        String email = null;
 
         if(target instanceof MemberSaveRequestDTO) {
 
             MemberSaveRequestDTO dto = (MemberSaveRequestDTO) target;
-            nickname = dto.getNickname();
-            checkNickname(nickname, errors);
+            email = dto.getEmail();
+            checkEmail(email, errors);
 
         } else {
 
             MemberProfileUpdateDTO dto = (MemberProfileUpdateDTO) target;
-            nickname = dto.getNickname();
+            email = dto.getEmail();
 
             Optional<Member> member = memberRepository.findByLoginId(dto.getLoginId());
-            if(!member.get().getNickname().equals(nickname)) {
-                checkNickname(nickname, errors);
+            String roleValue = member.get().getRoleValue();
+
+            if(!roleValue.equals("ROLE_SOCIAL") && !member.get().getEmail().equals(email)) {
+                checkEmail(email, errors);
             }
 
+
         }
 
     }
 
-    private void checkNickname(String nickname, Errors errors) {
+    private void checkEmail(String email, Errors errors) {
 
-        if(memberRepository.existsByNicknameAndActivated(nickname)) {
-            errors.rejectValue("nickname", "닉네임 중복 오류", "이미 사용중인 닉네임입니다.");
+        if(memberRepository.existsByEmailAndActivated(email)) {
+            errors.rejectValue("email", "이메일 중복 오류", "이미 사용중인 메일주소입니다.");
         }
-
     }
+
+
 }
