@@ -1,35 +1,59 @@
 
-//댓글 등록
+//댓글,답글 등록
 function addComment(form, event) {
     event.preventDefault();
 
     let data = form.content.value;
     let postId = form.postId.value;
-
-    let pathname = window.location.pathname;
-    let origin = window.location.origin;
-
-    //let contextPath = origin + pathname + "?postId=" + postId;
-    let contextPath = origin + pathname; //http://localhost:8081/post/1/detail
+    let contextPath = form.contextPath.value;
+    let parentId;
+    let comment;
 
     if(!data || data.trim() === "") {
         alert("공백 또는 입력하지 않은 부분이 있습니다");
         return false;
     }
 
+    if(form.parentId === undefined) {
+        comment = {content:data};
+    } else {
+        parentId = form.parentId.value;
+        comment = {content:data, parentId:parentId};
+    }
+
+
     $.ajax({
         type: 'post',
         url: '/api/post/' + postId + '/comment/add',
 //        dataType: 'JSON',
         contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify({content:data})
+        data: JSON.stringify(comment)
     }).done(function(result) {
-        //console.log(result);
-        //window.location.reload();
-        $(".comment-list").load(contextPath + " .comment-list");
         $("#commentTextarea").val('');
+        contextPath = contextPath + "?commentId=" + result + "#comment_" + result;
+
+        $(".comment-list").load(contextPath + " .comment-list", function() {
+            //댓글 위치
+            const myElement = document.getElementById('comment_'+result);
+            const verticalScrollPosition = setElementScrollPosition(myElement);
+
+            // 수직 스크롤 위치 설정하기
+            window.scrollTo({
+              top: verticalScrollPosition,
+              behavior: 'smooth' // 부드러운 스크롤(선택 사항)
+            });
+        });
+
+
     }).fail(function(error) {
-        console.log(error);
+        const result = error.responseJSON;
+//        for(var key in result) {
+//            alert("댓글을 등록할 수 없습니다. \n[에러메세지:" + result[key] + "]");
+//        }
+
+        alert("댓글을 등록할 수 없습니다.");
+        window.location.reload();
+
     });
 
 }
@@ -41,46 +65,40 @@ function editComment(commentId) {
     const comment = document.getElementById('commentContent' + commentId);
     const isModified = document.getElementById('commentIsModified' + commentId);
 
+
     // 숨기기 (display: none)
     if(form.style.display !== 'none') {
         form.style.display = 'none';
         comment.style.display = 'block';
-        isModified.style.display = 'block';
-    }
-    // 보이기 (display: block)
-    else {
+        isModified != null ? isModified.style.display = 'block':'';
+    }else {
+        // 보이기 (display: block)
         form.style.display = 'block';
         comment.style.display = 'none';
-        isModified.style.display = 'none';
+        isModified != null ? isModified.style.display = 'none':'';
     }
 
 
 }
 
 
-//댓글 수정 저장
+//댓글 수정
 function editCommentSave(form) {
+
     const commentId = form.commentId.value;
     const postId = form.postId.value;
     const newContent = form.commentContent.value;
 
     const oldContent = document.getElementById('commentContent' + commentId).innerText;
 //    const oldContent = document.getElementById('commentContent').textContent;
-
-    let origin = window.location.origin;
-    let pathname = window.location.pathname;
-    //let contextPath = origin + pathname + "?postId=" + postId;
-    let contextPath = origin + pathname;
+    let contextPath = form.contextPath.value;
 
     if(!newContent || newContent.trim() === "") {
         alert("공백 또는 입력하지 않은 부분이 있습니다");
         return false;
     }
 
-    if (newContent !== oldContent) {
-//        $.post(`/board/${id}/comment/${commentId}/update`, {content: newContent}, function(data) {
-//            window.location.href = data;
-//        });
+    if(newContent !== oldContent) {
 
         $.ajax({
             type: 'PUT',
@@ -89,15 +107,29 @@ function editCommentSave(form) {
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify({content: newContent})
         }).done(function(result) {
-            //console.log("updated commentId = " + result);
-            //window.location.reload();
-            $(".comment-list").load(contextPath + " .comment-list");
+            contextPath = contextPath + "?commentId=" + result + "#comment_" + result;
+
+            $(".comment-list").load(contextPath + " .comment-list", function() {
+                //댓글 위치
+                const myElement = document.getElementById('comment_'+result);
+                const verticalScrollPosition = setElementScrollPosition(myElement);
+                // 수직 스크롤 위치 설정하기
+                window.scrollTo({
+                  top: verticalScrollPosition,
+                  behavior: 'smooth' // 부드러운 스크롤(선택 사항)
+                });
+            });
+
         }).fail(function(error) {
-            console.log(error);
+            const result = error.responseJSON;
+//            for(var key in result) {
+//                alert("댓글을 수정할 수 없습니다. \n[에러메세지:" + result[key] + "]");
+//            }
+            alert("댓글을 수정할 수 없습니다.");
+            window.location.reload();
         });
 
     }else {
-        console.log("기존댓글과 같음");
         return false;
     }
 }
@@ -108,7 +140,6 @@ function deleteComment(commentId, postId) {
 
     let origin = window.location.origin;
     let pathname = window.location.pathname;
-    //let contextPath = origin + pathname + "?postId=" + postId;
     let contextPath = origin + pathname;
 
     const check = confirm("댓글을 삭제하시겠습니까?");
@@ -118,11 +149,14 @@ function deleteComment(commentId, postId) {
             url: '/api/post/' + postId + '/comment/' + commentId + '/delete',
             dataType: 'JSON'
         }).done(function(result) {
-            //console.log("deleted commentId = " + result);
-            //window.location.reload();
             $(".comment-list").load(contextPath + " .comment-list");
         }).fail(function(error) {
-            console.log(error);
+            const result = error.responseJSON;
+//            for(var key in result) {
+//                alert("댓글을 삭제할 수 없습니다. \n[에러메세지:" + result[key] + "]");
+//            }
+            alert("댓글을 삭제할 수 없습니다.");
+            window.location.reload();
         });
     }
 }
@@ -140,53 +174,47 @@ function replyComment(commentId) {
     else {
         form.style.display = 'block';
     }
-
 }
 
-
-//답글 저장
-function replyCommentSave(form) {
-
-    let parentId = form.parentId.value;
-    let postId = form.postId.value;
-    let data = form.replyCommentContent.value;
-    let depth = form.depth.value;
-
-    let origin = window.location.origin;
-    let pathname = window.location.pathname;
-    //let contextPath = origin + pathname + "?postId=" + postId;
-    let contextPath = origin + pathname;
-
-    if(!data || data.trim() === "") {
-        alert("공백 또는 입력하지 않은 부분이 있습니다");
-        return false;
-    }
-
-    $.ajax({
-        type: 'post',
-        url: '/api/post/' + postId + '/comment/add',
-        contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify({content:data, parentId:parentId, depth:depth})
-        //dataType: 'JSON'
-    }).done(function(result) {
-        //console.log(result);
-        //window.location.reload();
-        $(".comment-list").load(contextPath + " .comment-list");
-    }).fail(function(error) {
-        console.log(error);
-    });
-
-}
 
 //댓글 페이지 이동
-function moveToPage(postId, page) {
+function moveToPage(page) {
 
     let origin = window.location.origin;
     let pathname = window.location.pathname;
-    //let contextPath = origin + pathname + "?postId=" + postId + "&page=" + page;
     let contextPath = origin + pathname + "?page=" + page;
 
     //가져온 댓글로 교체
     $(".comment-list").load(contextPath + " .comment-list");
 
+}
+
+//element 스크롤 위치
+function setElementScrollPosition(element) {
+  const elementPosition = element.getBoundingClientRect().top;
+  const currentWindowScrollY = window.scrollY;
+  const scrollDifference = currentWindowScrollY + elementPosition;
+  return element.scrollTop + scrollDifference;
+}
+
+
+//부모 댓글로 이동
+function moveToParent(commentId) {
+
+    let origin = window.location.origin;
+    let pathname = window.location.pathname;
+    let contextPath = origin + pathname + "?commentId=" + commentId + "#comment_" + commentId;
+
+    $(".comment-list").load(contextPath + " .comment-list", function() {
+
+        //부모 댓글 위치
+        const myElement = document.getElementById('comment_'+commentId);
+        const verticalScrollPosition = setElementScrollPosition(myElement);
+
+        //수직 스크롤 위치 설정하기
+        window.scrollTo({
+          top: verticalScrollPosition,
+          behavior: 'smooth' // 부드러운 스크롤(선택 사항)
+        });
+    });
 }
