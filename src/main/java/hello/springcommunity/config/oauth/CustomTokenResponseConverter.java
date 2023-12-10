@@ -1,5 +1,6 @@
 package hello.springcommunity.config.oauth;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
@@ -9,10 +10,12 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class CustomTokenResponseConverter implements Converter<Map<String, String>, OAuth2AccessTokenResponse> {
 
     @Override
     public OAuth2AccessTokenResponse convert(Map<String, String> tokenResponseParameters) {
+
         String accessToken = tokenResponseParameters.get(OAuth2ParameterNames.ACCESS_TOKEN);
         String refreshToken = tokenResponseParameters.get(OAuth2ParameterNames.REFRESH_TOKEN);
         long expiresIn = Long.parseLong(tokenResponseParameters.get(OAuth2ParameterNames.EXPIRES_IN));
