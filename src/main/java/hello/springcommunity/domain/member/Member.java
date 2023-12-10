@@ -1,9 +1,11 @@
 package hello.springcommunity.domain.member;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import hello.springcommunity.domain.TimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Member Entity
@@ -20,21 +22,27 @@ public class Member extends TimeEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    //@Column(unique = true)
     private String loginId; //로그인 ID
 
-    @Column(unique = true, nullable = false)
+    //@Column(unique = true)
     private String nickname; //사용자 이름
 
-    //@Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
     private String email;
 
     @Enumerated(EnumType.STRING) //enum의 값을 index가 아닌 텍스트 값 그대로 저장
     @Column(nullable = false)
     private Role role;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean activated = true;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberLikePost> likePosts;
 
 
     public String getRoleValue() {
@@ -46,7 +54,7 @@ public class Member extends TimeEntity {
      */
     
     //닉네임, 이메일 수정
-    public void updateNickname(String nickname, String email) {
+    public void updateProfile(String nickname, String email) {
         this.nickname = nickname;
         this.email = email;
         this.onPreUpdate();
@@ -64,4 +72,5 @@ public class Member extends TimeEntity {
         this.onPreUpdate();
         return this;
     }
+
 }

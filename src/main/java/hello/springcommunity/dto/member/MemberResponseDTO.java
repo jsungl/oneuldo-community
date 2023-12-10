@@ -24,6 +24,7 @@ public class MemberResponseDTO {
     private String nickname;
     private String email;
     private String role;
+    private boolean activated;
     private String createdDate;
 
     @Builder
@@ -34,6 +35,7 @@ public class MemberResponseDTO {
         this.nickname = member.getNickname();
         this.email = member.getEmail();
         this.role = member.getRoleValue();
+        this.activated = member.getActivated();
         this.createdDate = member.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }

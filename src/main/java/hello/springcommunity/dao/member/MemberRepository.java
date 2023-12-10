@@ -2,6 +2,10 @@ package hello.springcommunity.dao.member;
 
 import hello.springcommunity.domain.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -13,20 +17,43 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     /**
-     * 유효성 검사 - 중복체크
+     * 유효성 검사 - 아이디, 닉네임, 이메일 중복체크
      * 중복이면 true
      * 중복이 아니면 false
      */
-    boolean existsByLoginId(String loginId);
-    boolean existsByNickname(String nickname);
+//    boolean existsByLoginId(String loginId);
+//    boolean existsByNickname(String nickname);
+//    boolean existsByEmail(String mail);
+
+    @Query("select count(m.id) > 0 from Member m where m.loginId = :loginId and m.activated = TRUE")
+    boolean existsByLoginIdAndActivated(@Param("loginId") String loginId);
+
+    @Query("select count(m.id) > 0 from Member m where m.nickname = :nickname and m.activated = TRUE")
+    boolean existsByNicknameAndActivated(@Param("nickname") String nickname);
+
+    @Query("select count(m.id) > 0 from Member m where m.email = :email and m.activated = TRUE")
+    boolean existsByEmailAndActivated(@Param("email") String email);
 
     /**
      * 로그인 아이디로 회원 조회
      */
     Optional<Member> findByLoginId(String loginId);
 
+
     /**
-     * 이메일로 회원 조회 - oauth2 로그인
+     * 이메일로 회원 조회
      */
     Optional<Member> findByEmail(String email);
+
+
+    /**
+     * 회원탈퇴 처리 - 계정 비활성화
+     * activated = false, loginId = null, password = null
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Transactional
+    @Query("update Member m set m.activated = FALSE, m.loginId = NULL, m.password = NULL, m.nickname = NULL, m.email = NULL where m.id = :memberId")
+    void updateActivated(@Param("memberId") Long memberId);
+
+
 }
