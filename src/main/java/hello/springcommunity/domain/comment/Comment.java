@@ -6,6 +6,8 @@ import hello.springcommunity.domain.post.Post;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -29,31 +31,39 @@ public class Comment extends TimeEntity {
     @Column(nullable = false)
     private String content;
 
+    /** 댓글의 입장에선 게시글과 사용자는 다대일 관계이므로 @ManyToOne 이 된다 **/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
 //    @CreatedDate
 //    private LocalDate regDate;
 
-    @ColumnDefault("FALSE")
+    /**
+     * 댓글 삭제 유무(true면 삭제된 댓글)
+     *
+     */
+    @ColumnDefault("FALSE") //테이블 생성시 컬럼 기본값 설정
     @Column(nullable = false)
-    private Boolean isDeleted; //댓글 삭제 유무(true 면 삭제된 댓글)
+    private Boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
+    @JoinColumn(name = "parent_id") //@OnDelete(action = OnDeleteAction.CASCADE)
     private Comment parent; //부모 댓글(null 이면 최상위 댓글)
 
-    @Builder.Default //빌더로 객체 생성시 해당 필드 기본값 설정 -> null 이 아닌 empty list
+    /**
+     * 빌더로 엔티티 객체 생성시 해당 필드 기본값 설정은 null 이 아닌 empty list 가 된다
+     */
+    @Builder.Default
     @OneToMany(mappedBy = "parent", orphanRemoval = true)
-    private List<Comment> children = new ArrayList<>(); //자식 댓글 리스트
+    private List<Comment> children = new ArrayList<>();
 
     @Builder.Default
-    private int depth = 0;
+    private Integer depth = 0;
 
     private Long groupId;
 
@@ -78,7 +88,7 @@ public class Comment extends TimeEntity {
     /**
      * 댓글 계층 level 연결
      */
-    public void updateDepth(int depth) {
+    public void updateDepth(Integer depth) {
         this.depth = depth;
     }
 
@@ -92,8 +102,8 @@ public class Comment extends TimeEntity {
     /**
      * 댓글 그룹 연결
      */
-    public void updateGroupId(Long id) {
-        this.groupId = id;
+    public void updateGroupId(Long groupId) {
+        this.groupId = groupId;
     }
 
     /**

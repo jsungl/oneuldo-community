@@ -8,11 +8,11 @@ import lombok.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class CommentRequestDTO {
 
     private Long parentId;
     private String content;
-    private int depth;
 
     public CommentRequestDTO(String content) {
         this.content = content;

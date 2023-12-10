@@ -2,10 +2,10 @@ package hello.springcommunity.dto.comment;
 
 import hello.springcommunity.domain.comment.Comment;
 import hello.springcommunity.domain.member.Member;
+import hello.springcommunity.domain.post.Post;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -24,19 +24,21 @@ public class CommentResponseDTO {
     private Long id;
     private String content;
     private Member member;
+    private Post post;
     private String createdDate;
     private String modifiedDate;
-    private Comment parent; //부모 댓글 id
-    private int depth;
+    private Comment parent;
+    private Integer depth;
     private Boolean isDeleted;
     private Boolean isModified;
-    private List<CommentResponseDTO> children = new ArrayList<>(); //자식 댓글 리스트
+    private List<CommentResponseDTO> children = new ArrayList<>();
 
 
-    public CommentResponseDTO(Long id, String content, Member member, LocalDateTime createdDate, LocalDateTime modifiedDate, Comment parent, int depth, Boolean isDeleted, Boolean isModified) {
+    public CommentResponseDTO(Long id, String content, Member member, Post post, LocalDateTime createdDate, LocalDateTime modifiedDate, Comment parent, Integer depth, Boolean isDeleted, Boolean isModified) {
         this.id = id;
         this.content = content;
         this.member = member;
+        this.post = post;
         this.createdDate = createdDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         this.modifiedDate = modifiedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         this.parent = parent;
@@ -46,8 +48,10 @@ public class CommentResponseDTO {
     }
 
 
-
-    // Entity -> DTO
+    /**
+     * Entity -> DTO
+     * 조건이 많아 Builder를 통해 생성하지 않는다
+     */
     public static CommentResponseDTO entityToDto(Comment comment) {
 
         /**
@@ -55,16 +59,16 @@ public class CommentResponseDTO {
          */
         LocalDateTime createdTime = comment.getCreatedDate().truncatedTo(ChronoUnit.SECONDS);
         LocalDateTime modifiedTime = comment.getModifiedDate().truncatedTo(ChronoUnit.SECONDS);
+        /** 수정여부 **/
         Boolean displayModification = false;
-        log.info("createdTime={}", createdTime);
-        log.info("modifiedTime={}", modifiedTime);
 
-        //댓글 삭제 유무
+        /** 댓글 삭제 유무 **/
         if(comment.getIsDeleted()) {
             return new CommentResponseDTO(
                     comment.getId(),
                     "[삭제된 댓글입니다]",
                     comment.getMember(),
+                    comment.getPost(),
                     comment.getCreatedDate(),
                     comment.getModifiedDate(),
                     comment.getParent(),
@@ -73,7 +77,7 @@ public class CommentResponseDTO {
                     displayModification);
         }else {
 
-            //자식댓글이 있는경우
+            /** 자식댓글이 있는경우 **/
             if(createdTime.compareTo(modifiedTime) < 0 && comment.getChildren().size() != 0) {
                 displayModification = true;
             }
@@ -82,6 +86,7 @@ public class CommentResponseDTO {
                     comment.getId(),
                     comment.getContent(),
                     comment.getMember(),
+                    comment.getPost(),
                     comment.getCreatedDate(),
                     comment.getModifiedDate(),
                     comment.getParent(),
@@ -92,14 +97,4 @@ public class CommentResponseDTO {
 
     }
 
-//    @Builder
-//    public CommentResponseDTO(Comment comment) {
-//        this.id = comment.getId();
-//        this.regDate = comment.getRegDate();
-//        this.content = comment.getContent();
-//        this.depth = comment.getDepth();
-//        this.isDeleted = comment.getIsDeleted();
-//        this.member = comment.getMember();
-//        this.parent = comment.getParent();
-//    }
 }
