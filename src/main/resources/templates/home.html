@@ -2,103 +2,113 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-  <title>홈</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>홈</title>
 </head>
+
 <body>
-<div class="container" style="max-width: 600px">
-  <div class="py-5 text-center">
-    <h2>홈 화면</h2>
-  </div>
+    <div class="container" style="max-width:720px">
 
-  <th:block sec:authorize="isAuthenticated()">
+        <div class="py-5 text-center">
+            <h2>홈 화면</h2>
+        </div>
 
-<!--    <h5 class="mb-3" th:text="|${member.nickname} 님 로그인 하셨습니다|">로그인 사용자 이름</h5>-->
-    <h5 class="mb-3">
-      <span sec:authentication="principal.member.nickname">닉네임</span>
-      님 로그인 하셨습니다
-    </h5>
+        <!-- 회원탈퇴 성공 -->
+        <div th:if="${msg}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span th:text="${msg}">탈퇴성공</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
 
-    <!--인증시 사용된 객체의 Username (ID)-->
-<!--    <div sec:authentication="name"></div>-->
-    <!--인증시 사용된 객체에 대한 정보-->
-<!--    <div sec:authentication="principal"></div>-->
+        <th:block sec:authorize="isAuthenticated()">
+
+            <h5 class="mb-3">
+              <span th:text="${#strings.abbreviate(#authentication.principal.member.nickname,20)}">닉네임</span>
+              님 로그인 하셨습니다
+            </h5>
 
 
-    <!--Spring Expression Language를 사용-->
-<!--    <div th:text="${#authentication.name}"></div>-->
-<!--    <div th:text="${#authentication.principal.member.role}"></div>-->
+        <!--인증시 사용된 객체의 Username (ID)-->
+    <!--    <div sec:authentication="name"></div>-->
+        <!--인증시 사용된 객체에 대한 정보-->
+    <!--    <div sec:authentication="principal.member"></div>-->
 
-    <hr class="my-4">
 
-    <p class="row">
-      <p class="col">
-        <button class="w-100 btn btn-lg btn-info" type="button"
-                th:onclick="|location.href='@{/posts}'|">
-          게시판
-        </button>
-      </p>
-    </p>
+        <!--Spring Expression Language를 사용-->
+    <!--    <div th:text="${#authentication.name}"></div>-->
+    <!--    <div th:text="${#authentication.principal.member.role}"></div>-->
 
-    <div class="row">
-      <div class="col">
-        <button class="w-100 btn btn-primary btn-lg" type="button"
-                th:onclick="|location.href='@{/member/{loginId}(loginId=${#authentication.name})}'|">
-          마이페이지
-        </button>
-      </div>
-      <div class="col">
-        <form th:action="@{/logout}" method="post">
-          <button class="w-100 btn btn-dark btn-lg" type="submit">
-            로그아웃
-          </button>
-        </form>
-      </div>
-    </div>
+            <hr class="my-4">
 
-  </th:block>
+            <p class="row">
+              <p class="col">
+                <button class="w-100 btn btn-lg btn-info" type="button"
+                        th:onclick="|location.href='@{/posts}'|">
+                  게시판
+                </button>
+              </p>
+            </p>
 
-  <th:block sec:authorize="isAnonymous()">
+            <div class="row">
+              <div class="col">
+                <button class="w-100 btn btn-primary btn-lg" type="button"
+                        th:onclick="|location.href='@{/member/info}'|">
+                  마이페이지
+                </button>
+              </div>
+              <div class="col">
+                <form th:action="@{/logout}" method="post">
+                  <button class="w-100 btn btn-dark btn-lg" type="submit">
+                    로그아웃
+                  </button>
+                </form>
+              </div>
+            </div>
+        </th:block>
 
-<!--    <div th:text="${#authentication.principal}"></div>-->
 
-<!--    <div th:if="${#authentication.principal} == anonymousUser">true</div>-->
+        <th:block sec:authorize="isAnonymous()">
+    <!--    <div th:if="${#authentication.principal} == anonymousUser">true</div>-->
 
-    <p class="row">
-    <p class="col">
-      <button class="w-100 btn btn-lg btn-info" type="button"
-              th:onclick="|location.href='@{/posts}'|">
-        게시판
-      </button>
-    </p>
-    </p>
+            <p class="row">
+                <p class="col">
+                  <button class="w-100 btn btn-lg btn-info" type="button"
+                          th:onclick="|location.href='@{/posts}'|">
+                    게시판
+                  </button>
+                </p>
+            </p>
 
-    <div class="row">
-      <div class="col">
-        <button class="w-100 btn btn-secondary btn-lg" type="button"
-                th:onclick="|location.href='@{/member/add}'|">
-          회원 가입
-        </button>
-      </div>
-      <div class="col">
-        <button class="w-100 btn btn-dark btn-lg"
-                onclick="location.href='items.html'"
-                th:onclick="|location.href='@{/login}'|" type="button">
-          로그인
-        </button>
-      </div>
-    </div>
+            <div class="row">
+              <div class="col">
+                <button class="w-100 btn btn-secondary btn-lg" type="button"
+                        th:onclick="|location.href='@{/signup}'|">
+                  회원 가입
+                </button>
+              </div>
+              <div class="col">
+                <button class="w-100 btn btn-dark btn-lg"
+                        th:onclick="|location.href='@{/login}'|" type="button">
+                  로그인
+                </button>
+              </div>
+            </div>
+        </th:block>
 
-  </th:block>
+        <hr class="my-4">
 
-  <hr class="my-4">
-</div> <!-- /container -->
+        <div class="mt-5">
+            <p class="text-center">
+                <small class="text-muted">Copyright © www.yoursite.com All rights reserved.</small>
+            </p>
+        </div>
+    </div> <!-- /container -->
+
 </body>
 </html>

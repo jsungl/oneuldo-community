@@ -8,36 +8,11 @@
 
 <th:block layout:fragment="content">
 
-    <div class="container" style="max-width: 600px">
+    <div class="container">
         <div class="col-md-12">
             <div class="py-5 text-center">
                 <h2>회원 목록</h2>
             </div>
-
-            <form action="/members/search" method="get" class="form-inline" autocomplete="off">
-                <div class="row">
-                    <div class="col">
-                        <select class="form-select" id="searchType" name="searchType">
-                            <option value="">검색 조건</option>
-                            <option value="title">제목</option>
-                            <option value="content">내용</option>
-                            <option value="loginId">작성자</option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <input type="text" id="keyword" name="keyword" class="form-control" />
-                    </div>
-                    <div class="col">
-                        <button type="submit" class="btn btn-secondary mb-2">검색</button>
-                    </div>
-                    <div class="col">
-                    </div>
-                </div>
-
-            </form>
-
-
-            <hr class="my-4">
 
             <div>
                 <table class="table">
@@ -46,20 +21,78 @@
                         <th>No.</th>
                         <th>아이디</th>
                         <th>닉네임</th>
+                        <th>권한</th>
                         <th>가입일</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="member, memberStat :${members}" th:if="${#strings.equals(member.role, 'ROLE_USER')}">
-                        <td th:text="${memberStat.count}">1</a></td>
-                        <td>
-                            <a th:href="@{/memberId/detail(memberId=${memberStat.count})}" th:text="${member.loginId}">아이디</a>
-                        </td>
-                        <td th:text="${member.nickname}">닉네임</td>
-                        <td th:text="${member.createdDate}">가입일</td>
-                    </tr>
+
+                        <tr th:each="member, memberStat :${members}">
+                            <td th:text="${memberStat.count}">1</td>
+                            <td th:text="${#strings.abbreviate(member.loginId,10)}">아이디</td>
+                            <td>
+                                <div class="btn-group dropend">
+                                    <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${#strings.abbreviate(member.nickname,10)}">닉네임</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" th:href="@{/admin/memberProfile(memberId=${member.id})}">회원 정보</a></li>
+                                        <li><a class="dropdown-item" th:href="@{/admin/memberDocuments(memberId=${member.id})}">작성 글</a></li>
+                                        <li><a class="dropdown-item" th:href="@{/admin/memberComments(memberId=${member.id})}">작성 댓글</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td th:text="${member.role} == 'ROLE_USER' ? '일반유저' : '소셜유저'">권한</td>
+                            <td th:text="${member.createdDate}">가입일</td>
+                        </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- 페이징 -->
+            <div th:if="${!members.isEmpty()}">
+                <ul class="pagination justify-content-center"
+                    th:with="
+                        pageNumber = ${members.pageable.pageNumber},
+                        pageSize = ${members.pageable.pageSize},
+                        totalPages = ${members.totalPages},
+                        startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+                        tempEndPage = ${startPage + pageSize - 1},
+                        endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})">
+
+                    <!-- 처음으로 이동 -->
+                    <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
+                        <a class="page-link" th:href="@{/posts(page=0)}">
+                            <span>&laquo;</span>
+                        </a>
+                    </li>
+
+                    <!-- 이전으로 이동 -->
+                    <li th:classappend="${members.first} ? 'disabled'" class="page-item">
+                        <a class="page-link" th:href="${members.first} ? '#' : @{/admin/members(page=${pageNumber - 1})}" aria-label="Previous">
+                            <span aria-hidden="true">&lt;</span>
+                        </a>
+                    </li>
+
+                    <!-- 현재 페이지 -->
+                    <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
+                        <span th:if="${page == pageNumber + 1}" th:text="${page}" class="page-link"></span>
+                        <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link" th:href="@{/admin/members(page=${page - 1})}"></a>
+                    </li>
+
+                    <!-- 다음으로 이동 -->
+                    <li th:classappend="${members.last} ? 'disabled'" class="page-item">
+                        <a class="page-link" th:href="${members.last} ? '#' : @{/admin/members(page=${pageNumber + 1})}" aria-label="Next">
+                            <span aria-hidden="true">&gt;</span>
+                        </a>
+                    </li>
+
+                    <!-- 마지막으로 이동 -->
+                    <li th:classappend="${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
+                        <a class="page-link" th:href="@{/admin/members(page=${totalPages - 1})}">
+                            <span>&raquo;</span>
+                        </a>
+                    </li>
+
+                </ul>
             </div>
 
         </div>
