@@ -22,6 +22,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
+	//Jwt
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
 	//Spring email 서비스
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
@@ -59,6 +64,7 @@ dependencies {
 //	runtimeOnly 'com.h2database:h2'
 
 	//MySQL 데이터베이스 추가
+	//Spring Boot 2.7.8 이후 mysql-connector-java 를 더이상 지원X
 //	runtimeOnly 'mysql:mysql-connector-java:8.0.32'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
