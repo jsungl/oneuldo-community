@@ -7,19 +7,16 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <title>아이디/비밀번호 정보</title>
 </head>
 <body>
 <div style="margin:100px;">
-    <h1>아이디 찾기</h1>
+    <h1>Spring-Community Project 인증 메일입니다.</h1>
     <br>
-    <p>요청하신 아이디 정보는 아래와 같습니다.</p>
+    <p>아래 링크를 클릭하시면 이메일 인증이 완료됩니다.</p>
     <br>
 
-    <div style="border:1px solid black; font-family:verdana;text-align: center;">
-      <h3 style="color:blue">아이디</h3>
-      <div style="font-size:130%" th:text="${code}"></div>
-    </div>
+    <p><a th:href="@{|${path}|(id=${memberId}, authKey=${authKey})}" target="_blank">이메일 인증하기</a></p>
+
     <br/>
 </div>
 </body>

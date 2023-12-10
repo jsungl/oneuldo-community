@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+  <title>나의 댓글</title>
+</head>
+
+<th:block layout:fragment="content">
+
+  <div class="container">
+    <div class="col-md-12">
+      <div class="py-5 text-center">
+        <h2>나의 댓글</h2>
+      </div>
+
+      <hr class="my-4">
+
+      <div>
+        <table class="table">
+          <thead>
+          <tr>
+            <th>No.</th>
+            <th>내용</th>
+            <th>작성일</th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr th:each="comment:${comments}" th:if="${comments.getTotalElements() != 0} and ${comment.post.member.activated} != false">
+              <td th:text="${comment.id}">1</a></td>
+              <td>
+                  <a th:href="@{|/post/${comment.post.id}?commentId=${comment.id}#comment_${comment.id}|}" th:text="${#strings.abbreviate(comment.content,10)}">내용</a>
+              </td>
+              <td th:text="${comment.createdDate}">작성일</td>
+            </tr>
+            <tr th:unless="${comments.getTotalElements() != 0}">
+              <td colspan="3" class="text-center">작성한 댓글이 존재하지 않습니다.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div th:if="${!comments.isEmpty()}">
+          <ul class="pagination justify-content-center"
+              th:with="
+                  pageNumber = ${comments.pageable.pageNumber},
+                  pageSize = ${comments.pageable.pageSize},
+                  totalPages = ${comments.totalPages},
+                  startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+                  tempEndPage = ${startPage + pageSize - 1},
+                  endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})">
+
+            <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
+              <a class="page-link" th:href="@{/member/myComment(page=0)}">
+                <span>&laquo;</span>
+              </a>
+            </li>
+
+            <li th:classappend="${comments.first} ? 'disabled'" class="page-item">
+              <a class="page-link" th:href="${comments.first} ? '#' : @{/member/myComment(page=${pageNumber - 1})}" aria-label="Previous">
+                <span aria-hidden="true">&lt;</span>
+              </a>
+            </li>
+
+            <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
+                <span th:if="${page == pageNumber + 1}" th:text="${page}" class="page-link"></span>
+                <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link" th:href="@{/member/myComment(page=${page - 1})}"></a>
+            </li>
+
+            <li th:classappend="${comments.last} ? 'disabled'" class="page-item">
+              <a class="page-link" th:href="${comments.last} ? '#' : @{/member/myComment(page=${pageNumber + 1})}" aria-label="Next">
+                <span aria-hidden="true">&gt;</span>
+              </a>
+            </li>
+
+            <li th:classappend="${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
+              <a class="page-link" th:href="@{/member/myComment(page=${totalPages - 1})}">
+                <span>&raquo;</span>
+              </a>
+            </li>
+
+          </ul>
+      </div>
+
+    </div>
+  </div> <!-- /container -->
+
+</th:block>
+</html>

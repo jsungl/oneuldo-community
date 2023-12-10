@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>아이디 찾기 결과</title>
+</head>
+
+<th:block layout:fragment="content">
+
+    <div class="container">
+
+        <div class="py-5 text-center">
+            <h2>아이디 조회</h2>
+            <p style="color:#767676; margin:0"><small>개인정보보호를 위해 일부분은 *로 표시됩니다.</small></p>
+            <p style="color:#767676; margin:0"><small>동명이인이 있는 경우, 본인 외의 ID가 노출될 수 있습니다.</small></p>
+        </div>
+
+
+        <div class="mbrTplBox py-5" style="border:1px solid #cccccc">
+            <p class="info text-center">
+                <strong>
+                    입력된 정보로 등록된 아이디는 다음과 같습니다.
+                </strong>
+            </p>
+
+            <div class="mbrTplBoxList">
+                <ul
+                    th:with="temp = ${#strings.substring(findMember.getLoginId(), 3)},
+                            size = ${#strings.length(temp)}">
+                    <li class="d-flex justify-content-center" style="list-style: none;">
+                        <span th:text="${#strings.replace(findMember.getLoginId(), temp, #strings.repeat('*', size))}">아이디</span>
+                    </li>
+                    <li class="d-flex justify-content-center" style="list-style: none;">
+                        (가입일:
+                        <span th:text="${findMember.getCreatedDate()}">가입일</span>
+                        )
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="row mt-5">
+            <div class="col">
+                <button class="w-100 btn btn-primary btn-lg" th:onclick="|location.href='@{/login}'|">로그인</button>
+            </div>
+            <div class="col">
+                <button class="w-100 btn btn-secondary btn-lg"
+                        th:onclick="|location.href='@{/find/password}'|"
+                        type="button">비밀번호 찾기</button>
+            </div>
+        </div>
+
+    </div>
+
+</th:block>
+</html>

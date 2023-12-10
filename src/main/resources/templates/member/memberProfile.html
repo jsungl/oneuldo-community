@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+  <title>회원 정보</title>
+</head>
+<th:block layout:fragment="content">
+    <div class="container">
+
+        <div class="py-5 text-center">
+            <h2>회원 정보</h2>
+        </div>
+
+        <div>
+            <label for="loginId">아이디</label>
+            <input type="text" id="loginId" name="loginId" class="form-control" value="아이디" th:value="${member.loginId}" readonly>
+        </div>
+        <div>
+            <label for="username">닉네임</label>
+            <input type="text" id="username" name="username" class="form-control" value="닉네임" th:value="${member.nickname}" readonly>
+        </div>
+        <div>
+            <label for="email">이메일</label>
+            <input type="text" id="email" name="email" class="form-control" value="이메일" th:value="${member.email}" readonly>
+        </div>
+        <div>
+            <label for="createdDate">가입일</label>
+            <input type="text" id="createdDate" name="createdDate" class="form-control"
+                   value="작성자" th:value="${member.createdDate}" readonly>
+        </div>
+
+      <hr class="my-4">
+
+      <!-- 일반 로그인 사용자 -->
+      <th:block sec:authorize="hasRole('ROLE_USER')">
+        <div class="row">
+          <div class="col">
+            <button class="w-100 btn btn-primary btn-lg" type="button"
+                    onclick="location.href='editNicknameForm.html'"
+                    th:onclick="|location.href='@{/edit/profile}'|">
+              회원 정보 변경
+            </button>
+          </div>
+          <div class="col">
+            <button class="w-100 btn btn-info btn-lg"
+                    onclick="location.href='editPasswordForm.html'"
+                    th:onclick="|location.href='@{/edit/password}'|" type="button">
+              비밀번호 변경
+            </button>
+          </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <button class="w-100 btn btn-secondary btn-lg" type="button"
+                        th:onclick="|location.href='@{/}'|">
+                    홈으로
+                </button>
+            </div>
+        </div>
+      </th:block>
+
+      <!-- 소셜 로그인 사용자 -->
+      <th:block sec:authorize="hasRole('ROLE_SOCIAL')">
+        <div class="row">
+          <div class="col">
+            <button class="w-100 btn btn-primary btn-lg" type="button"
+                    onclick="location.href='editNicknameForm.html'"
+                    th:onclick="|location.href='@{/edit/profile}'|">
+              회원 정보 변경
+            </button>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col">
+              <button class="w-100 btn btn-secondary btn-lg" type="button"
+                      th:onclick="|location.href='@{/}'|">
+                  홈으로
+              </button>
+          </div>
+        </div>
+      </th:block>
+
+    </div> <!-- /container -->
+</th:block>
+</html>

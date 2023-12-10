@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+  <title>나의 게시물</title>
+</head>
+
+<th:block layout:fragment="content">
+
+  <div class="container">
+    <div class="col-md-12">
+      <div class="py-5 text-center">
+        <h2>나의 게시물</h2>
+      </div>
+
+      <hr class="my-4">
+
+      <div>
+        <table class="table">
+          <thead>
+          <tr>
+            <th>No.</th>
+            <th>제목</th>
+            <th>조회수</th>
+            <th>작성일</th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr th:each="post:${posts}" th:if="${posts.getTotalElements() != 0}">
+              <td th:text="${post.id}">1</a></td>
+              <td>
+                <a th:href="@{/post/{postId}(postId=${post.id})}" th:text="${#strings.abbreviate(post.title,10)}">제목</a>
+                <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
+              </td>
+              <td th:text="${post.viewCount}">조회수</td>
+              <td th:text="${post.createdDate}">작성일</td>
+            </tr>
+            <tr th:unless="${posts.getTotalElements() != 0}">
+              <td colspan="4" class="text-center">작성한 글이 존재하지 않습니다.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div th:if="${!posts.isEmpty()}">
+          <ul class="pagination justify-content-center"
+              th:with="
+                  pageNumber = ${posts.pageable.pageNumber},
+                  pageSize = ${posts.pageable.pageSize},
+                  totalPages = ${posts.totalPages},
+                  startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+                  tempEndPage = ${startPage + pageSize - 1},
+                  endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})">
+
+            <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
+              <a class="page-link" th:href="@{/member/myDocument(page=0)}">
+                <span>&laquo;</span>
+              </a>
+            </li>
+
+            <li th:classappend="${posts.first} ? 'disabled'" class="page-item">
+              <a class="page-link" th:href="${posts.first} ? '#' : @{/member/myDocument(page=${pageNumber - 1})}" aria-label="Previous">
+                <span aria-hidden="true">&lt;</span>
+              </a>
+            </li>
+
+            <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
+              <span th:if="${page == pageNumber + 1}" th:text="${page}" class="page-link"></span>
+              <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link" th:href="@{/member/myDocument(page=${page - 1})}"></a>
+            </li>
+
+            <li th:classappend="${posts.last} ? 'disabled'" class="page-item">
+              <a class="page-link" th:href="${posts.last} ? '#' : @{/member/myDocument(page=${pageNumber + 1})}" aria-label="Next">
+                <span aria-hidden="true">&gt;</span>
+              </a>
+            </li>
+
+            <li th:classappend="${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
+              <a class="page-link" th:href="@{/member/myDocument(page=${totalPages - 1})}">
+                <span>&raquo;</span>
+              </a>
+            </li>
+
+          </ul>
+      </div>
+
+    </div>
+  </div> <!-- /container -->
+
+</th:block>
+</html>
