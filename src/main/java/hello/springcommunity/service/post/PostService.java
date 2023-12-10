@@ -1,19 +1,19 @@
 package hello.springcommunity.service.post;
 
+import hello.springcommunity.dao.comment.CommentRepository;
+import hello.springcommunity.dao.member.MemberLikePostRepository;
 import hello.springcommunity.dao.post.PostQueryRepository;
 import hello.springcommunity.dao.post.PostRepository;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.dao.member.MemberRepository;
+import hello.springcommunity.domain.member.MemberLikePost;
 import hello.springcommunity.domain.post.Post;
 import hello.springcommunity.dto.post.PostResponseDTO;
 import hello.springcommunity.dto.post.PostSearchCond;
-import hello.springcommunity.common.CookieConst;
-import hello.springcommunity.dto.post.PostSaveRequestDTO;
+import hello.springcommunity.dto.post.PostRequestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +27,8 @@ import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 
 @Slf4j
 @Service
@@ -35,20 +37,21 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
     private final PostQueryRepository postQueryRepository;
+    private final MemberLikePostRepository memberLikePostRepository;
 
     /**
      * 게시물 등록
      */
-    public Post save(PostSaveRequestDTO postSaveRequestDTO, String loginId) {
-//        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("member is not exist"));
-        Member member = memberRepository.findByLoginId(loginId).orElseThrow(() -> new UsernameNotFoundException("해당 유저가 존재하지 않습니다. loginId=" + loginId));
+    public Post addPost(PostRequestDTO postRequestDTO, String loginId) {
+        Member member = memberRepository.findByLoginId(loginId).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
 
         //DTO -> Entity
         Post post = Post.builder()
-                .title(postSaveRequestDTO.getTitle())
-                .content(postSaveRequestDTO.getContent())
+                .title(postRequestDTO.getTitle())
+                .content(postRequestDTO.getContent())
                 .member(member)
                 .build();
 
@@ -59,127 +62,200 @@ public class PostService {
     /**
      * 게시물 수정
      */
-    public Long update(Long id, PostSaveRequestDTO postSaveRequestDTO) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다. id= " + id));
-        post.updatePost(postSaveRequestDTO.getTitle(), postSaveRequestDTO.getContent());
-        //postRepository.save(post);
+    public Long updatePost(Long id, PostRequestDTO postRequestDTO) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+        post.updatePost(postRequestDTO.getTitle(), postRequestDTO.getContent());
 
         return post.getId();
     }
 
 
     /**
-     * 게시물 삭제
+     * 게시물 1개 삭제
+     *
+     * JpaRepository에서 제공하는 deleteByXXX 등의 메소드를 이용하는 삭제는 단건이 아닌 여러건을 삭제하더라도 먼저 조회를 하고 그 결과로 얻은 엔티티 데이터를 1건씩 삭제한다.
+     * 즉, 만약 1억건 중 50만건을 삭제한다고 하면 50만건을 먼저 조회후 건건으로 삭제한다.
      */
-    public void delete(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다. id= " + id));
-        postRepository.delete(post);
+    public void deletePost(Post post) {
+
+        //댓글이 1개이상 있다면
+        if(post.getComments().size() != 0) {
+            //삭제하려는 게시물의 댓글들의 연관관계 삭제
+            commentRepository.updateParentByPostId(post.getId());
+            //삭제하려는 게시물의 댓글 모두 삭제
+            commentRepository.deleteAllByPostId(post.getId());
+        }
+        //추천 삭제
+        memberLikePostRepository.deleteAllByPostId(post.getId());
+        //게시물 삭제
+        postRepository.deleteOne(post.getId());
     }
+
+    /**
+     * 탈퇴시 회원이 작성한 게시물 모두 삭제
+     * 게시물에 달린 댓글들 모두 삭제
+     */
+//    public void deleteAllPost(Long memberId) {
+//
+//        List<Post> list = postRepository.findByMemberId(memberId);
+//
+//        if(list.size() != 0) {
+//
+//            //작성한 게시물의 댓글 모두 삭제
+//            list.forEach(post ->  {
+//                commentRepository.updateParentByPostId(post.getId());
+//                commentRepository.deleteAllByPostId(post.getId());
+//            });
+//
+//            //작성한 게시물 모두 삭제
+//            postRepository.deleteAllByMemberId(memberId);
+//
+//        }
+//
+//    }
 
 
     /**
      * 게시물 1개 조회
      */
-//    public Optional<Post> findOne(Long id) {
-//        return postRepository.findById(id);
-//    }
+    public Post getPost(Long id) {
+        return postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+    }
 
-    public PostResponseDTO findOne(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다. id= " + id));
+    public PostResponseDTO getPostDto(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
 
         /**
          * 파라미터로 전달받은 id 로 게시물을 찾은 뒤 Entity로 바로 넘겨주지 않고 DTO에서 한번 감싼후
          * DTO 값을 넘겨준다
          */
         //Entity -> DTO
-        PostResponseDTO result = PostResponseDTO.builder()
+        return PostResponseDTO.builder()
                 .post(post)
                 .build();
-
-        return result;
     }
 
 
     /**
-     * 게시물 전체 조회
+     * 게시물 상세 조회
+     * 조회수 증가
      */
-//    public List<Post> findAll() {
-//        return postRepository.findAll();
-//    }
+    public PostResponseDTO getPostDetail(Long id, HttpServletRequest request, HttpServletResponse response) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+
+        if(!post.getMember().getActivated()) {
+            throw new IllegalArgumentException("탈퇴한 회원입니다.");
+        }
+
+        /** 조회수 증가 **/
+        updateViews(post, request, response);
+
+        //Entity -> DTO
+        return PostResponseDTO.builder()
+                .post(post)
+                .build();
+    }
+
 
     /**
      * 게시물 전체 조회 - 페이징
      */
-    public Page<PostResponseDTO> findAll(Pageable pageable) {
-        Page<Post> posts = postRepository.findAll(pageable);
+    public Page<PostResponseDTO> getAllPost(String sort, int pageNo) {
+
+        Pageable pageable;
+
+        /** 첫번째 정렬조건에서 동일한 값을 가진 경우는 2번째 정렬조건으로 최신순으로 정렬한다 **/
+        if("id".equals(sort)) {
+            pageable = PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.DESC, sort));
+        } else {
+            pageable = PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.DESC, sort, "id"));
+        }
+
+        Page<Post> posts = postQueryRepository.findAll(pageable);
+
+        return posts.map(post -> PostResponseDTO.builder().post(post).build());
+
+    }
+
+    /**
+     * 특정 사용자가 작성한 게시물 모두 조회
+     */
+    public Page<PostResponseDTO> getMemberPostAll(Long id, Pageable pageable) {
+
+        Page<Post> posts = postQueryRepository.findByMemberId(id, pageable);
+
         List<PostResponseDTO> list = new ArrayList<>();
 
         //Entity -> DTO
         for (Post post : posts) {
             PostResponseDTO result = PostResponseDTO.builder()
-                                                    .post(post)
-                                                    .build();
+                    .post(post)
+                    .build();
             list.add(result);
         }
 
         return new PageImpl<>(list, pageable, posts.getTotalElements());
+
     }
 
 
     /**
      * 게시물 검색 - 페이징
      */
-//    public Page<Post> findPostBySearchV1(String searchType, String keyword, Pageable pageable) {
-//        switch (searchType) {
-//            case "title":
-//                return postQueryRepository.findAll(new PostSearchCond(keyword, null, null), pageable);
-//            case "content" :
-//                return postQueryRepository.findAll(new PostSearchCond(null, keyword, null), pageable);
-//            case "loginId" :
-//                return postQueryRepository.findAll(new PostSearchCond(null, null, keyword), pageable);
-//            default:
-//                return postQueryRepository.findAll(new PostSearchCond(null, null, null), pageable);
-//
-//        }
-//    }
+    public Page<PostResponseDTO> getSearchPost(Map<String, Object> param) {
+        String type = (String) param.get("searchType");
+        String keyword = (String) param.get("keyword");
+        int pageNo = (int) param.get("page");
+        String sort = (String) param.get("sort_index");
+        Pageable pageable;
 
-    public Page<PostResponseDTO> getSearchedPost(String searchType, String keyword, Pageable pageable) {
-        switch (searchType) {
+        if("id".equals(sort)) {
+            pageable = PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.DESC, sort));
+        }else {
+            pageable = PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.DESC, sort, "id"));
+        }
+
+        switch (type) {
             case "title":
-                return getPostResponseDto(postQueryRepository.findAll(new PostSearchCond(keyword, null, null), pageable), pageable);
-            case "content" :
-                return getPostResponseDto(postQueryRepository.findAll(new PostSearchCond(null, keyword, null), pageable), pageable);
-            case "nickname" :
-                return getPostResponseDto(postQueryRepository.findAll(new PostSearchCond(null, null, keyword), pageable), pageable);
+                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(keyword, null, null), pageable));
+            case "content":
+                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(null, keyword, null), pageable));
+            case "nickname":
+                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(null, null, keyword), pageable));
             default:
-                return getPostResponseDto(postQueryRepository.findAll(new PostSearchCond(null, null, null), pageable), pageable);
-
+                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(), pageable));
         }
     }
 
-    private Page<PostResponseDTO> getPostResponseDto(Page<Post> posts, Pageable pageable) {
-        List<PostResponseDTO> list = new ArrayList<>();
 
-        //Entity -> DTO
-        for(Post post : posts) {
-            PostResponseDTO result = PostResponseDTO.builder()
-                                                    .post(post)
-                                                    .build();
-            list.add(result);
-        }
-
-        return new PageImpl<>(list, pageable, posts.getTotalElements());
+    /**
+     * entity -> DTO
+     */
+    private Page<PostResponseDTO> entityToDto(Page<Post> posts) {
+        return posts.map(post -> PostResponseDTO.builder().post(post).build());
     }
+
+//    private Page<PostResponseDTO> entityToDto(Page<Post> posts, Pageable pageable) {
+//        List<PostResponseDTO> list = new ArrayList<>();
+//
+//        //Entity -> DTO
+//        for(Post post : posts) {
+//            PostResponseDTO result = PostResponseDTO.builder()
+//                                                    .post(post)
+//                                                    .build();
+//            list.add(result);
+//        }
+//
+//        return new PageImpl<>(list, pageable, posts.getTotalElements());
+//    }
 
 
     /**
      * 조회수 증가
      * 쿠키를 이용한 조회수 증가 중복방지
      */
-    public void updateViews(Long postId, HttpServletRequest request, HttpServletResponse response) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않은 게시물입니다. id= " + postId));
+    public void updateViews(Post post, HttpServletRequest request, HttpServletResponse response) {
         viewCountValidation(post, request, response);
-//        return PostResponseDTO.builder().post(post).build();
     }
 
     private void viewCountValidation(Post post, HttpServletRequest request, HttpServletResponse response) {
@@ -189,8 +265,8 @@ public class PostService {
 
         if(cookies != null) {
             for (Cookie cookie : cookies) {
-                //조회수 쿠키가 있을 때
-                if (cookie.getName().equals(CookieConst.VIEW_COOKIE_NAME)) {
+                /** 조회수 쿠키가 있을 때 **/
+                if (cookie.getName().equals("viewCookie")) {
                     oldCookie = cookie;
 
                     if (oldCookie.getValue().contains(".")) {
@@ -206,7 +282,6 @@ public class PostService {
 
                         if (!chk) {
                             post.updateViewCount();
-                            //postQueryRepository.updateViewCount(post.getId());
                             oldCookie.setValue(oldCookie.getValue() + "." + post.getId());
                             Cookie newCookie = createCookieForNotOverlap(oldCookie);
                             response.addCookie(newCookie);
@@ -217,7 +292,6 @@ public class PostService {
                         //1개만 조회한 경우 + 다른 게시물인 경우
                         if(!oldCookie.getValue().matches(post.getId().toString())) {
                             post.updateViewCount();
-                            //postQueryRepository.updateViewCount(post.getId());
                             oldCookie.setValue(oldCookie.getValue() + "." + post.getId());
                             Cookie newCookie = createCookieForNotOverlap(oldCookie);
                             response.addCookie(newCookie);
@@ -237,8 +311,7 @@ public class PostService {
 
             //쿠키가 없으면 처음 접속한 것이므로 새로 생성
             post.updateViewCount();
-            //postQueryRepository.updateViewCount(post.getId());
-            Cookie cookie = new Cookie(CookieConst.VIEW_COOKIE_NAME, post.getId().toString());
+            Cookie cookie = new Cookie("viewCookie", post.getId().toString());
 
             Cookie newCookie = createCookieForNotOverlap(cookie);
             response.addCookie(newCookie);
@@ -250,12 +323,13 @@ public class PostService {
 
     /**
      * 조회수 중복 방지를 위한 쿠키 설정 메서드
+     * 쿠키 유지시간을 오늘 하루 자정까지로 설정
+     *
+     * todayEndSecond = 하루 종료 시간을 시간초로 변환
+     * currentSecond = 현재 시간을 시간초로 변환
+     * todayEndSecond - currentSecond = 오늘 하루 자정까지 남은 시간초
      */
     private Cookie createCookieForNotOverlap(Cookie cookie) {
-        // 쿠키 유지시간을 오늘 하루 자정까지로 설정
-        // todayEndSecond = 하루 종료 시간을 시간초로 변환
-        // currentSecond = 현재 시간을 시간초로 변환
-        // todayEndSecond - currentSecond = // 오늘 하루 자정까지 남은 시간초
         long todayEndSecond = LocalDate.now().atTime(LocalTime.MAX).toEpochSecond(ZoneOffset.UTC);
         long currentSecond = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
         cookie.setPath("/"); // 모든 경로에서 접근 가능
@@ -266,16 +340,55 @@ public class PostService {
 
 
     /**
-     * 게시물 검색(페이징 x)
+     * 게시물 추천, 추천취소
      */
-//    public Page<Post> findPostBySearch(String searchType, String keyword, Pageable pageable) {
-//        switch (searchType) {
-//            case "title":
-//                return postRepository.findByTitleContaining(keyword, pageable);
-//            case "content" :
-//                return postRepository.findByContentContaining(keyword, pageable);
-//            default:
-//                return postRepository.findAll(pageable);
-//        }
-//    }
+    public void likePost(Long postId, String loginId) {
+
+        Member member = memberRepository.findByLoginId(loginId).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
+
+        /** 추천하려는 게시물 조회 **/
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+
+        /** 좋아요가 되었는지 좋아요가 취소되었는지 알기위한 알림 문구 **/
+        String notice = "";
+
+        /** 로그인한 유저가 해당 게시물을 추천 했는지 안 했는지 확인 **/
+        if(memberLikePostRepository.existsByPostIdAndMemberId(postId,member.getId())) {
+
+            /** 추천이 이미 되어있을 경우 MemberLikePost 에서 추천취소 처리 **/
+            memberLikePostRepository.deleteByPostIdAndMemberId(postId, member.getId());
+            /** 게시물 추천수 -1 **/
+            post.minusLikeCount();
+
+        } else {
+            /** 추천이 되어있지 않다면 MemberLikePost 엔티티 생성 후 저장 **/
+            MemberLikePost likePost = MemberLikePost.builder()
+                                                    .member(member)
+                                                    .post(post)
+                                                    .build();
+
+            memberLikePostRepository.save(likePost);
+            /** 게시물 추천수 +1 **/
+            post.plusLikeCount();
+        }
+
+
+    }
+
+    /**
+     * 게시물 추천 수 조회
+     */
+    public Integer getPostLikeCount(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+        return post.getLikeCount();
+    }
+
+    /**
+     * 로그인한 유저가 해당 게시물을 추천 했는지 유무
+     */
+    public boolean getMemberLikePost(Long postId, String username) {
+        Member member = memberRepository.findByLoginId(username).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
+        return memberLikePostRepository.existsByPostIdAndMemberId(postId, member.getId());
+    }
+
 }

@@ -5,8 +5,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -23,21 +28,52 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     /**
-     * n+1 문제를 해결하기위해
-     * @EntityGraph 사용
+     * n+1 문제를 해결하기위해 @EntityGraph 사용
      */
-    @Override
-    @EntityGraph(attributePaths = {"member"})
-    Optional<Post> findById(Long aLong);
-
-    @Override
-    @EntityGraph(attributePaths = {"member"})
-    Page<Post> findAll(Pageable pageable);
+//    @Override
+//    @EntityGraph(attributePaths = {"member"})
+//    Optional<Post> findById(Long id);
 
     //제목으로 검색
 //    Page<Post> findByTitleContaining(String keyword, Pageable pageable);
 
     //내용으로 검색
 //    Page<Post> findByContentContaining(String keyword, Pageable pageable);
+
+    //닉네임으로 검색
+//    Page<Post> findByNicknameContaining(String keyword, Pageable pageable);
+
+
+    /**
+     * 게시물 1개 삭제
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Transactional
+    @Query("delete from Post p where p.id = :postId")
+    void deleteOne(@Param("postId") Long id);
+
+    /**
+     * 특정 회원이 작성한 게시물 모두 삭제
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Transactional
+    @Query("delete from Post p where p.member.id = :memberId")
+    void deleteAllByMemberId(@Param("memberId") Long id);
+
+//    /**
+//     * 추천수 + 1
+//     */
+//    @Modifying(clearAutomatically = true, flushAutomatically = true)
+//    @Transactional
+//    @Query("update Post p set p.likeCount + 1 where p.id = :postId")
+//    void plusLike(@Param("postId") Long postId);
+//
+//    /**
+//     * 추천수 - 1
+//     */
+//    @Modifying(clearAutomatically = true, flushAutomatically = true)
+//    @Transactional
+//    @Query("update Post p set p.likeCount - 1 where p.id = :postId")
+//    void minusLike(@Param("postId") Long postId);
 
 }
