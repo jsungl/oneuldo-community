@@ -17,22 +17,15 @@ public class UserSessionDTO implements Serializable {
     private String email;
     private String role;
     private String accessToken;
-    private String refreshToken;
     private String provider;
 
-    public UserSessionDTO(Member member, String accessToken, String refreshToken, String provider) {
+    public UserSessionDTO(Member member, String accessToken, String provider) {
         this.loginId = member.getLoginId();
         this.nickname = member.getNickname();
         this.email = member.getEmail();
         this.role = member.getRoleValue();
         this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
         this.provider = provider;
     }
 
-//    public UserSessionDTO(String accessToken, String refreshToken, String provider) {
-//        this.accessToken = accessToken;
-//        this.refreshToken = refreshToken;
-//        this.provider = provider;
-//    }
 }
