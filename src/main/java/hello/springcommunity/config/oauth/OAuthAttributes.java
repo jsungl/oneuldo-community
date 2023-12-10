@@ -22,7 +22,6 @@ public class OAuthAttributes {
     private Map<String, Object> attributes;
     private String nameAttributeKey;
     private String oauth2Id;
-    //private String loginId;
     private String nickname;
     private String email;
     private Role role;
@@ -50,13 +49,12 @@ public class OAuthAttributes {
     private static OAuthAttributes ofNaver(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
         /* JSON 형태이기 때문에 Map을 통해 데이터를 가져온다 */
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-        log.info("response={}", response);
+        log.info("응답={}", response);
         /*{id=AvMxLlwRODQIV8a35S8A6Ru-sCuz_I_HDL1YLqXgMC4, nickname=JS, email=morefromjs@gmail.com, name=이재성}*/
 
         return OAuthAttributes.builder()
-                .oauth2Id(registrationId + "_" + (String) response.get("id"))
-//                .loginId((String) response.get("email"))
-                .nickname((String) response.get("nickname"))
+                .oauth2Id(registrationId + "_" + response.get("id"))
+                .nickname(response.get("nickname") + "_" + response.get("id"))
                 .email((String) response.get("email"))
                 .attributes(response)
                 .nameAttributeKey(userNameAttributeName)
@@ -68,9 +66,8 @@ public class OAuthAttributes {
      */
     private static OAuthAttributes ofGoogle(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
         return OAuthAttributes.builder()
-                .oauth2Id(registrationId + "_" + (String) attributes.get("sub"))
-//                .loginId((String) attributes.get("email"))
-                .nickname((String) attributes.get("name"))
+                .oauth2Id(registrationId + "_" + attributes.get("sub"))
+                .nickname(attributes.get("name") + "_" + attributes.get("sub"))
                 .email((String) attributes.get("email"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
