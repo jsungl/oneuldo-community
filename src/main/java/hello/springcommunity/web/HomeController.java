@@ -1,21 +1,14 @@
 package hello.springcommunity.web;
 
-import hello.springcommunity.common.SessionConst;
-import hello.springcommunity.config.oauth.UserSessionDTO;
-import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.dto.security.UserDetailsDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.SessionAttribute;
 
-import javax.servlet.http.HttpSession;
-import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,22 +16,9 @@ import java.util.stream.Collectors;
 public class HomeController {
 
 
-    //@GetMapping("/")
-    public String homeLoginV1(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model) {
-
-        //로그인
-        //세션에 회원 데이터가 없으면 비로그인 사용자 -> 기존 home 으로 이동
-        if (loginMember == null) {
-            return "home";
-        }
-
-        //세션에 회원 데이터가 있으면 로그인 사용자 -> loginhome 으로 이동
-        model.addAttribute("member", loginMember);
-        return "loginHome";
-    }
-
     @GetMapping("/")
-    public String homeLogin(Authentication authentication, @AuthenticationPrincipal UserDetailsDTO dto) {
+    public String home(Authentication authentication,
+                       @AuthenticationPrincipal UserDetailsDTO dto) {
 
         /**
          * Authentication : 인증객체
@@ -57,7 +37,14 @@ public class HomeController {
          */
 
         if(authentication == null) {
+            log.info("비회원");
             return "home";
+        }
+
+
+        //관리자 페이지로 이동
+        if(dto.getMember().getRoleValue().equals("ROLE_ADMIN")) {
+            return "redirect:/admin";
         }
 
         //인증 객체에 저장된 사용자의 이름(ID)
@@ -96,29 +83,20 @@ public class HomeController {
                 Granted Authorities=[hello.springcommunity.dto.security.UserDetailsDTO$$Lambda$1605/0x0000000800c36840@7f45a6de]
         ]*/
 
-        UserDetailsDTO userDetailsDTO = (UserDetailsDTO) authentication.getPrincipal();
-        log.info("authentication user loginId={}", userDetailsDTO.getUsername());
-        log.info("authentication user nickname={}", userDetailsDTO.getMember().getNickname());
-        log.info("authentication user role={}", userDetailsDTO.getMember().getRoleValue());
+//        UserDetailsDTO userDetailsDTO = (UserDetailsDTO) authentication.getPrincipal();
+//        log.info("authentication user loginId={}", userDetailsDTO.getUsername());
+//        log.info("authentication user nickname={}", userDetailsDTO.getMember().getNickname());
+//        log.info("authentication user role={}", userDetailsDTO.getMember().getRoleValue());
 
         /**
          * Spring Security 3.2 부터는 @AuthenticationPrincipal 어노테이션을 이용하여
          * UserDetails를 구현하여 만든 인스턴스(현재 로그인한 사용자 객체)를 가져올 수 있다
          */
-//        log.info("authentication user loginId={}", dto.getUsername());
-//        log.info("authentication user nickname={}", dto.getUser().getNickname());
-//        log.info("authentication user role={}", dto.getUser().getRoleValue());
-
-
-        if(userDetailsDTO.getMember().getRoleValue().equals("ROLE_ADMIN")) {
-            return "admin/info";
-        }
+//        log.info("로그인 아이디={}", dto.getUsername());
+//        log.info("닉네임={}", dto.getMember().getNickname());
+//        log.info("권한={}", dto.getMember().getRoleValue());
 
         return "home";
     }
-
-
-
-
 
 }
