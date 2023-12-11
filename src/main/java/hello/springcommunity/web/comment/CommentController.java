@@ -25,7 +25,6 @@ import java.util.Map;
 @RequestMapping("/api/post")
 public class CommentController {
 
-    //private final CommentService commentService;
     private final CommentServiceImpl commentService;
 
     /**

@@ -1,8 +1,8 @@
 package hello.springcommunity.config.oauth;
 
-import hello.springcommunity.dao.jwt.RefreshTokenRepository;
+import hello.springcommunity.dao.member.RefreshTokenRepository;
 import hello.springcommunity.dao.member.MemberRepository;
-import hello.springcommunity.domain.jwt.RefreshToken;
+import hello.springcommunity.domain.member.RefreshToken;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.dto.member.MemberLeaveResponseDTO;
 import lombok.RequiredArgsConstructor;

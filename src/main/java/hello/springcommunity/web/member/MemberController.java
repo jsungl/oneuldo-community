@@ -41,7 +41,6 @@ public class MemberController {
     private final MemberAuthService memberAuthService;
     //private final HttpSession httpSession;
     private final DisConnectOauth2UserService disConnectOauth2UserService;
-    //private final CommentService commentService;
     private final CommentServiceImpl commentService;
     private final PostService postService;
 

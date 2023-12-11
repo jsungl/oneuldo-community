@@ -41,7 +41,6 @@ import java.util.Objects;
 public class PostController {
 
     private final PostService postService;
-    //private final CommentService commentService;
     private final CommentServiceImpl commentService;
 
     /**

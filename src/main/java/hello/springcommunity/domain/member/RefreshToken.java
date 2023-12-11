@@ -1,6 +1,5 @@
-package hello.springcommunity.domain.jwt;
+package hello.springcommunity.domain.member;
 
-import hello.springcommunity.domain.member.Member;
 import lombok.*;
 
 import javax.persistence.*;
