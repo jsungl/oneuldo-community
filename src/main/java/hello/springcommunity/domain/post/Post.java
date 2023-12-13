@@ -39,8 +39,8 @@ public class Post extends TimeEntity {
     private Member member;
 
     //@Column(columnDefinition = "integer default 0", nullable = false)
-    @Column(name = "view_count")
-    private Integer viewCount;
+    @Builder.Default
+    private Integer viewCount = 0;
 
     @Builder.Default
     private Integer likeCount = 0;
@@ -68,16 +68,16 @@ public class Post extends TimeEntity {
 
     //조회수 증가
     public void updateViewCount() {
-        this.viewCount++;
+        this.viewCount = this.viewCount + 1;
     }
 
     //추천수 증가
     public void plusLikeCount() {
-        this.likeCount++;
+        this.likeCount = this.likeCount + 1;
     }
 
     //추천수 감소
     public void minusLikeCount() {
-        this.likeCount--;
+        this.likeCount = this.likeCount - 1;
     }
 }
