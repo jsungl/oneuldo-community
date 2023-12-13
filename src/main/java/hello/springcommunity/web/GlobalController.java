@@ -67,8 +67,6 @@ public class GlobalController {
                         @RequestParam(value = "sort_index", required = false, defaultValue = "id") String sort,
                         Model model) {
 
-        //Page<PostResponseDTO> posts = postService.getAllPost(pageable);
-
         Page<PostResponseDTO> posts = postService.getAllPost(sort, pageNo);
         model.addAttribute("posts", posts);
         model.addAttribute("sort_index", sort);

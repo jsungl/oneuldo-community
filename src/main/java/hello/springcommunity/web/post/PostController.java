@@ -143,7 +143,7 @@ public class PostController {
             model.addAttribute("msg", "존재하지 않는 게시물입니다.");
             return "post/notFound";
 
-        } catch (RuntimeException e) {
+        } catch (UsernameNotFoundException e) {
             model.addAttribute("msg", "게시물을 조회할 수 없습니다.");
         }
         return "error/redirect";
@@ -196,11 +196,12 @@ public class PostController {
             model.addAttribute("msg", "게시물을 등록할 수 없습니다.");
             return "error/redirect";
 
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("msg", "게시물 등록에 실패하였습니다.");
-            redirectAttributes.addFlashAttribute("prevPostSaveReq", postForm);
-            return "redirect:/post/add";
         }
+//        catch (Exception e) {
+//            redirectAttributes.addFlashAttribute("msg", "게시물 등록에 실패하였습니다.");
+//            redirectAttributes.addFlashAttribute("prevPostSaveReq", postForm);
+//            return "redirect:/post/add";
+//        }
 
     }
 
@@ -270,12 +271,13 @@ public class PostController {
             model.addAttribute("msg", "게시물을 수정할 수 없습니다.");
             return "error/redirect";
 
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("msg", "게시물 수정에 실패하였습니다.");
-            redirectAttributes.addFlashAttribute("prevPostUpdateReq", postRequestDTO);
-            redirectAttributes.addAttribute("postId", postId);
-            return "redirect:/post/{postId}/edit";
         }
+//        catch (Exception e) {
+//            redirectAttributes.addFlashAttribute("msg", "게시물 수정에 실패하였습니다.");
+//            redirectAttributes.addFlashAttribute("prevPostUpdateReq", postRequestDTO);
+//            redirectAttributes.addAttribute("postId", postId);
+//            return "redirect:/post/{postId}/edit";
+//        }
 
 
     }
@@ -304,11 +306,13 @@ public class PostController {
             model.addAttribute("msg", "게시물을 삭제할 수 없습니다.");
             return "error/redirect";
 
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("msg", "게시물 삭제에 실패하였습니다.");
-            redirectAttributes.addAttribute("postId", postId);
-            return "redirect:/post/{postId}";
         }
+
+//        catch (Exception e) {
+//            redirectAttributes.addFlashAttribute("msg", "게시물 삭제에 실패하였습니다.");
+//            redirectAttributes.addAttribute("postId", postId);
+//            return "redirect:/post/{postId}";
+//        }
 
     }
 

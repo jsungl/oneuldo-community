@@ -174,7 +174,6 @@ public class PostService {
         Page<Post> posts = postQueryRepository.findAll(pageable);
 
         return posts.map(post -> PostResponseDTO.builder().post(post).build());
-
     }
 
     /**

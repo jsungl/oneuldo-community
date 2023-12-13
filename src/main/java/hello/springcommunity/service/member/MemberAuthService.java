@@ -24,17 +24,18 @@ public class MemberAuthService {
      */
     public boolean verify(Long id, String authKey) {
         MemberAuth memberAuth = memberAuthRepository.findByMemberId(id).orElseThrow(() -> new NoSuchElementException("존재하지 않는 인증정보입니다."));
+        boolean result = false;
 
         if(!memberAuth.getIsAuthenticated()) {
             //인증키 일치여부 확인
             if(authKey.equals(memberAuth.getAuthKey())) {
                 resolve(memberAuth);
-                return true;
+                result = true;
             }
 
         }
-        //이미 인증된 회원이거나 인증키가 일치하지 않는 경우
-        return false;
+        //이미 인증된 회원이거나 인증키가 일치하지 않는 경우 false 반환
+        return result;
 
     }
 

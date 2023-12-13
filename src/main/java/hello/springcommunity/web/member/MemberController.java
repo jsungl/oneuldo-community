@@ -22,6 +22,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -130,6 +131,7 @@ public class MemberController {
             model.addAttribute("result", result);
 
         } catch (NoSuchElementException e) {
+            model.addAttribute("result", false);
             model.addAttribute("msg", "인증시 오류가 발생하였습니다.");
         }
 
@@ -168,8 +170,8 @@ public class MemberController {
                 HttpSession session = request.getSession(false);
                 UserSessionDTO userSessionDTO = (UserSessionDTO) session.getAttribute(OAUTH2_MEMBER);
 
-                //세션에 저장된 회원정보가 없는경우 로그아웃
-                if(userSessionDTO == null) {
+                //세션에 저장된 회원정보가 없거나 AccessToken이 없는경우 로그아웃
+                if(userSessionDTO == null || !StringUtils.hasText(userSessionDTO.getAccessToken())) {
                     model.addAttribute("msg", "회원탈퇴에 실패하였습니다.");
                     return "member/procLogout";
                 }
@@ -207,7 +209,7 @@ public class MemberController {
             }
 
 
-        } catch (Exception e) {
+        } catch (UsernameNotFoundException | NoSuchElementException e) {
             model.addAttribute("msg", "회원탈퇴에 실패하였습니다.");
             return "error/redirect";
         }

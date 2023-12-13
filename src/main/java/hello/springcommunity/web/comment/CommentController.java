@@ -53,7 +53,7 @@ public class CommentController {
             errorMap.put("INVALID_PARAMETER_INCLUDED", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMap);
 
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             Map<String, String> errorMap = new HashMap<>();
             errorMap.put("UNEXPECTED_ERROR", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMap);
@@ -77,6 +77,10 @@ public class CommentController {
             Map<String, String> errorMap = new HashMap<>();
             errorMap.put("INVALID_PARAMETER_INCLUDED", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMap);
+        } catch (Exception e) {
+            Map<String, String> errorMap = new HashMap<>();
+            errorMap.put("UNEXPECTED_ERROR", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMap);
         }
 
     }
@@ -95,6 +99,10 @@ public class CommentController {
             Map<String, String> errorMap = new HashMap<>();
             errorMap.put("INVALID_PARAMETER_INCLUDED", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMap);
+        } catch (Exception e) {
+            Map<String, String> errorMap = new HashMap<>();
+            errorMap.put("UNEXPECTED_ERROR", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMap);
         }
 
     }

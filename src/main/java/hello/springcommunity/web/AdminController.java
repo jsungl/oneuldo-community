@@ -86,7 +86,7 @@ public class AdminController {
             model.addAttribute("posts", posts);
             return "admin/memberDocuments";
 
-        } catch (Exception e) {
+        } catch (UsernameNotFoundException e) {
             model.addAttribute("msg", "게시물을 조회할 수 없습니다.");
             return "error/redirect";
         }
@@ -108,7 +108,7 @@ public class AdminController {
             model.addAttribute("comments", comments);
             return "admin/memberComments";
 
-        } catch (Exception e) {
+        } catch (UsernameNotFoundException e) {
             model.addAttribute("msg", "댓글을 조회할 수 없습니다.");
             return "error/redirect";
         }
