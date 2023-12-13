@@ -46,18 +46,12 @@
             </style>
 
             <script th:inline="javascript">
-                //form 태그 초기화
+
                 window.onload = function() {
                     const msg = [[${msg}]];
                     if(msg) {
                         alert(msg);
                     }
-
-                    const form = document.getElementsByTagName("form");
-                    if(form.length != 0) {
-                        form[0].reset();
-                    }
-
                 }
 
                 //로그인 체크

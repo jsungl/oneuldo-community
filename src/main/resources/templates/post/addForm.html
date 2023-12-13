@@ -3,6 +3,12 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
 <head>
+    <script th:inline="javascript">
+         window.addEventListener('pageshow', function(event) {
+              const form = document.getElementById('addPostForm');
+              form.reset(); // Reset the form
+         });
+    </script>
     <title>게시물 등록</title>
 </head>
 <th:block layout:fragment="content">

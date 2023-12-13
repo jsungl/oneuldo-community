@@ -3,6 +3,12 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
 <head>
+    <script th:inline="javascript">
+        window.addEventListener('pageshow', function(event) {
+          const form = document.getElementById('addMemberForm');
+          form.reset(); // Reset the form
+        });
+    </script>
     <title>회원 가입</title>
 </head>
 

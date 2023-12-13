@@ -3,6 +3,15 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
 <head>
+  <!-- Include the Google Sign-In library -->
+<!--  <script src="https://accounts.google.com/gsi/client" async></script>-->
+
+  <script th:inline="javascript">
+    window.addEventListener('pageshow', function(event) {
+      const form = document.getElementById('loginForm');
+      form.reset(); // Reset the form
+    });
+  </script>
 
   <style>
     .divide-line {
@@ -17,6 +26,34 @@
     }
     .txt {
       padding: 0 10px;
+    }
+
+    .n-signin-btn {
+      width: 48px;
+      height: 48px;
+      /* Set the background image */
+      background-image: url('img/naver/btnG_icon.png');
+      /* Make the background image cover the button */
+      background-size: cover;
+      /* Center the background image */
+      background-position: center;
+      /* Optional: Add some padding and other styles */
+      padding: 10px;
+      border: none;
+    }
+
+    .g-signin-btn {
+      width: 48px;
+      height: 48px;
+      /* Set the background image */
+      background-image: url('img/google/btn_icon.png');
+      /* Make the background image cover the button */
+      background-size: cover;
+      /* Center the background image */
+      background-position: center;
+      /* Optional: Add some padding and other styles */
+      padding: 10px;
+      border: none;
     }
   </style>
   <title>로그인</title>
@@ -36,14 +73,51 @@
 <!--    </div>-->
 
     <!-- social login -->
-    <div class="d-flex flex-column my-3">
-      <button class="btn btn-outline-primary btn-lg mb-3"
-              th:onclick="|location.href='@{/oauth2/authorization/google}'|"
-              type="button">구글 로그인</button>
-      <button class="btn btn-outline-primary btn-lg mb-3"
-              th:onclick="|location.href='@{/oauth2/authorization/naver}'|"
-              type="button">네이버 로그인</button>
+
+    <div class="login-social mb-3">
+      <div class="login-social-title d-flex justify-content-center">
+        <div style="color:#a2a2a2">SNS 계정으로 간편 로그인/회원가입</div>
+      </div>
+      <div class="login-social-btn d-flex justify-content-center mt-3">
+        <div class="row">
+          <div class="col">
+            <button class="n-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/naver}'|"></button>
+          </div>
+          <div class="col">
+            <button class="g-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/google}'|"></button>
+          </div>
+        </div>
+      </div>
     </div>
+
+
+<!--    <div class="d-flex flex-column my-3">-->
+<!--      <button class="btn btn-outline-primary btn-lg mb-3"-->
+<!--              th:onclick="|location.href='@{/oauth2/authorization/google}'|"-->
+<!--              type="button">구글 로그인</button>-->
+<!--      <button class="btn btn-outline-primary btn-lg mb-3"-->
+<!--              th:onclick="|location.href='@{/oauth2/authorization/naver}'|"-->
+<!--              type="button">네이버 로그인</button>-->
+<!--    </div>-->
+
+
+    <!-- 구글 로그인 버튼 -->
+<!--    <div style="width:100%;max-width:300px">-->
+<!--      <div id="g_id_onload"-->
+<!--           th:data-client_id="${@environment.getProperty('spring.security.oauth2.client.registration.google.client-id')}"-->
+<!--           th:data-login_uri="@{/oauth2/authorization/google}"-->
+<!--           data-auto_prompt="false">-->
+<!--      </div>-->
+<!--      <div class="g_id_signin"-->
+<!--           data-width="250"-->
+<!--           data-type="standard"-->
+<!--           data-size="large"-->
+<!--           data-theme="outline"-->
+<!--           data-text="sign_in_with"-->
+<!--           data-shape="rectangular"-->
+<!--           data-logo_alignment="left">-->
+<!--      </div>-->
+<!--    </div>-->
 
     <div class="divide-line my-4">
       <hr class="bar">
@@ -83,7 +157,8 @@
       <div class="row">
         <div class="col">
           <button class="w-100 btn btn-primary btn-lg" type="submit">
-            로그인</button>
+            로그인
+          </button>
         </div>
       </div>
 
