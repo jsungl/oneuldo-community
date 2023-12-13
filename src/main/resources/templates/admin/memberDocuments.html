@@ -4,6 +4,16 @@
       layout:decorate="~{layout/default_layout}">
 <head>
   <title>내 글</title>
+  <style>
+    th,td:not(.title) {
+      white-space:nowrap;
+      text-align:center;
+    }
+    .title {
+      white-space:normal;
+      word-break:break-all;
+    }
+  </style>
 </head>
 
 <th:block layout:fragment="content">
@@ -29,21 +39,23 @@
         <table class="table">
           <thead>
           <tr>
-            <th>No.</th>
+            <th>탭</th>
             <th>제목</th>
-            <th>조회수</th>
             <th>작성일</th>
+            <th>조회</th>
+            <th>추천</th>
           </tr>
           </thead>
           <tbody>
             <tr th:each="post:${posts}" th:if="${posts.getTotalElements() != 0}">
-              <td th:text="${post.id}">1</a></td>
-              <td>
-                <a th:href="@{/post/{postId}(postId=${post.id})}" th:text="${#strings.abbreviate(post.title,10)}">제목</a>
+              <td class="cate">잡담</td>
+              <td class="title">
+                <a th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title)}">제목</a>
                 <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
               </td>
-              <td th:text="${post.viewCount}">조회수</td>
-              <td th:text="${post.createdDate}">작성일</td>
+              <td class="reg_time" th:text="${post.createdDate}">작성일</td>
+              <td class="view_cnt" th:text="${post.viewCount}">조회수</td>
+              <td class="like_cnt" th:text="${post.likeCount}">추천수</td>
             </tr>
             <tr th:unless="${posts.getTotalElements() != 0}">
               <td colspan="4" class="text-center">작성한 글이 존재하지 않습니다.</td>

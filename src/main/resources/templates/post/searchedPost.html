@@ -4,6 +4,28 @@
       layout:decorate="~{layout/default_layout}">
 <head>
   <title>게시물 목록</title>
+  <style>
+    th,td:not(.title) {
+      white-space:nowrap;
+      text-align:center;
+    }
+
+    .notice {
+      background:#f6f6f6;
+    }
+    .notice .cate {
+      color:#ff0000;
+    }
+    .notice .title {
+      font-weight:bold;
+    }
+
+    .title {
+      white-space:normal;
+      word-break:break-all;
+    }
+
+  </style>
 </head>
 <th:block layout:fragment="content">
 
@@ -79,23 +101,35 @@
           </tr>
           </thead>
           <tbody>
+
+            <!-- 공지 -->
+            <tr class="notice">
+              <td class="cate">공지</td>
+              <td class="title">6년간 방문한 안경점에 단골고객이 감사패 제작해서 보낼 예정인 이유.JPG</td>
+              <td class="author">관리자</td>
+              <td class="reg_time">2023-09-11</td>
+              <td class="view_cnt">100</td>
+              <td class="like_cnt"></td>
+            </tr>
+
+            <!-- 게시물 -->
             <tr th:each="post:${posts}">
-              <td>잡담</td>
-              <td>
-                <a th:href="@{/post/{postId}(postId=${post.id})}" th:text="${#strings.abbreviate(post.title,10)}">제목</a>
+              <td class="cate">잡담</td>
+              <td class="title">
+                <a th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
                 <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
               </td>
-              <td>
+              <td class="author">
                 <div class="btn-group dropend">
-                  <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${#strings.abbreviate(post.nickname,10)}">작성자</a>
+                  <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${post.nickname}">작성자</a>
                   <ul class="dropdown-menu">
                     <li><a class="dropdown-item" th:href="@{/post/search(searchType=nickname,keyword=${post.nickname})}">작성글</a></li>
                   </ul>
                 </div>
               </td>
-              <td th:text="${post.createdDate}">작성일</td>
-              <td th:text="${post.viewCount}">조회</td>
-              <td th:text="${post.likeCount == 0 ? '' : post.likeCount}">추천수</td>
+              <td class="reg_time" th:text="${post.createdDate}">작성일</td>
+              <td class="view_cnt" th:text="${post.viewCount}">조회</td>
+              <td class="like_cnt" th:text="${post.likeCount == 0 ? '' : post.likeCount}">추천수</td>
             </tr>
           </tbody>
         </table>
