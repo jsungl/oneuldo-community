@@ -107,6 +107,7 @@ public class SecurityConfig {
         http.authorizeRequests() //요청에 의한 보안검사 시작
                 .antMatchers("/signup", "/find/**", "/login/**").anonymous()
                 .antMatchers("/post/add").hasAnyRole("USER", "SOCIAL", "ADMIN") //Spring Security에서 prefix를 자동으로 "ROLE_"을 넣어주므로 이 때 hasRole에는 ROLE을 제외하고 뒷 부분인 USER만 써주면 된다
+                .antMatchers("/member/leave").hasAnyRole("USER", "SOCIAL")
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/", "/posts", "/post/{postId}", "/post/search", "/member/authAccount", "/error/**").permitAll()
                 .anyRequest().authenticated(); //그 외 요청들은 인증필요
@@ -123,7 +124,6 @@ public class SecurityConfig {
 
 
         //필터 추가
-        //http.addFilterBefore(new LoginAuthenticationFilter(memberAuthService), UsernamePasswordAuthenticationFilter.class);
         //http.apply(new CustomFilterApply());
                 
                 
