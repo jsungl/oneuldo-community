@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -54,10 +55,10 @@ public class DisConnectOauth2UserService {
      */
     public MemberLeaveResponseDTO disConnectUser(UserSessionDTO userSessionDTO, Long memberId) {
 
+        String provider = userSessionDTO.getProvider();
         String accessToken = userSessionDTO.getAccessToken();
         RefreshToken token = refreshTokenRepository.findByMemberId(memberId).orElseThrow(() -> new NoSuchElementException("존재하지 않는 토큰정보입니다."));
         String refreshToken = token.getValue();
-        String provider = userSessionDTO.getProvider();
         String result = "";
 
         if("naver".equals(provider)) {
@@ -113,7 +114,7 @@ public class DisConnectOauth2UserService {
 
 
 
-        } else {
+        } else if("google".equals(provider)){
             log.info("구글 로그인 사용자입니다.");
 
             //1. access token 유효성 검사(기본적으로 access token은 1시간동안 유효하다)
