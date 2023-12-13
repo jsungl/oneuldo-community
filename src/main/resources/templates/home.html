@@ -9,6 +9,14 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script th:inline="javascript">
+        window.onload = function() {
+            const msg = [[${errorMessage}]];
+            if(msg) {
+                alert(msg);
+            }
+        }
+    </script>
     <title>홈</title>
 </head>
 
@@ -19,13 +27,7 @@
             <h2>홈 화면</h2>
         </div>
 
-        <!-- 회원탈퇴 성공 -->
-        <div th:if="${msg}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            <span th:text="${msg}">탈퇴성공</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-
+        <!-- 로그인 사용자 -->
         <th:block sec:authorize="isAuthenticated()">
 
             <h5 class="mb-3">
@@ -72,9 +74,8 @@
             </div>
         </th:block>
 
-
+        <!-- 비로그인 사용자 -->
         <th:block sec:authorize="isAnonymous()">
-    <!--    <div th:if="${#authentication.principal} == anonymousUser">true</div>-->
 
             <p class="row">
                 <p class="col">

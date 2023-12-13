@@ -6,8 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import javax.servlet.http.HttpServletRequest;
 
 
 @Slf4j
@@ -18,7 +20,15 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Authentication authentication,
-                       @AuthenticationPrincipal UserDetailsDTO dto) {
+                       HttpServletRequest request,
+                       @AuthenticationPrincipal UserDetailsDTO dto,
+                       Model model) {
+
+        if(request.getSession().getAttribute("errorMessage") != null) {
+            String msg = (String) request.getSession().getAttribute("errorMessage");
+            model.addAttribute("errorMessage", msg);
+            request.getSession().removeAttribute("errorMessage");
+        }
 
         /**
          * Authentication : 인증객체
