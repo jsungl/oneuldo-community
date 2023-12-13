@@ -1,11 +1,11 @@
 package hello.springcommunity.dto.post;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * 게시물 등록용 폼 객체(DTO)
@@ -20,11 +20,12 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class PostRequestDTO {
 
-    @NotBlank(message = "제목을 입력해주세요")
+    @NotBlank(message = "제목을 입력해주세요.")
+    @Size(max = 40, message = "제목은 40자 이하로 입력해주세요.")
     private String title;
 
     //@NotNull //내용은 아무것도 입력하지 않았을 때 발생할 수 있는 Null pointer exception 을 방지
-    @NotBlank(message = "내용을 입력해주세요")
+    @NotBlank(message = "내용을 입력해주세요.")
     private String content;
 
 }
