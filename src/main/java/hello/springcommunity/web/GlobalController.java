@@ -4,6 +4,7 @@ import hello.springcommunity.common.validation.CheckIdValidator;
 import hello.springcommunity.common.validation.CheckMailValidator;
 import hello.springcommunity.common.validation.CheckNicknameValidator;
 import hello.springcommunity.common.validation.ValidationSequence;
+import hello.springcommunity.domain.post.CategoryCode;
 import hello.springcommunity.dto.login.LoginRequestDTO;
 import hello.springcommunity.dto.member.MemberSaveRequestDTO;
 import hello.springcommunity.dto.post.PostResponseDTO;
@@ -23,9 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -65,10 +64,34 @@ public class GlobalController {
     @GetMapping("/posts")
     public String posts(@RequestParam(value = "page", required = false, defaultValue = "0") int pageNo,
                         @RequestParam(value = "sort_index", required = false, defaultValue = "id") String sort,
+                        @RequestParam(value = "category", required = false) String category,
                         Model model) {
 
-        Page<PostResponseDTO> posts = postService.getAllPost(sort, pageNo);
-        model.addAttribute("posts", posts);
+        if(pageNo == 0) {
+            List<PostResponseDTO> topNotice = postService.getTopNotice();
+            model.addAttribute("topNotice", topNotice);
+        }
+
+        CategoryCode[] values = CategoryCode.values();
+        //boolean isRight = false;
+        CategoryCode categoryCode = null;
+        if(category != null) {
+            for(CategoryCode code : values) {
+                if(code.name().equals(category)) categoryCode = code;
+            }
+            //isRight = Arrays.stream(values).anyMatch(c -> c.name().equals(category));
+        }
+
+        if(category == null || categoryCode == null) {
+            Page<PostResponseDTO> posts = postService.getAllPost(sort, pageNo);
+            model.addAttribute("posts", posts);
+
+        } else {
+            Page<PostResponseDTO> categoryPosts = postService.getCategoryPost(sort, categoryCode, pageNo);
+            model.addAttribute("listCategory", categoryCode.name());
+            model.addAttribute("posts", categoryPosts);
+        }
+
         model.addAttribute("sort_index", sort);
 
         return "post/posts";

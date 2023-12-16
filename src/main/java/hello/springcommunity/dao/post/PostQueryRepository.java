@@ -6,7 +6,9 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import hello.springcommunity.domain.post.CategoryCode;
 import hello.springcommunity.domain.post.Post;
+import hello.springcommunity.domain.post.QNotice;
 import hello.springcommunity.dto.post.PostSearchCond;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,7 +21,12 @@ import org.springframework.util.StringUtils;
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import static hello.springcommunity.domain.comment.QComment.*;
+import static hello.springcommunity.domain.member.QMember.*;
+import static hello.springcommunity.domain.post.CategoryCode.*;
+import static hello.springcommunity.domain.post.QNotice.*;
 import static hello.springcommunity.domain.post.QPost.*;
 
 /**
@@ -31,14 +38,36 @@ import static hello.springcommunity.domain.post.QPost.*;
 @Repository
 public class PostQueryRepository {
 
-    // Querydsl 을 사용하려면 JPAQueryFactory 가 필요하다
-    // 그리고 JPAQueryFactory 는 JPA 쿼리인 JPQL 을 만들기 때문에 EntityManager 가 필요하다
     private final JPAQueryFactory query;
-//    private final EntityManager em;
 
+    /**
+     * Querydsl 을 사용하려면 JPAQueryFactory 가 필요하다
+     * 그리고 JPAQueryFactory 는 JPA 쿼리인 JPQL 을 만들기 때문에 EntityManager 가 필요하다
+     */
     public PostQueryRepository(EntityManager em) {
-//        this.em = em;
         this.query = new JPAQueryFactory(em);
+    }
+
+
+
+    /**
+     * 게시물 1개 조회
+     * @param postId
+     * @return
+     */
+    public Optional<Post> findOne(Long postId) {
+
+        Post findPost = query.selectFrom(post)
+                .leftJoin(post.notice, notice)
+                .fetchJoin()
+                .leftJoin(post.member, member)
+                .fetchJoin()
+                .leftJoin(post.comments, comment)
+                .fetchJoin()
+                .where(post.id.eq(postId))
+                .fetchOne();
+
+        return Optional.ofNullable(findPost);
     }
 
     /**
@@ -49,7 +78,7 @@ public class PostQueryRepository {
 
         Long totalCount = query.select(Wildcard.count)
                 .from(post)
-                .where(isMemberActivated())
+                .where(post.categoryCode.ne(NOTICE), isMemberActivated())
                 .fetchOne();
 
         /**
@@ -58,7 +87,43 @@ public class PostQueryRepository {
          * OrderSpecifier[]::new 는 함수형 인터페이스에서 생성자 메소드 참조로, :: 기준 우측에 있는 생성자 메소드를 적용해 배열을 생성하겠다는 의미다
          */
         List<Post> list =  query.selectFrom(post)
-                .where(isMemberActivated())
+                .where(post.categoryCode.ne(NOTICE), isMemberActivated())
+                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+
+        return new PageImpl<>(list, pageable, totalCount);
+    }
+
+    /**
+     * 상단에 고정된 공지 조회(fixed = true)
+     */
+    public List<Post> findTopNotice() {
+        List<Post> list = query.selectFrom(post)
+                .leftJoin(post.member, member)
+                .fetchJoin()
+                .leftJoin(post.comments, comment)
+                .fetchJoin()
+                .leftJoin(post.notice, notice)
+                .fetchJoin()
+                .where(post.categoryCode.eq(NOTICE), post.notice.fixed.eq(true))
+                .orderBy(post.notice.id.desc())
+                .fetch();
+
+        return list;
+    }
+
+    public Page<Post> findByCategory(CategoryCode category, Pageable pageable) {
+
+        Long totalCount = query.select(Wildcard.count)
+                .from(post)
+                .where(post.categoryCode.eq(category), isMemberActivated())
+                .fetchOne();
+
+        List<Post> list =  query.selectFrom(post)
+                .where(post.categoryCode.eq(category), isMemberActivated())
                 .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -188,25 +253,5 @@ public class PostQueryRepository {
         }
         return null;
     }
-
-    /**
-     * 조회수 증가
-     * 게시물 조회시 @LastModifiedDate 로 인해 수정시간이 자동으로 업데이트 되는걸 방지
-     */
-    /*
-    public Long updateViewCount(Long postId) {
-        long result = query.update(post)
-                .set(post.viewCount, post.viewCount.add(1))
-                .where(post.id.eq(postId))
-                .execute();
-
-        //영속성 컨텍스트 초기화
-        em.clear();
-        em.flush();
-
-        return result;
-    }
-    */
-
 
 }

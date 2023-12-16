@@ -6,8 +6,14 @@
     <script th:inline="javascript">
         window.addEventListener('pageshow', function(event) {
           const form = document.getElementById('editPostForm');
-          form.reset(); // Reset the form
+          form.reset();
         });
+
+        function submitEditForm(form,event) {
+            event.preventDefault();
+            $("#categoryCode").removeAttr("disabled");
+            form.submit();
+        }
     </script>
     <title>게시물 수정</title>
 </head>
@@ -19,23 +25,43 @@
             <h2>게시물 수정</h2>
         </div>
 
-        <form id="editPostForm" th:action th:object="${postForm}" method="post">
+        <form id="editPostForm" th:action th:object="${postForm}" method="post" onsubmit="submitEditForm(this,event)">
 
-            <div class="mb-3">
-                <label for="title">제목</label>
-                <input type="text" id="title" class="form-control" th:field="*{title}" th:classappend="${valid_title} ? 'field-error'">
-                <div th:if="${valid_title}" class="field-error">
-                    <p th:text="${valid_title}"></p>
+            <div class="row mb-3">
+                <div class="col-md-auto">
+                    <select th:field="*{categoryCode}" class="form-select" disabled>
+                        <option value="">탭</option>
+                        <th:block th:each="cate:${categoryCodes}">
+                            <option th:value="${cate.name()}" th:text="${cate.displayName}"
+                                    th:selected="${postForm.categoryCode} == ${cate.name()}">CHAT</option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="col">
+                    <input type="text" th:field="*{title}" class="form-control" th:classappend="${valid_title} ? 'field-error'" placeholder="제목을 입력하세요">
+                    <div th:if="${valid_title}" class="field-error">
+                        <p th:text="${valid_title}"></p>
+                    </div>
                 </div>
             </div>
 
             <div class="mb-3">
-                <label for="content">내용</label>
-                <textarea id="content" class="form-control" rows="5" th:field="*{content}" th:text="*{content}" th:classappend="${valid_content} ? 'field-error'"></textarea>
+                <textarea class="form-control" rows="7" th:field="*{content}" th:text="*{content}" th:classappend="${valid_content} ? 'field-error'"></textarea>
                 <div th:if="${valid_content}" class="field-error">
                     <p th:text="${valid_content}"></p>
                 </div>
             </div>
+
+            <!-- 공지일 경우 상단에 등록할건지 -->
+            <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+                <div id="notice_container" th:if="${postForm.fixed}">
+                    <div class="form-check">
+                        <input type="checkbox" id="fixed" name="fixed" class="form-check-input" th:checked="${postForm.fixed}">
+                        <input type="hidden" name="_fixed" value="on"/>
+                        <label for="fixed" class="form-check-label">상단에 등록</label>
+                    </div>
+                </div>
+            </th:block>
 
             <hr class="my-4">
 

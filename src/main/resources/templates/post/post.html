@@ -17,23 +17,26 @@
             <h2>게시물 상세</h2>
         </div>
 
-
-        <th:block sec:authorize="!hasRole('ROLE_ADMIN')">
+        <div class="my-3">
             <button class="w-100 btn btn-secondary"
                     onclick="location.href='posts.html'"
                     th:onclick="|location.href='@{/posts}'|"
                     type="button">
                 목록으로
             </button>
-        </th:block>
+        </div>
 
+        <div>
+            <label for="cate">카테고리</label>
+            <input type="text" id="cate" name="cate" class="form-control" value="카테고리" th:value="${post.categoryName}" readonly>
+        </div>
         <div>
             <label for="title">제목</label>
             <input type="text" id="title" name="title" class="form-control" value="제목" th:value="${post.title}" readonly>
         </div>
         <div>
             <label for="content">내용</label>
-            <textarea id="content" name="content" class="form-control" rows="5" th:value="${post.content}" th:text="${post.content}" readonly></textarea>
+            <textarea id="content" name="content" class="form-control" rows="7" th:value="${post.content}" th:text="${post.content}" readonly></textarea>
         </div>
         <div>
             <label for="author">작성자</label>

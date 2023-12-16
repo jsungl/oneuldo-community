@@ -2,6 +2,8 @@ package hello.springcommunity.dto.post;
 
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.member.MemberLikePost;
+import hello.springcommunity.domain.post.CategoryCode;
+import hello.springcommunity.domain.post.Notice;
 import hello.springcommunity.domain.post.Post;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +29,9 @@ public class PostResponseDTO {
     private String createdDate;
     private Integer viewCount;
     private Integer likeCount;
+    private String categoryCode; //"CHAT","NOTICE"
+    private String categoryName; //"잡담","공지"
+    private Boolean fixed;
     private Member member;
     private String loginId;
     private String nickname;
@@ -34,7 +39,9 @@ public class PostResponseDTO {
     //private List<CommentResponseDTO> comments;
     //private List<MemberLikePost> likePosts;
 
-    // Entity -> DTO
+    /**
+     * Entity -> DTO
+     */
     @Builder
     public PostResponseDTO(Post post) {
         this.id = post.getId();
@@ -43,6 +50,9 @@ public class PostResponseDTO {
         this.createdDate = post.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         this.viewCount = post.getViewCount();
         this.likeCount = post.getLikeCount();
+        this.categoryCode = post.getCategoryCode().name();
+        this.categoryName = post.getCategoryName();
+        this.fixed = post.getNotice() != null && post.getNotice().getFixed();
         this.member = post.getMember();
         this.loginId = post.getMember().getLoginId();
         this.nickname = post.getMember().getNickname();
@@ -50,4 +60,12 @@ public class PostResponseDTO {
         this.commentNumber = post.getComments().size();
         //this.comments = post.getComments().stream().map(CommentResponseDTO::entityToDto).collect(Collectors.toList());
     }
+
+    public PostResponseDTO(String title, String content, CategoryCode categoryCode, Boolean fixed) {
+        this.title = title;
+        this.content = content;
+        this.categoryCode = categoryCode.name();
+        this.fixed = fixed;
+    }
+
 }

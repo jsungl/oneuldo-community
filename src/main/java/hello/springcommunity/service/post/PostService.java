@@ -2,11 +2,14 @@ package hello.springcommunity.service.post;
 
 import hello.springcommunity.dao.comment.CommentRepository;
 import hello.springcommunity.dao.member.MemberLikePostRepository;
+import hello.springcommunity.dao.post.NoticeRepository;
 import hello.springcommunity.dao.post.PostQueryRepository;
 import hello.springcommunity.dao.post.PostRepository;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.dao.member.MemberRepository;
 import hello.springcommunity.domain.member.MemberLikePost;
+import hello.springcommunity.domain.post.CategoryCode;
+import hello.springcommunity.domain.post.Notice;
 import hello.springcommunity.domain.post.Post;
 import hello.springcommunity.dto.post.PostResponseDTO;
 import hello.springcommunity.dto.post.PostSearchCond;
@@ -29,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static hello.springcommunity.domain.post.CategoryCode.*;
+
 
 @Slf4j
 @Service
@@ -37,6 +42,7 @@ import java.util.Map;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final NoticeRepository noticeRepository;
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
     private final PostQueryRepository postQueryRepository;
@@ -48,11 +54,20 @@ public class PostService {
     public Post addPost(PostRequestDTO postRequestDTO, String loginId) {
         Member member = memberRepository.findByLoginId(loginId).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
 
+        //공지여부 확인
+        Notice savedNotice = null;
+        if(postRequestDTO.getCategoryCode().equals(NOTICE)) {
+            Notice notice = Notice.builder().fixed(postRequestDTO.getFixed()).build();
+            savedNotice = noticeRepository.save(notice);
+        }
+
         //DTO -> Entity
         Post post = Post.builder()
                 .title(postRequestDTO.getTitle())
                 .content(postRequestDTO.getContent())
                 .member(member)
+                .categoryCode(postRequestDTO.getCategoryCode())
+                .notice(savedNotice)
                 .build();
 
         return postRepository.save(post);
@@ -63,8 +78,17 @@ public class PostService {
      * 게시물 수정
      */
     public Long updatePost(Long id, PostRequestDTO postRequestDTO) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+
+        //Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+        Post post = postQueryRepository.findOne(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
         post.updatePost(postRequestDTO.getTitle(), postRequestDTO.getContent());
+
+        if(postRequestDTO.getCategoryCode().equals(NOTICE)) {
+            //Notice notice = Notice.builder().fixed(postRequestDTO.getFixed()).build();
+            Notice notice = post.getNotice();
+            notice.changeFixed(postRequestDTO.getFixed());
+            post.setNotice(notice);
+        }
 
         return post.getId();
     }
@@ -85,10 +109,20 @@ public class PostService {
             //삭제하려는 게시물의 댓글 모두 삭제
             commentRepository.deleteAllByPostId(post.getId());
         }
-        //추천 삭제
-        memberLikePostRepository.deleteAllByPostId(post.getId());
-        //게시물 삭제
-        postRepository.deleteOne(post.getId());
+
+        //공지여부 확인
+        if(post.getCategoryCode().equals(NOTICE)) {
+            Long id = post.getNotice().getId();
+            //게시물 삭제(부모인 Post 객체부터 삭제해야 한다)
+            postRepository.deleteOne(post.getId());
+            // 공지 삭제
+            noticeRepository.deleteOne(id);
+        } else {
+            //추천 삭제
+            memberLikePostRepository.deleteAllByPostId(post.getId());
+            //게시물 삭제
+            postRepository.deleteOne(post.getId());
+        }
     }
 
     /**
@@ -119,11 +153,14 @@ public class PostService {
      * 게시물 1개 조회
      */
     public Post getPost(Long id) {
-        return postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+        //return postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+        return postQueryRepository.findOne(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
     }
 
     public PostResponseDTO getPostDto(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+
+        //Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+        Post post = postQueryRepository.findOne(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
 
         /**
          * 파라미터로 전달받은 id 로 게시물을 찾은 뒤 Entity로 바로 넘겨주지 않고 DTO에서 한번 감싼후
@@ -141,7 +178,8 @@ public class PostService {
      * 조회수 증가
      */
     public PostResponseDTO getPostDetail(Long id, HttpServletRequest request, HttpServletResponse response) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+        //Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+        Post post = postQueryRepository.findOne(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
 
         if(!post.getMember().getActivated()) {
             throw new IllegalArgumentException("탈퇴한 회원입니다.");
@@ -156,6 +194,25 @@ public class PostService {
                 .build();
     }
 
+    /**
+     * 상단에 고정된 공지 조회
+     */
+    public List<PostResponseDTO> getTopNotice() {
+
+        List<Post> notices = postQueryRepository.findTopNotice();
+
+        //Entity -> DTO
+        List<PostResponseDTO> list = new ArrayList<>();
+        for (Post post : notices) {
+            PostResponseDTO result = PostResponseDTO.builder()
+                    .post(post)
+                    .build();
+            list.add(result);
+        }
+
+        return list;
+    }
+
 
     /**
      * 게시물 전체 조회 - 페이징
@@ -167,11 +224,29 @@ public class PostService {
         /** 첫번째 정렬조건에서 동일한 값을 가진 경우는 2번째 정렬조건으로 최신순으로 정렬한다 **/
         if("id".equals(sort)) {
             pageable = PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.DESC, sort));
+
         } else {
             pageable = PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.DESC, sort, "id"));
         }
 
         Page<Post> posts = postQueryRepository.findAll(pageable);
+
+        return posts.map(post -> PostResponseDTO.builder().post(post).build());
+    }
+
+    public Page<PostResponseDTO> getCategoryPost(String sort, CategoryCode category, int pageNo) {
+
+        Pageable pageable;
+
+        /** 첫번째 정렬조건에서 동일한 값을 가진 경우는 2번째 정렬조건으로 최신순으로 정렬한다 **/
+        if("id".equals(sort)) {
+            pageable = PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.DESC, sort));
+
+        } else {
+            pageable = PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.DESC, sort, "id"));
+        }
+
+        Page<Post> posts = postQueryRepository.findByCategory(category, pageable);
 
         return posts.map(post -> PostResponseDTO.builder().post(post).build());
     }
@@ -348,8 +423,6 @@ public class PostService {
         /** 추천하려는 게시물 조회 **/
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
 
-        /** 좋아요가 되었는지 좋아요가 취소되었는지 알기위한 알림 문구 **/
-        String notice = "";
 
         /** 로그인한 유저가 해당 게시물을 추천 했는지 안 했는지 확인 **/
         if(memberLikePostRepository.existsByPostIdAndMemberId(postId,member.getId())) {
@@ -389,5 +462,7 @@ public class PostService {
         Member member = memberRepository.findByLoginId(username).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
         return memberLikePostRepository.existsByPostIdAndMemberId(postId, member.getId());
     }
+
+
 
 }

@@ -1,8 +1,9 @@
 package hello.springcommunity.dto.post;
 
-import lombok.Getter;
+import hello.springcommunity.common.validation.EnumValue;
+import hello.springcommunity.domain.post.CategoryCode;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -15,8 +16,7 @@ import javax.validation.constraints.Size;
  * 이것을 통해 컨트롤러에서 폼 데이터를 전달받고, 이후 컨트롤러에서 필요한 데이터를 사용해서 Post 을 생성한다
  */
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class PostRequestDTO {
 
@@ -24,8 +24,15 @@ public class PostRequestDTO {
     @Size(max = 40, message = "제목은 40자 이하로 입력해주세요.")
     private String title;
 
-    //@NotNull //내용은 아무것도 입력하지 않았을 때 발생할 수 있는 Null pointer exception 을 방지
+    /**
+     * @NotNull : 내용은 아무것도 입력하지 않았을 때 Null pointer exception 이 발생할 수 있음
+     * 그걸 방지하고자 @NotBlank 사용
+     */
     @NotBlank(message = "내용을 입력해주세요.")
     private String content;
 
+    @EnumValue(enumClass = CategoryCode.class)
+    private CategoryCode categoryCode;
+
+    private Boolean fixed;
 }

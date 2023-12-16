@@ -1,5 +1,6 @@
 package hello.springcommunity.web.post;
 
+import hello.springcommunity.domain.post.CategoryCode;
 import hello.springcommunity.dto.comment.CommentResponseDTO;
 import hello.springcommunity.dto.post.PostResponseDTO;
 import hello.springcommunity.dto.security.UserDetailsDTO;
@@ -30,9 +31,9 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+
+import static hello.springcommunity.domain.post.CategoryCode.*;
 
 @Slf4j
 @Controller
@@ -42,6 +43,16 @@ public class PostController {
 
     private final PostService postService;
     private final CommentServiceImpl commentService;
+
+    /**
+     * CategoryCode(Enum)의 모든종류를 배열로 반환
+     * [CHAT, NOTICE]
+     */
+    @ModelAttribute("categoryCodes")
+    public CategoryCode[] categoryCodes() {
+        return values();
+    }
+
 
     /**
      * 게시물 검색 - 페이징
@@ -73,8 +84,6 @@ public class PostController {
             //검색조건을 선택하지 않고 검색시 전체 게시물 목록 조회
             return "redirect:/posts";
         }
-
-
     }
 
 
@@ -97,8 +106,12 @@ public class PostController {
         try {
             //해당 게시물 조회
             PostResponseDTO post = postService.getPostDetail(postId, request, response);
-            boolean like = false;
+            if(post.getCategoryCode().equals("NOTICE")) {
+                model.addAttribute("post", post);
+                return "notice/notice";
+            }
 
+            boolean like = false;
             //로그인 유무 확인
             if(dto != null) {
                 //해당 게시물을 추천했는지 조회
@@ -130,12 +143,10 @@ public class PostController {
             model.addAttribute("comments", commentList);
             //해당 게시물 댓글 총 갯수(대댓글 포함)
             model.addAttribute("totalCount", post.getCommentNumber());
-            /** 로그인 유저면 해당 게시물 추천유무, 비로그인 유저면 무조건 false **/
+            //로그인 유저면 해당 게시물 추천유무, 비로그인 유저면 무조건 false
             model.addAttribute("like", like);
 
             //개행문자
-            //String nlString = System.lineSeparator();
-            //String nlString2 = System.getProperty("line.separator");
             model.addAttribute("nlString", "\r\n");
             return "post/post";
 
@@ -154,7 +165,7 @@ public class PostController {
      * 게시물 등록 폼
      */
     @GetMapping("/add")
-    public String addForm(HttpServletRequest request, Model model) {
+    public String addForm(HttpServletRequest request, @AuthenticationPrincipal UserDetailsDTO dto, Model model) {
 
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
         if(inputFlashMap != null && inputFlashMap.get("prevPostSaveReq") != null) {
@@ -163,6 +174,7 @@ public class PostController {
         } else {
             model.addAttribute("postForm", new PostRequestDTO());
         }
+        model.addAttribute("role", dto.getMember().getRoleValue());
 
         return "post/addForm";
     }
@@ -184,7 +196,7 @@ public class PostController {
         }
 
         try {
-            Post savedPost = postService.addPost(postForm, dto.getUsername()); //등록한 게시물의 제목,내용,작성자(id) 를 담아서 전달
+            Post savedPost = postService.addPost(postForm, dto.getUsername());
 
             redirectAttributes.addAttribute("postId", savedPost.getId()); //IDENTITY 방식에 의해 DB에 저장후 id 값과 등록날짜(regDate)를 확인할 수 있다
             redirectAttributes.addFlashAttribute("msg", "게시물이 등록되었습니다.");
@@ -219,7 +231,8 @@ public class PostController {
             Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
             if(inputFlashMap != null && inputFlashMap.get("prevPostUpdateReq") != null) {
                 PostRequestDTO postRequestDTO = (PostRequestDTO) inputFlashMap.get("prevPostUpdateReq");
-                model.addAttribute("postForm", postRequestDTO);
+                PostResponseDTO postResponseDTO = new PostResponseDTO(postRequestDTO.getTitle(), postRequestDTO.getContent(), postRequestDTO.getCategoryCode(), postRequestDTO.getFixed());
+                model.addAttribute("postForm", postResponseDTO);
 
             } else {
                 PostResponseDTO post = postService.getPostDto(postId);
@@ -228,10 +241,10 @@ public class PostController {
                     model.addAttribute("msg", "게시물 작성자만 수정할 수 있습니다.");
                     return "error/redirect";
                 }
-
                 model.addAttribute("postForm", post);
             }
 
+            model.addAttribute("role", dto.getMember().getRoleValue());
             model.addAttribute("postId", postId);
             return "post/editForm";
 
