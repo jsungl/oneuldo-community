@@ -20,7 +20,7 @@ public class GlobalExceptionHandler{
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     protected void handleRuntimeEx(RuntimeException e, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        log.info("[handleRuntimeEx 실행]");
+        log.error("[handleRuntimeEx 실행]",e);
         String requestURI = request.getRequestURI();
         log.info("requestURI={}", requestURI);
 
@@ -32,8 +32,8 @@ public class GlobalExceptionHandler{
     //Exception 발생
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleException(IllegalArgumentException e, HttpServletRequest request) {
-        log.info("[handleException 실행]");
+    public String handleException(Exception e, HttpServletRequest request) {
+        log.error("[handleException 실행]",e);
         String requestURI = request.getRequestURI();
         log.info("requestURI={}", requestURI);
 

@@ -13,7 +13,7 @@
     .notice {
       background:#f6f6f6;
     }
-    .notice .cate {
+    .notice .cate a, .notice .title a {
       color:#ff0000;
     }
     .notice .title {
@@ -33,7 +33,7 @@
 
     <div class="col-md-12">
       <div class="pt-5 pb-3 text-center">
-        <h2>검색 결과</h2>
+        <h2>"[[${keyword}]]"에 대한 검색 결과</h2>
       </div>
 
       <div class="d-flex justify-content-center">
@@ -56,6 +56,7 @@
           </div>
         </form>
       </div>
+
 
       <div class="dummy_wrapper" style="height:100px"></div>
 
@@ -82,18 +83,22 @@
             <th>작성일</th>
             <th>
               <!-- 정렬되지 않은 상태 -->
-              <a class="text-underline-hover text-dark" th:href="@{/post/search(searchType=${searchType},keyword=${keyword},sort_index=viewCount)}" th:unless="${sort_index} == 'viewCount'">조회</a>
+              <a class="text-underline-hover text-dark" th:href="@{/post/search(searchType=${searchType},keyword=${keyword},sort_index=viewCount)}"
+                 th:if="${sort_index} != 'viewCount'">조회</a>
               <!-- 정렬된 상태 -->
-              <a class="text-underline-hover text-dark" th:href="@{/post/search(searchType=${searchType},keyword=${keyword})}" th:if="${sort_index} == 'viewCount'">
+              <a class="text-underline-hover text-dark" th:href="@{/post/search(searchType=${searchType},keyword=${keyword})}"
+                 th:if="${sort_index} == 'viewCount'">
                 조회
                 <i class="bi bi-caret-down-fill"></i>
               </a>
             </th>
             <th>
               <!-- 정렬되지 않은 상태 -->
-              <a class="text-underline-hover text-dark" th:href="@{/post/search(searchType=${searchType},keyword=${keyword},sort_index=likeCount)}" th:unless="${sort_index} == 'likeCount'">추천</a>
+              <a class="text-underline-hover text-dark" th:href="@{/post/search(searchType=${searchType},keyword=${keyword},sort_index=likeCount)}"
+                 th:if="${sort_index} != 'likeCount'">추천</a>
               <!-- 정렬된 상태 -->
-              <a class="text-underline-hover text-dark" th:href="@{/post/search(searchType=${searchType},keyword=${keyword})}" th:if="${sort_index} == 'likeCount'">
+              <a class="text-underline-hover text-dark" th:href="@{/post/search(searchType=${searchType},keyword=${keyword})}"
+                 th:if="${sort_index} == 'likeCount'">
                 추천
                 <i class="bi bi-caret-down-fill"></i>
               </a>
@@ -102,21 +107,14 @@
           </thead>
           <tbody>
 
-            <!-- 공지 -->
-            <tr class="notice">
-              <td class="cate">공지</td>
-              <td class="title">6년간 방문한 안경점에 단골고객이 감사패 제작해서 보낼 예정인 이유.JPG</td>
-              <td class="author">관리자</td>
-              <td class="reg_time">2023-09-11</td>
-              <td class="view_cnt">100</td>
-              <td class="like_cnt"></td>
-            </tr>
-
             <!-- 게시물 -->
             <tr th:each="post:${posts}">
-              <td class="cate">잡담</td>
+              <td class="cate">
+                <a class="text-underline-hover" th:href="@{/posts(category=${post.categoryCode})}" th:text="${post.categoryName}"
+                   th:style="${post.categoryCode} == 'NOTICE' ? 'color:#ff0000;' : 'color:#003f7f;'">카테고리</a>
+              </td>
               <td class="title">
-                <a th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
+                <a class="text-underline-hover" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
                 <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
               </td>
               <td class="author">
@@ -135,7 +133,7 @@
         </table>
       </div>
 
-      <!-- 페이징 -->
+      <!-- 페이징 버튼 -->
       <div th:if="${!posts.isEmpty()}">
           <ul class="pagination justify-content-center"
               th:with="

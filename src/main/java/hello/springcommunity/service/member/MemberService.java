@@ -60,8 +60,10 @@ public class MemberService {
                     .password(memberSaveRequestDTO.getPassword())
                     .nickname(memberSaveRequestDTO.getNickname())
                     .email(memberSaveRequestDTO.getEmail())
-                    .role(memberSaveRequestDTO.getLoginId().contains("admin") ? Role.ADMIN : Role.USER)
+                    .role(Role.USER)
                     .build();
+
+            //.role(memberSaveRequestDTO.getLoginId().contains("admin") ? Role.ADMIN : Role.USER)
 
             //기본정보 저장
             Member savedMember = memberRepository.save(member);
@@ -156,15 +158,6 @@ public class MemberService {
 
         return result;
     }
-
-//    public void deleteSocialMember(String loginId) {
-//        Member member = memberRepository.findByLoginId(loginId).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
-//        //refresh token 삭제
-//        RefreshToken token = refreshTokenRepository.findByLoginId(loginId).orElseThrow(() -> new NoSuchElementException("존재하지 않는 토큰정보입니다."));
-//        refreshTokenRepository.delete(token);
-//        //계정 비활성화
-//        memberRepository.updateActivated(member.getId());
-//    }
 
 
     /**

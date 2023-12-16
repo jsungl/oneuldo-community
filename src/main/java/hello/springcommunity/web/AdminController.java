@@ -1,6 +1,5 @@
 package hello.springcommunity.web;
 
-import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.dto.comment.CommentResponseDTO;
 import hello.springcommunity.dto.member.MemberResponseDTO;
 import hello.springcommunity.dto.post.PostResponseDTO;
@@ -114,5 +113,6 @@ public class AdminController {
         }
 
     }
+
 
 }
