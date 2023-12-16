@@ -1,18 +1,15 @@
 package hello.springcommunity.domain.comment;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import hello.springcommunity.domain.TimeEntity;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.post.Post;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +25,7 @@ public class Comment extends TimeEntity {
     @Column(name = "comment_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String content;
 
     /** 댓글의 입장에선 게시글과 사용자는 다대일 관계이므로 @ManyToOne 이 된다 **/
@@ -58,6 +55,7 @@ public class Comment extends TimeEntity {
     /**
      * 빌더로 엔티티 객체 생성시 해당 필드 기본값 설정은 null 이 아닌 empty list 가 된다
      */
+    @JsonIgnore
     @Builder.Default
     @OneToMany(mappedBy = "parent", orphanRemoval = true)
     private List<Comment> children = new ArrayList<>();
