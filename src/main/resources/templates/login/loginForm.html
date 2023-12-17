@@ -6,13 +6,6 @@
   <!-- Include the Google Sign-In library -->
 <!--  <script src="https://accounts.google.com/gsi/client" async></script>-->
 
-  <script th:inline="javascript">
-    window.addEventListener('pageshow', function(event) {
-      const form = document.getElementById('loginForm');
-      form.reset(); // Reset the form
-    });
-  </script>
-
   <style>
     .divide-line {
        display: flex;
@@ -57,6 +50,15 @@
     }
   </style>
   <title>로그인</title>
+  <script th:inline="javascript">
+    window.addEventListener('pageshow', function() {
+      const form = document.getElementById('loginForm');
+      form.reset(); // Reset the form
+    });
+    function popup(url) {
+      window.open(url,"","width=700px,height=500px,top=200px,left=200px;");
+    }
+  </script>
 </head>
 
 <th:block layout:fragment="content">
@@ -65,26 +67,21 @@
       <h2>로그인</h2>
     </div>
 
-    <!-- 회원성공 메세지 -->
-<!--    <div th:if="${msg}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">-->
-<!--      <i class="bi bi-check-circle-fill"></i>-->
-<!--      <span th:text="${msg}">가입완료</span>-->
-<!--      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>-->
-<!--    </div>-->
-
     <!-- social login -->
-
     <div class="login-social mb-3">
       <div class="login-social-title d-flex justify-content-center">
         <div style="color:#a2a2a2">SNS 계정으로 간편 로그인/회원가입</div>
       </div>
       <div class="login-social-btn d-flex justify-content-center mt-3">
-        <div class="row">
+        <div class="row" th:with="nlogin_url=|@{/oauth2/authorization/naver}|, glogin_url=|@{/oauth2/authorization/google}|">
           <div class="col">
-            <button class="n-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/naver}'|"></button>
+<!--            <button class="n-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/naver}'|"></button>-->
+            <button class="n-signin-btn p-3" type="button" th:onclick="popup([[${nlogin_url}]])"></button>
+
           </div>
           <div class="col">
-            <button class="g-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/google}'|"></button>
+<!--            <button class="g-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/google}'|"></button>-->
+            <button class="g-signin-btn p-3" type="button" th:onclick="popup([[${glogin_url}]])"></button>
           </div>
         </div>
       </div>
