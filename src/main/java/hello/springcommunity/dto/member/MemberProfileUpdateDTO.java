@@ -20,11 +20,11 @@ import static hello.springcommunity.common.validation.ValidationGroups.*;
 public class MemberProfileUpdateDTO {
 
     @NotBlank(message = "아이디를 입력해주세요.")
-    @Pattern(regexp = "^[a-z0-9]{4,15}$", message = "아이디는 영어 소문자와 숫자만 사용하여 4~15자리여야 합니다.")
+    @Pattern(regexp = "^[a-z0-9]{4,12}$", message = "아이디는 영어 소문자와 숫자만 사용하여 4~12자리여야 합니다.")
     private String loginId;
 
     @NotBlank(message = "닉네임을 입력해주세요.", groups = NotBlankGroup.class)
-    @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$", message = "닉네임은 특수문자를 포함하지 않은 2~10자리여야 합니다.", groups = PatternGroup.class)
+    @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,8}$", message = "닉네임은 특수문자를 포함하지 않은 2~8자리여야 합니다.", groups = PatternGroup.class)
     private String nickname;
 
     @NotBlank(message = "이메일을 입력해주세요.", groups = NotBlankGroup.class)

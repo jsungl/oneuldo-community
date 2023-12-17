@@ -20,7 +20,7 @@ public class MemberPwdUpdateDTO {
     private String currentPassword;
 
     @NotBlank(message = "새로운 비밀번호를 입력해주세요.", groups = NotBlankGroup.class)
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,16}$", message = "비밀번호는 영문 대소문자, 숫자, 특수문자를 1개 이상 포함한 8~16자리수여야 합니다.", groups = PatternGroup.class)
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,12}$", message = "비밀번호는 영문 대소문자, 숫자, 특수문자를 1개 이상 포함한 8~12자리수여야 합니다.", groups = PatternGroup.class)
     private String newPassword;
 
     @NotBlank(message = "다시 한번 입력해주세요.", groups = NotBlankGroup.class)

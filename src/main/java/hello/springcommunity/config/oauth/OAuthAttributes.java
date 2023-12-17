@@ -54,7 +54,8 @@ public class OAuthAttributes {
 
         return OAuthAttributes.builder()
                 .oauth2Id(registrationId + "_" + response.get("id"))
-                .nickname(response.get("nickname") + "_" + response.get("id"))
+                //.nickname(response.get("nickname") + "_" + response.get("id"))
+                .nickname(response.get("id").toString().substring(0,7))
                 .email((String) response.get("email"))
                 .attributes(response)
                 .nameAttributeKey(userNameAttributeName)
@@ -67,7 +68,8 @@ public class OAuthAttributes {
     private static OAuthAttributes ofGoogle(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
         return OAuthAttributes.builder()
                 .oauth2Id(registrationId + "_" + attributes.get("sub"))
-                .nickname(attributes.get("name") + "_" + attributes.get("sub"))
+                //.nickname(attributes.get("name") + "_" + attributes.get("sub"))
+                .nickname(attributes.get("sub").toString().substring(0,7))
                 .email((String) attributes.get("email"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
