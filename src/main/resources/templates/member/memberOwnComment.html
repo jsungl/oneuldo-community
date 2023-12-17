@@ -9,7 +9,7 @@
       white-space:nowrap;
       text-align:center;
     }
-    .content {
+    .content .word {
       white-space:normal;
       word-break:break-all;
     }
@@ -30,21 +30,30 @@
         <table class="table">
           <thead>
           <tr>
+            <th>번호</th>
             <th>탭</th>
             <th>내용</th>
             <th>작성일</th>
           </tr>
           </thead>
           <tbody>
-            <tr th:each="comment:${comments}" th:if="${comments.getTotalElements() != 0} and ${comment.post.member.activated} != false">
-              <td class="cate">잡담</td>
-              <td class="content">
-                  <a th:href="@{|/post/${comment.post.id}?commentId=${comment.id}#comment_${comment.id}|}" th:text="${#strings.abbreviate(comment.content,30)}">내용</a>
+            <tr th:each="comment,stat:${comments}" th:if="${comments.getTotalElements() != 0} and ${comment.post.member.activated} != false">
+              <td class="no" th:text="${comments.getTotalElements() - stat.index}">0</td>
+              <td class="cate">
+                <a class="text-decoration-none" th:text="${comment.post.categoryName}"
+                   th:href="@{/posts(category=${comment.post.categoryCode})}"
+                   th:style="${comment.post.categoryCode} == 'NOTICE' ? 'color:#ff0000;' : 'color:#003f7f;'">카테고리</a>
               </td>
-              <td class="reg_time" th:text="${comment.createdDate}">작성일</td>
+              <td class="content">
+                <div class="word">
+                  <a th:href="@{|/post/${comment.post.id}?commentId=${comment.id}#comment_${comment.id}|}"
+                     th:text="${comment.content}">내용</a>
+                </div>
+              </td>
+              <td class="reg_time" th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd')}">작성일</td>
             </tr>
             <tr th:unless="${comments.getTotalElements() != 0}">
-              <td colspan="3" class="text-center">작성한 댓글이 존재하지 않습니다.</td>
+              <td colspan="4" class="text-center">작성한 댓글이 존재하지 않습니다.</td>
             </tr>
           </tbody>
         </table>

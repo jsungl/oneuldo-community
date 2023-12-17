@@ -4,6 +4,12 @@
       layout:decorate="~{layout/default_layout}">
 <head>
     <title>회원 목록</title>
+    <style>
+        th,td {
+          white-space:nowrap;
+          text-align:center;
+        }
+  </style>
 </head>
 
 <th:block layout:fragment="content">
@@ -18,29 +24,34 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>No.</th>
-                        <th>아이디</th>
+                        <th>번호</th>
+<!--                        <th>아이디</th>-->
                         <th>닉네임</th>
-                        <th>권한</th>
+                        <th>회원상태</th>
+                        <th>가입상태</th>
                         <th>가입일</th>
                     </tr>
                     </thead>
                     <tbody>
 
                         <tr th:each="member, memberStat :${members}">
-                            <td th:text="${memberStat.count}">1</td>
-                            <td th:text="${#strings.abbreviate(member.loginId,10)}">아이디</td>
+                            <td class="no" th:text="${members.getTotalElements() - memberStat.index}">0</td>
                             <td>
                                 <div class="btn-group dropend">
-                                    <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${#strings.abbreviate(member.nickname,10)}">닉네임</a>
+<!--                                    <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" -->
+<!--                                       th:text="${#strings.abbreviate(member.nickname,10)}">닉네임</a>-->
+                                    <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown"
+                                       th:text="${member.nickname}">닉네임</a>
+
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" th:href="@{/admin/memberProfile(memberId=${member.id})}">회원 정보</a></li>
-                                        <li><a class="dropdown-item" th:href="@{/admin/memberDocuments(memberId=${member.id})}">작성 글</a></li>
-                                        <li><a class="dropdown-item" th:href="@{/admin/memberComments(memberId=${member.id})}">작성 댓글</a></li>
+                                        <li th:if="${member.activated}"><a class="dropdown-item" th:href="@{/admin/memberProfile(memberId=${member.id})}">회원 정보</a></li>
+                                        <li><a class="dropdown-item" th:href="@{/admin/memberDocument(memberId=${member.id})}">작성 게시물</a></li>
+                                        <li><a class="dropdown-item" th:href="@{/admin/memberComment(memberId=${member.id})}">작성 댓글</a></li>
                                     </ul>
                                 </div>
                             </td>
-                            <td th:text="${member.role} == 'ROLE_USER' ? '일반유저' : '소셜유저'">권한</td>
+                            <td th:text="${member.activated} ? '활성' : '비활성'">회원상태</td>
+                            <td th:text="${member.role} == 'ROLE_USER' ? '일반' : '소셜'">가입상태</td>
                             <td th:text="${member.createdDate}">가입일</td>
                         </tr>
                     </tbody>

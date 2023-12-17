@@ -50,12 +50,19 @@
 
             <script th:inline="javascript">
 
-                window.onload = function() {
+               window.addEventListener('load', function() {
+
                     const msg = [[${msg}]];
                     if(msg) {
                         alert(msg);
                     }
-                }
+
+                    const openerWindow = window.opener;
+                    if(openerWindow) {
+                        openerWindow.location.href = "/login?error=true";
+                        window.close();
+                    }
+                });
 
                 //로그인 체크
                 function loginCheck() {

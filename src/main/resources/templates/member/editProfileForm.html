@@ -34,7 +34,8 @@
 
             <div class="mb-3">
                 <label for="nickname">닉네임</label>
-                <input type="text" id="nickname" class="form-control" th:field="*{nickname}" th:classappend="${valid_nickname} ? field-error" placeholder="닉네임은 특수문자를 포함하지 않은 2~10자리여야 합니다">
+                <input type="text" id="nickname" class="form-control" th:field="*{nickname}" th:classappend="${valid_nickname} ? field-error"
+                       placeholder="닉네임은 특수문자를 포함하지 않은 2~8자리여야 합니다">
                 <div class="field-error" th:text="${valid_nickname}" />
             </div>
 

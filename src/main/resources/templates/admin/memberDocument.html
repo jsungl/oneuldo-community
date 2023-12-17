@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
 <head>
-  <title>내 글</title>
+  <title>[[${nickname}]]의 게시물</title>
   <style>
     th,td:not(.title) {
       white-space:nowrap;
@@ -39,6 +39,7 @@
         <table class="table">
           <thead>
           <tr>
+            <th>번호</th>
             <th>탭</th>
             <th>제목</th>
             <th>작성일</th>
@@ -47,18 +48,30 @@
           </tr>
           </thead>
           <tbody>
-            <tr th:each="post:${posts}" th:if="${posts.getTotalElements() != 0}">
-              <td class="cate">잡담</td>
-              <td class="title">
-                <a th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title)}">제목</a>
-                <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
+            <tr th:each="post,stat:${posts}" th:if="${posts.getTotalElements() != 0}">
+              <td class="no" th:text="${posts.getTotalElements() - stat.index}">0</td>
+              <td class="cate">
+                <a class="text-decoration-none" th:text="${post.categoryName}"
+                   th:href="@{/posts(category=${post.categoryCode})}"
+                   th:style="${post.categoryCode} == 'NOTICE' ? 'color:#ff0000;' : 'color:#003f7f;'">카테고리</a>
               </td>
-              <td class="reg_time" th:text="${post.createdDate}">작성일</td>
+              <td class="title">
+                <th:block th:if="${memberActivated}">
+                  <a class="text-underline-hover" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
+                  <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
+                </th:block>
+                <th:block th:unless="${memberActivated}">
+                  <div th:text="${post.title}">
+                    <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
+                  </div>
+                </th:block>
+              </td>
+              <td class="reg_time" th:text="${#temporals.format(post.createdDate, 'yyyy-MM-dd')}">작성일</td>
               <td class="view_cnt" th:text="${post.viewCount}">조회수</td>
               <td class="like_cnt" th:text="${post.likeCount}">추천수</td>
             </tr>
             <tr th:unless="${posts.getTotalElements() != 0}">
-              <td colspan="4" class="text-center">작성한 글이 존재하지 않습니다.</td>
+              <td colspan="6" class="text-center">작성한 게시물이 존재하지 않습니다.</td>
             </tr>
           </tbody>
         </table>

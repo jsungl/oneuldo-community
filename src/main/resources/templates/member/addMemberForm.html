@@ -31,7 +31,7 @@
                 <label for="loginId">로그인 ID</label>
                 <input type="text" id="loginId" th:field="*{loginId}" class="form-control"
                        th:classappend="${valid_loginId} ? 'field-error'"
-                       th:errorclass="field-error" placeholder="아이디는 영어 소문자와 숫자만 사용하여 4~15자리여야 합니다">
+                       th:errorclass="field-error" placeholder="아이디는 영어 소문자와 숫자만 사용하여 4~12자리여야 합니다">
                 <div th:if="${valid_loginId}" class="field-error">
                     <p th:text="${valid_loginId}"></p>
                 </div>
@@ -43,7 +43,7 @@
                        class="form-control"
                        th:classappend="${valid_password} ? 'field-error'"
                        th:errorclass="field-error"
-                       placeholder="비밀번호는 영문 대소문자, 숫자, 특수문자를 1개 이상 포함한 8~16자리수여야 합니다">
+                       placeholder="비밀번호는 영문 대소문자, 숫자, 특수문자를 1개 이상 포함한 8~12자리수여야 합니다">
                 <div th:if="${valid_password}" class="field-error">
                     <p th:text="${valid_password}"></p>
                 </div>
@@ -64,7 +64,7 @@
                 <label for="nickname">닉네임</label>
                 <input type="text" id="nickname" th:field="*{nickname}" class="form-control"
                        th:classappend="${valid_nickname} ? 'field-error'"
-                       th:errorclass="field-error" placeholder="닉네임은 특수문자를 포함하지 않은 2~10자리여야 합니다">
+                       th:errorclass="field-error" placeholder="닉네임은 특수문자를 포함하지 않은 2~8자리여야 합니다">
                 <div th:if="${valid_nickname}" class="field-error">
                     <p th:text="${valid_nickname}"></p>
                 </div>
