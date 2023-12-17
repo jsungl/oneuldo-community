@@ -19,7 +19,31 @@ function likePost(postId) {
                 contentType: 'application/json; charset=utf-8'
             }).done(function (result) {
                 //클릭 해제된 이미지로 바꾸기 + 추천 숫자 갱신
-                $(".like-container").load(contextPath + " .like-container");
+                //$(".like-container").load(contextPath + " .like-container");
+
+                console.log(result);
+                let like = result.isLike;
+                let likeCount = result.likeCount;
+                let postId = result.postId;
+                let newContainer = `<div class="like-container">
+                                        <div class="d-flex justify-content-center mt-5">
+                                            <div class="likeButtonGroup">
+                                                <input type="hidden" id="like_check" value="${like}">
+                                                <button type="button" class="btn btn-outline-primary" onclick="likePost(${postId});">
+                                                    추천
+                                                    <i class="bi bi-hand-thumbs-up"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-center mt-3 mb-5">
+                                            <span class="like_count"
+                                                style="color:#1171cc;font:bold 14px georgia,sans-serif;border:1px solid #ccc;border-radius:3px;white-space:nowrap;padding:3px 7px 0;height:28px">
+                                            ${likeCount}</span>
+                                        </div>
+                                    </div>`;
+
+                $(".like-container").replaceWith(newContainer);
             }).fail(function (error) {
                 const result = error.responseJSON;
                 alert(JSON.stringify(result));
@@ -36,7 +60,32 @@ function likePost(postId) {
                 contentType: 'application/json; charset=utf-8'
             }).done(function (result) {
                 //클릭된 이미지로 바꾸기 + 추천 숫자 갱신
-                $(".like-container").load(contextPath + " .like-container");
+                //$(".like-container").load(contextPath + " .like-container");
+
+                console.log(result);
+                let like = result.isLike;
+                let likeCount = result.likeCount;
+                let postId = result.postId;
+                let newContainer = `<div class="like-container">
+                                        <div class="d-flex justify-content-center mt-5">
+                                            <div class="likeButtonGroup">
+                                                <input type="hidden" id="like_check" value="${like}">
+
+                                                <button type="button" class="btn btn-primary" onclick="likePost(${postId});">
+                                                    추천
+                                                    <i class="bi bi-hand-thumbs-up-fill"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-center mt-3 mb-5">
+                                            <span class="like_count"
+                                                style="color:#1171cc;font:bold 14px georgia,sans-serif;border:1px solid #ccc;border-radius:3px;white-space:nowrap;padding:3px 7px 0;height:28px">
+                                            ${likeCount}</span>
+                                        </div>
+                                    </div>`;
+
+                $(".like-container").replaceWith(newContainer);
             }).fail(function (error) {
                 const result = error.responseJSON;
                 alert(JSON.stringify(result));

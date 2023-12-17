@@ -70,7 +70,7 @@ public class CommentQueryRepository {
 //
 //    }
 
-    public Page<CommentResponseDTO> findCommentsByPostId(PostResponseDTO post, Pageable pageable) {
+    public Page<CommentResponseDTO> findCommentByPostId(PostResponseDTO post, Pageable pageable) {
 
         //조회 결과인 commentList 는 정렬된 결과를 가지고 있다
         List<Comment> commentList = query.selectFrom(comment)
@@ -107,9 +107,9 @@ public class CommentQueryRepository {
     }
 
     /**
-     * 회원이 작성한 댓글 조회
+     * 회원이 작성한 댓글의 현재 페이지 조회
      */
-    public List<CommentResponseDTO> findCommentsByCommentId(PostResponseDTO post) {
+    public List<CommentResponseDTO> findCommentByCommentId(PostResponseDTO post) {
         List<Comment> commentList = query.selectFrom(comment)
                 .leftJoin(comment.parent).fetchJoin()
                 .join(comment.member).fetchJoin() //n+1 문제를 해결하기위해 fetchJoin

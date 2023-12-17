@@ -147,7 +147,7 @@ public class PostController {
             model.addAttribute("like", like);
 
             //개행문자
-            model.addAttribute("nlString", "\r\n");
+            //model.addAttribute("nlString", "\r\n");
             return "post/post";
 
         } catch (IllegalArgumentException e) {
@@ -231,7 +231,8 @@ public class PostController {
             Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
             if(inputFlashMap != null && inputFlashMap.get("prevPostUpdateReq") != null) {
                 PostRequestDTO postRequestDTO = (PostRequestDTO) inputFlashMap.get("prevPostUpdateReq");
-                PostResponseDTO postResponseDTO = new PostResponseDTO(postRequestDTO.getTitle(), postRequestDTO.getContent(), postRequestDTO.getCategoryCode(), postRequestDTO.getFixed());
+                PostResponseDTO postResponseDTO =
+                        new PostResponseDTO(postRequestDTO.getTitle(), postRequestDTO.getContent(), postRequestDTO.getCategoryCode(), postRequestDTO.getFixed());
                 model.addAttribute("postForm", postResponseDTO);
 
             } else {
@@ -339,8 +340,20 @@ public class PostController {
 
         try {
             postService.likePost(postId, dto.getUsername());
-            Integer postLikeCount = postService.getPostLikeCount(postId);
-            return ResponseEntity.status(HttpStatus.OK).body(postLikeCount);
+            //게시물 추천수
+            Integer likeCount = postService.getPostLikeCount(postId);
+
+            boolean like = false;
+            //해당 게시물을 추천했는지 조회
+            like = postService.getMemberLikePost(postId, dto.getUsername());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("postId",postId);
+            response.put("isLike", like);
+            response.put("likeCount",likeCount);
+
+            //return ResponseEntity.status(HttpStatus.OK).body(postLikeCount);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } catch (UsernameNotFoundException e) {
             Map<String, String> errorMap = new HashMap<>();

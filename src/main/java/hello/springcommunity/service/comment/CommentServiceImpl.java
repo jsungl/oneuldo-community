@@ -41,7 +41,7 @@ public class CommentServiceImpl {
      * 댓글 조회 - 페이징
      */
     public Page<CommentResponseDTO> getPostComment(PostResponseDTO post, Pageable pageable) {
-        return commentQueryRepository.findCommentsByPostId(post, pageable);
+        return commentQueryRepository.findCommentByPostId(post, pageable);
     }
 
     /**
@@ -64,7 +64,7 @@ public class CommentServiceImpl {
      * 댓글의 현재 위치에 해당하는 페이지
      */
     public int getCommentPageNumber(Long commentId, PostResponseDTO post, Pageable pageable) {
-        List<CommentResponseDTO> list = commentQueryRepository.findCommentsByCommentId(post);
+        List<CommentResponseDTO> list = commentQueryRepository.findCommentByCommentId(post);
         int num = 1;
         int temp = 0;
 
@@ -321,6 +321,7 @@ public class CommentServiceImpl {
      * 해당 id를 가진 사용자가 작성한 댓글 모두 조회
      */
     public Page<CommentResponseDTO> getMemberCommentAll(Long id, Pageable pageable) {
+        //TODO: 댓글 조회시 탈퇴한 회원의 게시물에 작성한 댓글은 조회시 빼도록 할것 -> 타임리프 수정
         Page<Comment> comments = commentRepository.findByMemberId(id, pageable);
 
         List<CommentResponseDTO> list = new ArrayList<>();

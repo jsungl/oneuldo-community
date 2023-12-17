@@ -73,7 +73,6 @@ public class GlobalController {
         }
 
         CategoryCode[] values = CategoryCode.values();
-        //boolean isRight = false;
         CategoryCode categoryCode = null;
         if(category != null) {
             for(CategoryCode code : values) {
