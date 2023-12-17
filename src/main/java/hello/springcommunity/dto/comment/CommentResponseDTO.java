@@ -25,8 +25,8 @@ public class CommentResponseDTO {
     private String content;
     private Member member;
     private Post post;
-    private String createdDate;
-    private String modifiedDate;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
     private Comment parent;
     private Integer depth;
     private Boolean isDeleted;
@@ -34,13 +34,14 @@ public class CommentResponseDTO {
     private List<CommentResponseDTO> children = new ArrayList<>();
 
 
-    public CommentResponseDTO(Long id, String content, Member member, Post post, LocalDateTime createdDate, LocalDateTime modifiedDate, Comment parent, Integer depth, Boolean isDeleted, Boolean isModified) {
+    public CommentResponseDTO(Long id, String content, Member member, Post post, LocalDateTime createdDate, LocalDateTime modifiedDate,
+                              Comment parent, Integer depth, Boolean isDeleted, Boolean isModified) {
         this.id = id;
         this.content = content;
         this.member = member;
         this.post = post;
-        this.createdDate = createdDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        this.modifiedDate = modifiedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        this.createdDate = createdDate;
+        this.modifiedDate = modifiedDate;
         this.parent = parent;
         this.depth = depth;
         this.isDeleted = isDeleted;
