@@ -17,7 +17,7 @@
             <h2>게시물 상세</h2>
         </div>
 
-        <div class="my-3">
+        <div class="mb-2">
             <button class="w-100 btn btn-secondary"
                     onclick="location.href='posts.html'"
                     th:onclick="|location.href='@{/posts}'|"
@@ -26,42 +26,62 @@
             </button>
         </div>
 
-        <div>
-            <label for="cate">카테고리</label>
-            <input type="text" id="cate" name="cate" class="form-control" value="카테고리" th:value="${post.categoryName}" readonly>
-        </div>
-        <div>
-            <label for="title">제목</label>
-            <input type="text" id="title" name="title" class="form-control" value="제목" th:value="${post.title}" readonly>
-        </div>
-        <div>
-            <label for="content">내용</label>
-            <textarea id="content" name="content" class="form-control" rows="7" th:value="${post.content}" th:text="${post.content}" readonly></textarea>
-        </div>
-        <div>
-            <label for="author">작성자</label>
-            <input type="text" id="author" name="author" class="form-control" value="작성자" th:value="${post.nickname}" readonly>
+        <!-- 게시물 내용 -->
+        <div class="content_wrapper">
+            <div class="nav_cate">
+                <h5>
+                    <a class="text-underline-hover" th:text="${post.categoryName}" th:href="@{/posts(category=${post.categoryCode})}"
+                       style="color:#555">카테고리</a>
+                </h5>
+            </div>
+            <div class="header">
 
+                <div class="d-flex bd-highlight" style="border-top:1px solid #ccc;border-bottom:1px solid #ccc;background:#fcfcfc;">
+                    <div class="me-auto p-2 bd-highlight">
+                        <span class="title" th:text="${post.title}" style="font-size: large;font-weight:bold;">제목</span>
+                    </div>
+                    <div class="p-2 bd-highlight" style="white-space:nowrap;word-break:break-all;">
+                        <small class="createdDate" th:text="${post.createdDate}">2013-03-12</small>
+                    </div>
+                </div>
+
+                <div class="d-flex bd-highlight mb-3" style="border-bottom:1px solid #eee;">
+                    <div class="me-auto p-1 bd-highlight">
+                        <div class="btn-group dropend">
+                            <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown"
+                               th:text="${post.nickname}">작성자</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" th:href="@{/post/search(searchType=nickname,keyword=${post.nickname})}">작성글</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="p-1 bd-highlight">
+                        <span style="color:#888">
+                            조회수
+                            <b th:text="${post.viewCount}" style="color:#666">조회수</b>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="body mb-3">
+                <article>
+                    <div th:class="'document_'+${post.id}" th:text="${post.content}">내용</div>
+                </article>
+            </div>
         </div>
-        <div>
-            <label for="createdDate">작성일</label>
-            <input type="text" id="createdDate" name="createdDate" class="form-control"
-                   value="작성일" th:value="${post.createdDate}" readonly>
-        </div>
-        <div>
-            <label for="viewCount">조회</label>
-            <input type="text" id="viewCount" name="viewCount" class="form-control"
-                   value="조회" th:value="${post.viewCount}" readonly>
-        </div>
+
+        <!-- 여백 -->
+        <div class="dummy_wrapper" style="height:100px"></div>
 
         <!-- 추천버튼 -->
         <div class="like-container">
 
-            <div class="d-flex justify-content-center mt-5">
+            <div class="d-flex justify-content-center">
                 <!-- 로그인 유저 -->
                 <th:block sec:authorize="isAuthenticated()">
-                    <div>
+                    <div class="likeButtonGroup">
                         <input type="hidden" id="like_check" th:value="${like}">
+
                         <button type="button" class="btn btn-primary" th:onclick="likePost([[${post.id}]]);"
                                 th:if="${like}">
                             추천
@@ -146,7 +166,7 @@
                             th:classappend="${comment.parent != null} ? 're' : ''"
                             th:id="'comment_' + ${comment.id}"
                             th:style="|margin-left: ${comment.depth * 2}%|"
-                            th:with="content=${comment.content}, nlString=${nlString}">
+                            th:with="content=${comment.content}">
                             <div>
                                 <i class="bi bi-arrow-return-right" th:if="${comment.parent} != null"></i>
                                 <th:block th:if="${comment.member.nickname} == null">
@@ -163,7 +183,7 @@
                                     </div>
                                 </th:block>
 
-                                <small class="text-muted" th:text="${comment.createdDate}">registerDate</small>
+                                <small class="text-muted" th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd HH:mm')}">registerDate</small>
 
                                 <!-- 답글 여부, 본인이 작성한 댓글 수정/삭제 여부 -->
                                 <th:block sec:authorize="isAuthenticated()">
@@ -178,7 +198,7 @@
                                     </th:block>
 
                                     <!-- 다른사람 댓글 답글달기 -->
-                                    <th:block th:unless="${comment.member.loginId == #authentication.name}">
+                                    <th:block th:if="${comment.member.loginId != #authentication.name}">
                                         <a href="javascript:;" class="text-decoration-none text-secondary" th:onclick="replyComment([[${comment.id}]]);">
                                             답글
                                             <i class="bi bi-chat-dots"></i>
@@ -303,15 +323,6 @@
 
                     <!-- 로그인 유저 -->
                     <th:block sec:authorize="isAuthenticated()">
-<!--                        <div class="form-group mb-3">-->
-<!--                            <input type="hidden" name="postId" th:value="${post.id}">-->
-<!--                            <input type="hidden" name="contextPath" th:value="${#httpServletRequest.requestURL}">-->
-<!--                            <textarea name="content" class="form-control" id="commentTextarea" rows="3" placeholder="댓글을 입력하세요"></textarea>-->
-<!--                        </div>-->
-<!--                        <div class="d-flex justify-content-end">-->
-<!--                            <button type="submit" class="btn btn-outline-primary">등록</button>-->
-<!--                        </div>-->
-
                         <div class="row">
                             <div class="col-10">
                                 <input type="hidden" name="postId" th:value="${post.id}">
