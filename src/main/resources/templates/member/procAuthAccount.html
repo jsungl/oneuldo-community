@@ -6,7 +6,7 @@
 </head>
 <body>
   <script th:inline="javascript">
-    window.onload = () => {
+    window.addEventListener('load', function() {
         const msg = [[${msg}]];
         const result = [[${result}]];
 
@@ -21,7 +21,7 @@
             alert("인증키가 일치하지 않거나 이미 인증된 회원입니다.");
         }
 
-    }
+    });
   </script>
 </body>
 </html>

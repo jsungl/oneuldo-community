@@ -5,13 +5,13 @@
 </head>
 <body>
   <script th:inline="javascript">
-    window.onload = () => {
+    window.addEventListener('load', function() {
         const msg = [[${msg}]];
         if(msg) {
             alert(msg);
         }
         location.href="/logout";
-    }
+    });
   </script>
 </body>
 </html>

@@ -5,11 +5,11 @@
 </head>
 <body>
   <script th:inline="javascript">
-    window.onload = () => {
+    window.addEventListener('load', function() {
         const msg = [[${msg}]];
         alert(msg);
         location.href="/posts";
-    }
+    });
   </script>
 </body>
 </html>

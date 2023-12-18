@@ -8,7 +8,7 @@
 </head>
 <body>
   <script th:inline="javascript">
-    window.onload = function() {
+    window.addEventListener('load', function() {
         let msg = [[${msg}]];
         let nextPage = [[${nextPage}]];
 
@@ -21,7 +21,7 @@
         } else {
             location.href = "/";
         }
-    }
+    });
   </script>
 </body>
 </html>
