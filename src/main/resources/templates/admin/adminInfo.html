@@ -28,8 +28,17 @@
         <div class="row">
             <p class="col">
                 <button class="w-100 btn btn-lg btn-outline-primary" type="button"
+                        th:onclick="|location.href='@{/admin/myDocument}'|">
+                    나의 게시물
+                </button>
+            </p>
+        </div>
+
+        <div class="row">
+            <p class="col">
+                <button class="w-100 btn btn-lg btn-outline-primary" type="button"
                         th:onclick="|location.href='@{/posts}'|">
-                    게시판 관리
+                    게시판
                 </button>
             </p>
         </div>

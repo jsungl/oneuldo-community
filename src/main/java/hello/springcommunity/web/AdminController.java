@@ -1,8 +1,10 @@
 package hello.springcommunity.web;
 
+import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.dto.comment.CommentResponseDTO;
 import hello.springcommunity.dto.member.MemberResponseDTO;
 import hello.springcommunity.dto.post.PostResponseDTO;
+import hello.springcommunity.dto.security.UserDetailsDTO;
 import hello.springcommunity.service.comment.CommentServiceImpl;
 import hello.springcommunity.service.member.MemberService;
 import hello.springcommunity.service.post.PostService;
@@ -13,12 +15,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @Slf4j
@@ -49,6 +53,28 @@ public class AdminController {
         return "admin/members";
     }
 
+    /**
+     * 관리자가 작성한 게시물
+     */
+    @GetMapping("/myDocument")
+    public String myDocument(@AuthenticationPrincipal UserDetailsDTO dto,
+                             @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 5) Pageable pageable,
+                             Model model) {
+
+        try {
+            Member member = memberService.getMemberByLoginId(dto.getUsername());
+            Page<PostResponseDTO> posts = postService.getMemberAllPost(member.getId(), pageable);
+
+            model.addAttribute("posts", posts);
+            return "admin/adminOwnDocument";
+
+        } catch (UsernameNotFoundException e) {
+            model.addAttribute("msg", "게시물을 조회할 수 없습니다.");
+            return "error/redirect";
+        }
+
+    }
+
 
     /**
      * 회원 프로필 상세 조회
@@ -59,6 +85,12 @@ public class AdminController {
 
         try {
             MemberResponseDTO member = memberService.getMemberById(id);
+
+            if(!member.isActivated()) {
+                model.addAttribute("msg", "이미 탈퇴된 회원입니다.");
+                return "error/redirect";
+            }
+
             model.addAttribute("member", member);
             return "admin/memberProfile";
 
@@ -73,17 +105,18 @@ public class AdminController {
     /**
      * 회원이 작성한 게시물
      */
-    @GetMapping("/memberDocuments")
-    public String memberDocuments(@RequestParam("memberId") String memberId,
+    @GetMapping("/memberDocument")
+    public String memberDocument(@RequestParam("memberId") String memberId,
                                   @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 5) Pageable pageable,
                                   Model model) {
         try {
             long id = Long.parseLong(memberId);
             MemberResponseDTO member = memberService.getMemberById(id);
-            Page<PostResponseDTO> posts = postService.getMemberPostAll(member.getId(), pageable);
+            Page<PostResponseDTO> posts = postService.getMemberAllPost(member.getId(), pageable);
             model.addAttribute("nickname", member.getNickname());
+            model.addAttribute("memberActivated", member.isActivated());
             model.addAttribute("posts", posts);
-            return "admin/memberDocuments";
+            return "admin/memberDocument";
 
         } catch (UsernameNotFoundException e) {
             model.addAttribute("msg", "게시물을 조회할 수 없습니다.");
@@ -95,8 +128,8 @@ public class AdminController {
     /**
      * 회원이 작성한 댓글
      */
-    @GetMapping("/memberComments")
-    public String memberComments(@RequestParam("memberId") String memberId,
+    @GetMapping("/memberComment")
+    public String memberComment(@RequestParam("memberId") String memberId,
                                  @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 5) Pageable pageable,
                                  Model model) {
         try {
@@ -104,8 +137,9 @@ public class AdminController {
             MemberResponseDTO member = memberService.getMemberById(id);
             Page<CommentResponseDTO> comments = commentService.getMemberCommentAll(member.getId(), pageable);
             model.addAttribute("nickname", member.getNickname());
+            model.addAttribute("memberActivated", member.isActivated());
             model.addAttribute("comments", comments);
-            return "admin/memberComments";
+            return "admin/memberComment";
 
         } catch (UsernameNotFoundException e) {
             model.addAttribute("msg", "댓글을 조회할 수 없습니다.");
