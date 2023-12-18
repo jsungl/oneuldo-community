@@ -46,6 +46,7 @@ public class CheckNicknameValidator implements Validator {
             nickname = dto.getNickname();
 
             Optional<Member> member = memberRepository.findByLoginId(dto.getLoginId());
+            /** 닉네임을 변경한 경우 **/
             if(!member.get().getNickname().equals(nickname)) {
                 checkNickname(nickname, errors);
             }

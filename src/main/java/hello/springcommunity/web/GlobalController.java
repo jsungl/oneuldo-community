@@ -1,9 +1,6 @@
 package hello.springcommunity.web;
 
-import hello.springcommunity.common.validation.CheckIdValidator;
-import hello.springcommunity.common.validation.CheckMailValidator;
-import hello.springcommunity.common.validation.CheckNicknameValidator;
-import hello.springcommunity.common.validation.ValidationSequence;
+import hello.springcommunity.common.validation.*;
 import hello.springcommunity.domain.post.CategoryCode;
 import hello.springcommunity.dto.login.LoginRequestDTO;
 import hello.springcommunity.dto.member.MemberSaveRequestDTO;
@@ -13,6 +10,7 @@ import hello.springcommunity.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,6 +23,8 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+
+import static hello.springcommunity.common.validation.SortAndCategoryValidator.*;
 
 @Slf4j
 @Controller
@@ -63,37 +63,32 @@ public class GlobalController {
      */
     @GetMapping("/posts")
     public String posts(@RequestParam(value = "page", required = false, defaultValue = "0") int pageNo,
-                        @RequestParam(value = "sort_index", required = false, defaultValue = "id") String sort,
+                        @RequestParam(value = "sort_index", required = false, defaultValue = "id") String sortIndex,
                         @RequestParam(value = "category", required = false) String category,
                         Model model) {
 
+        /** 첫 페이지는 공지 목록 가져오기 **/
         if(pageNo == 0) {
             List<PostResponseDTO> topNotice = postService.getTopNotice();
             model.addAttribute("topNotice", topNotice);
         }
 
-        CategoryCode[] values = CategoryCode.values();
-        CategoryCode categoryCode = null;
-        if(category != null) {
-            for(CategoryCode code : values) {
-                if(code.name().equals(category)) categoryCode = code;
-            }
-            //isRight = Arrays.stream(values).anyMatch(c -> c.name().equals(category));
-        }
+        CategoryCode categoryCode = checkCategory(category);
+        String sort = checkSort(sortIndex);
 
-        if(category == null || categoryCode == null) {
+        if(categoryCode == null) {
             Page<PostResponseDTO> posts = postService.getAllPost(sort, pageNo);
             model.addAttribute("posts", posts);
 
         } else {
-            Page<PostResponseDTO> categoryPosts = postService.getCategoryPost(sort, categoryCode, pageNo);
+            Page<PostResponseDTO> categoryPosts = postService.getAllPostByCategory(sort, categoryCode, pageNo);
             model.addAttribute("listCategory", categoryCode.name());
             model.addAttribute("posts", categoryPosts);
         }
 
         model.addAttribute("sort_index", sort);
-
         return "post/posts";
+
     }
 
 

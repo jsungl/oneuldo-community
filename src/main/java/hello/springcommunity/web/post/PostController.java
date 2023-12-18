@@ -60,30 +60,34 @@ public class PostController {
     @GetMapping("/search")
     public String searchPost(@RequestParam("searchType") String searchType,
                              @RequestParam("keyword") String keyword,
-                             @RequestParam(value = "sort_index", required = false, defaultValue = "id") String sort,
-                             @RequestParam(value = "page", required = false, defaultValue = "0") int pageNo,
+                             @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 5) Pageable pageable,
                              Model model) {
+        try {
 
-        if(StringUtils.hasText(searchType)) {
-            //Page<PostResponseDTO> list = postService.findPost(searchType, keyword, pageable);
+            if(StringUtils.hasText(searchType)) {
+                //Page<PostResponseDTO> list = postService.findPost(searchType, keyword, pageable);
 
-            Map<String, Object> param = new HashMap<>();
-            param.put("searchType", searchType);
-            param.put("keyword", keyword);
-            param.put("page", pageNo);
-            param.put("sort_index", sort);
-            Page<PostResponseDTO> list = postService.getSearchPost(param);
+                Map<String, Object> param = new HashMap<>();
+                param.put("searchType", searchType);
+                param.put("keyword", keyword);
 
-            model.addAttribute("posts", list);
-            model.addAttribute("searchType", searchType);
-            model.addAttribute("keyword", keyword);
-            model.addAttribute("sort_index", sort);
-            return "post/searchedPost";
+                Page<PostResponseDTO> list = postService.getSearchPost(param,pageable);
 
-        }else {
-            //검색조건을 선택하지 않고 검색시 전체 게시물 목록 조회
-            return "redirect:/posts";
+                model.addAttribute("posts", list);
+                model.addAttribute("searchType", searchType);
+                model.addAttribute("keyword", keyword);
+                return "post/searchedPost";
+
+            }else {
+                //검색조건을 선택하지 않고 검색시 전체 게시물 목록 조회
+                return "redirect:/posts";
+            }
+
+        } catch (UsernameNotFoundException | IllegalArgumentException e) {
+            model.addAttribute("msg", e.getMessage());
+            return "error/redirect";
         }
+
     }
 
 

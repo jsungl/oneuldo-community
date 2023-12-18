@@ -234,7 +234,11 @@ public class PostService {
         return posts.map(post -> PostResponseDTO.builder().post(post).build());
     }
 
-    public Page<PostResponseDTO> getCategoryPost(String sort, CategoryCode category, int pageNo) {
+
+    /**
+     * 게시물 전체 카테고리별 조회 - 페이징
+     */
+    public Page<PostResponseDTO> getAllPostByCategory(String sort, CategoryCode category, int pageNo) {
 
         Pageable pageable;
 
@@ -251,10 +255,11 @@ public class PostService {
         return posts.map(post -> PostResponseDTO.builder().post(post).build());
     }
 
+
     /**
      * 특정 사용자가 작성한 게시물 모두 조회
      */
-    public Page<PostResponseDTO> getMemberPostAll(Long id, Pageable pageable) {
+    public Page<PostResponseDTO> getMemberAllPost(Long id, Pageable pageable) {
 
         Page<Post> posts = postQueryRepository.findByMemberId(id, pageable);
 
@@ -276,26 +281,24 @@ public class PostService {
     /**
      * 게시물 검색 - 페이징
      */
-    public Page<PostResponseDTO> getSearchPost(Map<String, Object> param) {
+    public Page<PostResponseDTO> getSearchPost(Map<String, Object> param, Pageable pageable) {
         String type = (String) param.get("searchType");
         String keyword = (String) param.get("keyword");
-        int pageNo = (int) param.get("page");
-        String sort = (String) param.get("sort_index");
-        Pageable pageable;
-
-        if("id".equals(sort)) {
-            pageable = PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.DESC, sort));
-        }else {
-            pageable = PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.DESC, sort, "id"));
-        }
 
         switch (type) {
             case "title":
-                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(keyword, null, null), pageable));
+                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(keyword, null, null,null), pageable));
             case "content":
-                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(null, keyword, null), pageable));
+                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(null, keyword, null,null), pageable));
             case "nickname":
-                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(null, null, keyword), pageable));
+                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(null, null, keyword,null), pageable));
+            case "memberId":
+                Long id = Long.valueOf(keyword);
+                Member member = memberRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
+                if(!member.getActivated()) {
+                    throw new IllegalArgumentException("이미 탈퇴된 회원입니다.");
+                }
+                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(null, null, null, id), pageable));
             default:
                 return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(), pageable));
         }

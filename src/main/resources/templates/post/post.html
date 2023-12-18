@@ -51,7 +51,7 @@
                             <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown"
                                th:text="${post.nickname}">작성자</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" th:href="@{/post/search(searchType=nickname,keyword=${post.nickname})}">작성글</a></li>
+                                <li><a class="dropdown-item" th:href="@{/post/search(searchType=memberId,keyword=${post.member.id})}">작성글</a></li>
                             </ul>
                         </div>
                     </div>
@@ -169,19 +169,14 @@
                             th:with="content=${comment.content}">
                             <div>
                                 <i class="bi bi-arrow-return-right" th:if="${comment.parent} != null"></i>
-                                <th:block th:if="${comment.member.nickname} == null">
-                                    <span>알수없음</span>
-                                </th:block>
 
-                                <th:block th:if="${comment.member.nickname} != null">
-                                    <div class="btn-group dropend">
-                                        <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown"
-                                           th:text="${comment.member.nickname}">작성자</a>
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" th:href="@{/post/search(searchType=nickname,keyword=${comment.member.nickname})}">작성글</a></li>
-                                        </ul>
-                                    </div>
-                                </th:block>
+                                <div class="btn-group dropend">
+                                    <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown"
+                                       th:text="${comment.member.nickname}">작성자</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" th:href="@{/post/search(searchType=memberId,keyword=${comment.member.id})}">작성글</a></li>
+                                    </ul>
+                                </div>
 
                                 <small class="text-muted" th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd HH:mm')}">registerDate</small>
 

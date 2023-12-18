@@ -2,6 +2,7 @@ package hello.springcommunity.dao.post;
 
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.core.types.dsl.Wildcard;
@@ -183,7 +184,8 @@ public class PostQueryRepository {
                 .where(post.member.id.eq(id))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(post.id.desc())
+                //.orderBy(post.id.desc())
+                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .fetch();
 
         return new PageImpl<>(list, pageable, totalCount);
@@ -199,11 +201,13 @@ public class PostQueryRepository {
 
         Long totalCount = query.select(Wildcard.count)
                 .from(post)
-                .where(isMemberActivated(),likePostTitle(cond.getTitle()), likePostContent(cond.getContent()), likePostByNickname(cond.getNickname()))
+                .where(isMemberActivated(),likePostTitle(cond.getTitle()), likePostContent(cond.getContent()),
+                        findPostByNickname(cond.getNickname()), findPostByMemberId(cond.getMemberId()))
                 .fetchOne();
 
         List<Post> postList = query.selectFrom(post)
-                .where(isMemberActivated(),likePostTitle(cond.getTitle()), likePostContent(cond.getContent()), likePostByNickname(cond.getNickname()))
+                .where(isMemberActivated(),likePostTitle(cond.getTitle()), likePostContent(cond.getContent()),
+                        findPostByNickname(cond.getNickname()),findPostByMemberId(cond.getMemberId()))
                 .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -214,6 +218,8 @@ public class PostQueryRepository {
 
     }
 
+
+
     /**
      * 해당 유저가 활성,비활성 유무
      */
@@ -223,9 +229,17 @@ public class PostQueryRepository {
 
 
     /**
+     * id 로 검색
+     */
+    private Predicate findPostByMemberId(Long memberId) {
+        return post.member.id.eq(memberId);
+    }
+
+
+    /**
      * 작성자 닉네임으로 검색
      */
-    private BooleanExpression likePostByNickname(String nickname) {
+    private BooleanExpression findPostByNickname(String nickname) {
         if(StringUtils.hasText(nickname)) {
             return post.member.nickname.eq(nickname);
         }

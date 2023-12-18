@@ -48,6 +48,7 @@ public class CheckMailValidator implements Validator {
             Optional<Member> member = memberRepository.findByLoginId(dto.getLoginId());
             String roleValue = member.get().getRoleValue();
 
+            /** 소셜 회원이 아니고 이메일을 변경한 경우 **/
             if(!roleValue.equals("ROLE_SOCIAL") && !member.get().getEmail().equals(email)) {
                 checkEmail(email, errors);
             }

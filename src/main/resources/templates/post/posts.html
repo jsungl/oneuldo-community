@@ -151,28 +151,32 @@
 
             <!-- 게시물 -->
             <th:block th:each="post:${posts}">
-              <tr>
-                <td class="cate">
-                  <a class="text-underline-hover" th:href="@{/posts(category=${post.categoryCode})}" th:text="${post.categoryName}"
-                     th:style="${post.categoryCode} == 'NOTICE' ? 'color:#ff0000;' : 'color:#003f7f;'">카테고리</a>
-                </td>
-                <td class="title">
-                  <a class="text-underline-hover" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
-                  <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
-                </td>
-                <td class="author">
-                  <div class="btn-group dropend">
+                  <tr>
+                    <td class="cate">
+                      <a class="text-underline-hover" th:href="@{/posts(category=${post.categoryCode})}" th:text="${post.categoryName}"
+                         th:style="${post.categoryCode} == 'NOTICE' ? 'color:#ff0000;' : 'color:#003f7f;'">카테고리</a>
+                    </td>
+                    <td class="title">
+                      <a class="text-underline-hover" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
+                      <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
+                    </td>
+                    <td class="author">
+                      <div class="btn-group dropend">
   <!--                  <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${#strings.abbreviate(post.nickname,10)}">작성자</a>-->
-                    <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${post.nickname}">작성자</a>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" th:href="@{/post/search(searchType=nickname,keyword=${post.nickname})}">작성글</a></li>
-                    </ul>
-                  </div>
-                </td>
-                <td class="reg_time" th:text="${post.createdDate}">작성일</td>
-                <td class="view_cnt" th:text="${post.viewCount}">조회수</td>
-                <td class="like_cnt" th:text="${post.likeCount == 0 ? '' : post.likeCount}">추천수</td>
-              </tr>
+                        <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${post.nickname}">작성자</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/post/search(searchType=memberId,keyword=${post.member.id})}">작성글</a></li>
+                        </ul>
+                      </div>
+                    </td>
+                    <td class="reg_time" th:text="${post.createdDate}">작성일</td>
+                    <td class="view_cnt" th:text="${post.viewCount}">조회수</td>
+                    <td class="like_cnt" th:text="${post.likeCount == 0 ? '' : post.likeCount}">추천수</td>
+                </tr>
+
+                <tr th:unless="${posts.getTotalElements() != 0}">
+                    <td colspan="4" class="text-center">게시물이 존재하지 않습니다.</td>
+                </tr>
             </th:block>
           </tbody>
         </table>
