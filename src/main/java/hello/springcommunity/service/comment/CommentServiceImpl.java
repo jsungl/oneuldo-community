@@ -79,67 +79,12 @@ public class CommentServiceImpl {
         int remainder = temp % pageable.getPageSize();
 
         return remainder == 0 ? pageNumber - 1 : pageNumber;
-
     }
 
 
     /**
-     * 댓글 등록
+     * 댓글 저장
      */
-//    public Long addComment(CommentRequestDTO commentRequestDTO, Long postId, String loginId) {
-//
-//        Member member = memberRepository.findByLoginId(loginId).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
-//
-//        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
-//
-//
-//        //DTO -> Entity
-//        Comment comment = Comment.builder()
-//                .content(commentRequestDTO.getContent())
-//                .post(post)
-//                .member(member)
-//                .isDeleted(false)
-//                .build();
-//
-//        try {
-//            /**
-//             * 대댓글인 경우
-//             */
-//            if(commentRequestDTO.getParentId() != null) {
-//                Comment parent = commentRepository.findById(commentRequestDTO.getParentId()).orElseThrow(
-//                        () -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
-//
-//                //저장하려는 대댓글의 부모 댓글을 찾아 연결
-//                comment.updateParent(parent);
-//
-//                //댓글 그룹내 순서(step) 정하기
-//                Integer result = updateCommentStep(parent);
-//                log.info("step={}", result);
-//
-//                //음수면 대댓글 작성 오류
-//                if(result == null) {
-//                    throw new RuntimeException("답글을 등록할 수 없습니다.");
-//                }
-//
-//                comment.updateDepth(parent.getDepth() + 1); //댓글 깊이 설정
-//                comment.updateStep(result); //댓글 그룹내 순서 설정
-//            }
-//
-//            //댓글 저장
-//            Comment savedComment = commentRepository.save(comment);
-//
-//            //댓글 그룹 연결
-//            updateGroupId(savedComment, savedComment.getId());
-//
-//            return savedComment.getId();
-//
-//        } catch (NullPointerException | ArithmeticException e) {
-//            throw new RuntimeException("서버내부에서 오류가 발생하였습니다.");
-//        }
-//
-//
-//    }
-
     public Long addComment(CommentRequestDTO commentRequestDTO, Long postId, String loginId) {
 
         Member member = memberRepository.findByLoginId(loginId).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
@@ -157,10 +102,9 @@ public class CommentServiceImpl {
                 .build();
 
         try {
-            /**
-             * 대댓글인 경우
-             */
+
             if(commentRequestDTO.getParentId() != null) {
+                /** 대댓글 **/
                 Comment parent = commentRepository.findById(commentRequestDTO.getParentId()).orElseThrow(
                         () -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
 
@@ -170,7 +114,7 @@ public class CommentServiceImpl {
                 //댓글 그룹내 순서(step) 정하기
                 Integer result = updateCommentStep(parent);
 
-                //음수면 대댓글 작성 오류
+                //null이면 대댓글 작성 오류
                 if(result == null) {
                     throw new RuntimeException("답글을 등록할 수 없습니다.");
                 }
@@ -180,6 +124,7 @@ public class CommentServiceImpl {
                 comment.updateGroupId(parent.getGroupId()); //댓글 그룹 연결
 
             } else {
+                /** 댓글 **/
                 Long groupId = Optional.ofNullable(commentRepository.getGroupId(post.getId())).orElse(1L);
 
                 if(size != 0) {
@@ -197,7 +142,6 @@ public class CommentServiceImpl {
         } catch (NullPointerException | ArithmeticException e) {
             throw new RuntimeException("서버내부에서 오류가 발생하였습니다.");
         }
-
     }
 
 
@@ -254,7 +198,6 @@ public class CommentServiceImpl {
 
         //오류시 null 반환
         return null;
-
     }
 
 
@@ -329,9 +272,7 @@ public class CommentServiceImpl {
             CommentResponseDTO dto = entityToDto(comment);
             list.add(dto);
         }
-
         return new PageImpl<>(list, pageable, comments.getTotalElements());
     }
-
 
 }

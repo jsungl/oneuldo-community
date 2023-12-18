@@ -56,8 +56,8 @@ public class PostResponseDTO {
         this.member = post.getMember();
         this.loginId = post.getMember().getLoginId();
         this.nickname = post.getMember().getNickname();
-        //this.nickname = post.getMember().getActivated() ? post.getMember().getNickname() : "알수없음";
         this.commentNumber = post.getComments().size();
+        //this.nickname = post.getMember().getActivated() ? post.getMember().getNickname() : "알수없음";
         //this.comments = post.getComments().stream().map(CommentResponseDTO::entityToDto).collect(Collectors.toList());
     }
 
