@@ -164,11 +164,18 @@ public class SecurityConfig {
                 @Override
                 public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
                     log.info("인가 실패! accessDeniedHandler 실행");
-                    log.info("url={}", request.getRequestURI());
+                    String requestURI = request.getRequestURI();
+                    String message = "";
+                    log.info("url={}", requestURI);
+                    if(requestURI.contains("/login")) {
+                        message = "이미 로그인 한 상태입니다.";
+                    } else {
+                        message = "접근권한이 없습니다.";
+                    }
                     //log.error("AccessDeniedException",accessDeniedException);
                     //response.sendRedirect("/?denied=true");
 
-                    request.setAttribute("msg", "접근권한이 없습니다.");
+                    request.setAttribute("msg", message);
                     request.setAttribute("nextPage", "/");
                     request.getRequestDispatcher("/error/denied").forward(request, response);
                 }
