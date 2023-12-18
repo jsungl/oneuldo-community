@@ -35,11 +35,11 @@ public class MemberQueryRepository {
 
         Long totalCount = query.select(Wildcard.count)
                 .from(member)
-                .where(member.activated.eq(true), member.role.ne(Role.ADMIN))
+                .where(member.role.ne(Role.ADMIN))
                 .fetchOne();
 
         List<Member> list = query.selectFrom(member)
-                .where(member.activated.eq(true), member.role.ne(Role.ADMIN))
+                .where(member.role.ne(Role.ADMIN))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(member.id.desc())
