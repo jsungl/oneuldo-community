@@ -332,7 +332,7 @@ public class DisConnectOauth2UserService {
         refreshTokenRepository.delete(token);
 
         //계정 비활성화
-        memberRepository.updateActivated(member.getId());
+        memberRepository.changeActivated(member.getId());
     }
 
 }
