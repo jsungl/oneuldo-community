@@ -33,7 +33,8 @@
 
     <div class="col-md-12">
       <div class="pt-5 pb-3 text-center">
-        <h2>"[[${keyword}]]"에 대한 검색 결과</h2>
+        <h2 th:if="${searchType} == 'memberId'">검색 결과</h2>
+        <h2 th:if="${searchType} != 'memberId'">"[[${keyword}]]"에 대한 검색 결과</h2>
       </div>
 
       <div class="d-flex justify-content-center">
@@ -48,7 +49,7 @@
               </select>
             </div>
             <div class="col">
-              <input type="text" id="keyword" name="keyword" th:value="${keyword}" class="form-control" />
+              <input type="text" id="keyword" name="keyword" th:value="${keyword}" class="form-control"/>
             </div>
             <div class="col">
               <button type="submit" class="btn btn-light" style="border-color: #adb5bd;">검색</button>
@@ -81,28 +82,8 @@
             <th>제목</th>
             <th>작성자</th>
             <th>작성일</th>
-            <th>
-              <!-- 정렬되지 않은 상태 -->
-              <a class="text-underline-hover text-dark" th:href="@{/post/search(searchType=${searchType},keyword=${keyword},sort_index=viewCount)}"
-                 th:if="${sort_index} != 'viewCount'">조회</a>
-              <!-- 정렬된 상태 -->
-              <a class="text-underline-hover text-dark" th:href="@{/post/search(searchType=${searchType},keyword=${keyword})}"
-                 th:if="${sort_index} == 'viewCount'">
-                조회
-                <i class="bi bi-caret-down-fill"></i>
-              </a>
-            </th>
-            <th>
-              <!-- 정렬되지 않은 상태 -->
-              <a class="text-underline-hover text-dark" th:href="@{/post/search(searchType=${searchType},keyword=${keyword},sort_index=likeCount)}"
-                 th:if="${sort_index} != 'likeCount'">추천</a>
-              <!-- 정렬된 상태 -->
-              <a class="text-underline-hover text-dark" th:href="@{/post/search(searchType=${searchType},keyword=${keyword})}"
-                 th:if="${sort_index} == 'likeCount'">
-                추천
-                <i class="bi bi-caret-down-fill"></i>
-              </a>
-            </th>
+            <th>조회</th>
+            <th>추천</th>
           </tr>
           </thead>
           <tbody>
@@ -129,6 +110,11 @@
               <td class="view_cnt" th:text="${post.viewCount}">조회</td>
               <td class="like_cnt" th:text="${post.likeCount == 0 ? '' : post.likeCount}">추천수</td>
             </tr>
+
+            <tr th:unless="${posts.getTotalElements() != 0}">
+              <td colspan="6" class="text-center">게시물이 존재하지 않습니다.</td>
+            </tr>
+
           </tbody>
         </table>
       </div>
@@ -147,10 +133,7 @@
             <!-- 처음으로 이동 -->
             <!-- 현재 페이지 인덱스(0부터 시작)가 페이지 사이즈보다 작을 경우 첫 페이지 라인(1~5페이지)에 머물러 있는 경우이므로 비활성화 한다 -->
             <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
-              <a class="page-link" th:href="@{/post/search(searchType=${searchType},keyword=${keyword},sort_index=${sort_index})}" th:if="${sort_index} != 'id'">
-                <span>&laquo;</span>
-              </a>
-              <a class="page-link" th:href="@{/post/search(searchType=${searchType},keyword=${keyword})}" th:if="${sort_index} == 'id'">
+              <a class="page-link" th:href="@{/post/search(searchType=${searchType},keyword=${keyword})}">
                 <span>&laquo;</span>
               </a>
             </li>
@@ -158,12 +141,7 @@
             <!-- 이전으로 이동 -->
             <!-- 첫 페이지인 경우 비활성화, 첫 페이지가 아니라면 현재 페이지 인덱스(0부터 시작) - 1 -->
             <li th:classappend="${posts.first} ? 'disabled'" class="page-item">
-              <a class="page-link" th:href="${posts.first} ? '#' : @{/post/search(searchType=${searchType},keyword=${keyword},sort_index=${sort_index},page=${pageNumber - 1})}"
-                 th:if="${sort_index} != 'id'">
-                <span aria-hidden="true">&lt;</span>
-              </a>
-              <a class="page-link" th:href="${posts.first} ? '#' : @{/post/search(searchType=${searchType},keyword=${keyword},page=${pageNumber - 1})}"
-                 th:if="${sort_index} == 'id'">
+              <a class="page-link" th:href="${posts.first} ? '#' : @{/post/search(searchType=${searchType},keyword=${keyword},page=${pageNumber - 1})}">
                 <span aria-hidden="true">&lt;</span>
               </a>
             </li>
@@ -174,19 +152,12 @@
             <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
               <span th:if="${page == pageNumber + 1}" th:text="${page}" class="page-link"></span>
               <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link"
-                 th:href="@{/post/search(searchType=${searchType},keyword=${keyword},sort_index=${sort_index},page=${page - 1})}" th:if="${sort_index} != 'id'">page</a>
-              <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link"
-                 th:href="@{/post/search(searchType=${searchType},keyword=${keyword},page=${page - 1})}" th:if="${sort_index} == 'id'">page</a>
+                 th:href="@{/post/search(searchType=${searchType},keyword=${keyword},page=${page - 1})}">page</a>
             </li>
 
             <!-- 다음으로 이동 -->
             <li th:classappend="${posts.last} ? 'disabled'" class="page-item">
-              <a class="page-link" th:href="${posts.last} ? '#' : @{/post/search(searchType=${searchType},keyword=${keyword},sort_index=${sort_index},page=${pageNumber + 1})}"
-                 th:if="${sort_index} != 'id'">
-                <span aria-hidden="true">&gt;</span>
-              </a>
-              <a class="page-link" th:href="${posts.last} ? '#' : @{/post/search(searchType=${searchType},keyword=${keyword},page=${pageNumber + 1})}"
-                 th:if="${sort_index} == 'id'">
+              <a class="page-link" th:href="${posts.last} ? '#' : @{/post/search(searchType=${searchType},keyword=${keyword},page=${pageNumber + 1})}">
                 <span aria-hidden="true">&gt;</span>
               </a>
             </li>
@@ -194,12 +165,7 @@
             <!-- 마지막으로 이동 -->
             <!-- startPage 가 왼쪽 연산보다 이상일 경우 마지막 페이지 라인에 있는 경우이므로 비활성화, 그게 아니면 전체 페이지수(totalPages) - 1 만큼 이동하여 마지막 페이지로 이동한다 -->
             <li th:classappend="${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
-              <a class="page-link" th:href="@{/post/search(searchType=${searchType},keyword=${keyword},sort_index=${sort_index},page=${totalPages - 1})}"
-                 th:if="${sort_index} != 'id'">
-                <span>&raquo;</span>
-              </a>
-              <a class="page-link" th:href="@{/post/search(searchType=${searchType},keyword=${keyword},page=${totalPages - 1})}"
-                 th:if="${sort_index} == 'id'">
+              <a class="page-link" th:href="@{/post/search(searchType=${searchType},keyword=${keyword},page=${totalPages - 1})}">
                 <span>&raquo;</span>
               </a>
             </li>
