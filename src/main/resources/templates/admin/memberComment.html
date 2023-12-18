@@ -53,12 +53,9 @@
                    th:style="${comment.post.categoryCode} == 'NOTICE' ? 'color:#ff0000;' : 'color:#003f7f;'">카테고리</a>
               </td>
               <td class="content">
-                <div class="word" th:if="${memberActivated}">
-                  <a class="text-underline-hover" th:href="@{|/post/${comment.post.id}?commentId=${comment.id}#comment_${comment.id}|}"
+                <div class="word">
+                  <a class="text-underline-hover text-dark" th:href="@{|/post/${comment.post.id}?commentId=${comment.id}#comment_${comment.id}|}"
                      th:text="${comment.content}">내용</a>
-                </div>
-                <div class="word" th:unless="${memberActivated}">
-                  <div th:text="${comment.content}">내용</div>
                 </div>
               </td>
               <td class="reg_time" th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd')}">작성일</td>

@@ -83,7 +83,7 @@ public class MemberController {
 
         try {
             Member member = memberService.getMemberByLoginId(dto.getUsername());
-            Page<PostResponseDTO> posts = postService.getMemberPostAll(member.getId(), pageable);
+            Page<PostResponseDTO> posts = postService.getMemberAllPost(member.getId(), pageable);
 
             model.addAttribute("posts", posts);
             return "member/memberOwnDocument";
@@ -164,8 +164,9 @@ public class MemberController {
 
             Member member = memberService.getMemberByLoginId(dto.getUsername());
 
-            //social 로그인 유저의 경우
+
             if("ROLE_SOCIAL".equals(member.getRoleValue())) {
+                /** 소셜 로그인 유저 **/
                 //UserSessionDTO userSessionDTO = (UserSessionDTO) httpSession.getAttribute(OAUTH2_MEMBER);
                 HttpSession session = request.getSession(false);
                 UserSessionDTO userSessionDTO = (UserSessionDTO) session.getAttribute(OAUTH2_MEMBER);
@@ -193,7 +194,7 @@ public class MemberController {
                 return "member/procLogout";
 
             } else {
-                //일반회원
+                /** 일반 로그인 유저 **/
                 boolean result = memberService.deleteMember(member, currentPassword);
 
                 if(result) {

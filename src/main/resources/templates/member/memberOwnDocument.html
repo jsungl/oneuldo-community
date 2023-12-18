@@ -50,7 +50,7 @@
                 <a th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
                 <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
               </td>
-              <td class="reg_time" th:text="${#temporals.format(post.createdDate, 'yyyy-MM-dd')}">작성일</td>
+              <td class="reg_time" th:text="${post.createdDate}">작성일</td>
               <td class="view_cnt" th:text="${post.viewCount}">조회수</td>
               <td class="like_cnt" th:text="${post.likeCount}">추천수</td>
             </tr>

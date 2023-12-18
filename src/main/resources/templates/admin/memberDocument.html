@@ -56,17 +56,10 @@
                    th:style="${post.categoryCode} == 'NOTICE' ? 'color:#ff0000;' : 'color:#003f7f;'">카테고리</a>
               </td>
               <td class="title">
-                <th:block th:if="${memberActivated}">
-                  <a class="text-underline-hover" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
-                  <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
-                </th:block>
-                <th:block th:unless="${memberActivated}">
-                  <div th:text="${post.title}">
-                    <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
-                  </div>
-                </th:block>
+                <a class="text-underline-hover" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
+                <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
               </td>
-              <td class="reg_time" th:text="${#temporals.format(post.createdDate, 'yyyy-MM-dd')}">작성일</td>
+              <td class="reg_time" th:text="${post.createdDate}">작성일</td>
               <td class="view_cnt" th:text="${post.viewCount}">조회수</td>
               <td class="like_cnt" th:text="${post.likeCount}">추천수</td>
             </tr>
