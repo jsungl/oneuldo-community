@@ -152,7 +152,7 @@ public class MemberService {
             //인증권한 삭제
             memberAuthRepository.deleteByMemberId(member.getId());
             //계정 비활성화
-            memberRepository.updateActivated(member.getId());
+            memberRepository.changeActivated(member.getId());
             result = true;
         }
 
