@@ -52,9 +52,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Transactional
-    @Query("update Member m set m.activated = FALSE where m.id = :memberId")
+    @Query("update Member m set m.activated = FALSE, m.loginId = NULL, m.password = NULL where m.id = :memberId")
     void changeActivated(@Param("memberId") Long memberId);
-
-//    @Query("update Member m set m.activated = FALSE, m.loginId = NULL, m.password = NULL, m.nickname = NULL, m.email = NULL where m.id = :memberId")
 
 }

@@ -111,7 +111,7 @@ public class MemberUpdateController {
                 return "redirect:/member/profile";
             }
 
-            String path = request.getRequestURL().toString().replace(request.getRequestURI(), "/member/authAccount");
+            String path = request.getRequestURL().toString().replace(request.getRequestURI(), "/memberAuthMail");
             //회원정보 변경
             Member updatedMember = memberUpdateService.updateMemberProfile(memberProfileUpdateDTO, member, path);
 

@@ -8,7 +8,6 @@ import hello.springcommunity.dto.member.MemberLeaveResponseDTO;
 import hello.springcommunity.dto.post.PostResponseDTO;
 import hello.springcommunity.dto.security.UserDetailsDTO;
 import hello.springcommunity.service.comment.CommentServiceImpl;
-import hello.springcommunity.service.member.MemberAuthService;
 import hello.springcommunity.service.member.MemberService;
 import hello.springcommunity.dto.member.MemberResponseDTO;
 import hello.springcommunity.service.post.PostService;
@@ -39,7 +38,6 @@ import static hello.springcommunity.common.SessionConst.OAUTH2_MEMBER;
 public class MemberController {
 
     private final MemberService memberService;
-    private final MemberAuthService memberAuthService;
     //private final HttpSession httpSession;
     private final DisConnectOauth2UserService disConnectOauth2UserService;
     private final CommentServiceImpl commentService;
@@ -116,26 +114,6 @@ public class MemberController {
         }
 
 
-    }
-
-
-    /**
-     * 이메일 인증 - 회원가입, 회원정보 변경
-     * 유저 이메일 인증 상태 변경
-     */
-    @GetMapping("/authAccount")
-    public String authAccount(@RequestParam Long id, @RequestParam String authKey, Model model) {
-
-        try {
-            boolean result = memberAuthService.verify(id, authKey);
-            model.addAttribute("result", result);
-
-        } catch (NoSuchElementException e) {
-            model.addAttribute("result", false);
-            model.addAttribute("msg", "인증시 오류가 발생하였습니다.");
-        }
-
-        return "member/procAuthAccount";
     }
 
 

@@ -5,14 +5,15 @@ import hello.springcommunity.domain.post.CategoryCode;
 import hello.springcommunity.dto.login.LoginRequestDTO;
 import hello.springcommunity.dto.member.MemberSaveRequestDTO;
 import hello.springcommunity.dto.post.PostResponseDTO;
+import hello.springcommunity.service.member.MemberAuthService;
 import hello.springcommunity.service.member.MemberService;
 import hello.springcommunity.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -33,6 +34,7 @@ public class GlobalController {
 
     private final PostService postService;
     private final MemberService memberService;
+    private final MemberAuthService memberAuthService;
     private final CheckIdValidator checkIdValidator;
     private final CheckNicknameValidator checkNicknameValidator;
     private final CheckMailValidator checkMailValidator;
@@ -167,7 +169,7 @@ public class GlobalController {
         try {
             //이메일 인증 경로 생성
             //http://localhost:8081/member/authAccount
-            String path = request.getRequestURL().toString().replace(request.getRequestURI(), "/member/authAccount");
+            String path = request.getRequestURL().toString().replace(request.getRequestURI(), "/memberAuthMail");
             memberService.join(memberSaveRequestDTO, path);
 
             redirectAttributes.addFlashAttribute("msg", "가입시 입력한 메일주소로 메일을 보냈습니다. 메일 확인 후 인증버튼을 눌러주세요!");
@@ -177,8 +179,32 @@ public class GlobalController {
             model.addAttribute("msg", "회원가입에 실패하였습니다.");
             return "error/redirect";
         }
+    }
 
 
+    /**
+     * 이메일 인증 - 회원가입, 회원정보 변경
+     * 유저 이메일 인증 상태 변경
+     */
+    @GetMapping("/memberAuthMail")
+    public String authMail(@RequestParam String id, @RequestParam String authKey, Model model) {
+
+        try {
+
+            if(!StringUtils.hasText(authKey) || !StringUtils.hasText(id)) {
+                return "home";
+            }
+
+            Long memberId = Long.valueOf(id);
+            boolean result = memberAuthService.verify(memberId, authKey);
+            model.addAttribute("result", result);
+
+        } catch (NoSuchElementException e) {
+            model.addAttribute("result", false);
+            model.addAttribute("msg", "인증시 오류가 발생하였습니다.");
+        }
+
+        return "member/procAuthMail";
     }
 
 
