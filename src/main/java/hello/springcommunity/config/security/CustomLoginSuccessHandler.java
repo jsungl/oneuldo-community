@@ -61,8 +61,13 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
                  * 1. Security 가 요청을 가로챈 경우
                  */
                 url = savedRequest.getRedirectUrl();
-                log.info("redirectUrl={}", url); //ex) redirectUrl=http://localhost:8081/posts/add
-                // 세션에 저장된 객체를 다 사용한 뒤에는 지워줘서 메모리 누수 방지
+                /** ex) redirectUrl=http://localhost:8081/posts/add **/
+                //log.info("redirectUrl={}", url);
+                //log.info("prevPage={}", prevPage);
+
+                if(!url.equals(prevPage)) url = prevPage;
+
+                /** 세션에 저장된 객체를 다 사용한 뒤에는 지워줘서 메모리 누수 방지 **/
                 requestCache.removeRequest(request, response);
 
             } else if (prevPage != null && !prevPage.equals("") && !match) {
