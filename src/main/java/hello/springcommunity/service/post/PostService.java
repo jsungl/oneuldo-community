@@ -287,18 +287,18 @@ public class PostService {
 
         switch (type) {
             case "title":
-                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(keyword, null, null,null), pageable));
+                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(keyword, null, null), pageable));
             case "content":
-                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(null, keyword, null,null), pageable));
+                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(null, keyword, null), pageable));
             case "nickname":
-                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(null, null, keyword,null), pageable));
+                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(null, null, keyword), pageable));
             case "memberId":
                 Long id = Long.valueOf(keyword);
                 Member member = memberRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
                 if(!member.getActivated()) {
                     throw new IllegalArgumentException("이미 탈퇴된 회원입니다.");
                 }
-                return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(null, null, null, id), pageable));
+                return entityToDto(postQueryRepository.findAllByMemberId(id, pageable));
             default:
                 return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(), pageable));
         }

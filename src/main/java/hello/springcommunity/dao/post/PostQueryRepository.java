@@ -202,12 +202,12 @@ public class PostQueryRepository {
         Long totalCount = query.select(Wildcard.count)
                 .from(post)
                 .where(isMemberActivated(),likePostTitle(cond.getTitle()), likePostContent(cond.getContent()),
-                        findPostByNickname(cond.getNickname()), findPostByMemberId(cond.getMemberId()))
+                        findPostByNickname(cond.getNickname()))
                 .fetchOne();
 
         List<Post> postList = query.selectFrom(post)
                 .where(isMemberActivated(),likePostTitle(cond.getTitle()), likePostContent(cond.getContent()),
-                        findPostByNickname(cond.getNickname()),findPostByMemberId(cond.getMemberId()))
+                        findPostByNickname(cond.getNickname()))
                 .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -216,6 +216,23 @@ public class PostQueryRepository {
 
         return new PageImpl<>(postList, pageable, totalCount);
 
+    }
+
+    public Page<Post> findAllByMemberId(Long memberId, Pageable pageable) {
+
+        Long totalCount = query.select(Wildcard.count)
+                .from(post)
+                .where(findPostByMemberId(memberId))
+                .fetchOne();
+
+        List<Post> postList = query.selectFrom(post)
+                .where(findPostByMemberId(memberId))
+                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(postList, pageable, totalCount);
     }
 
 
@@ -267,5 +284,6 @@ public class PostQueryRepository {
         }
         return null;
     }
+
 
 }
