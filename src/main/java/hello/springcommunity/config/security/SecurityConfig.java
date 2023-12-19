@@ -95,22 +95,20 @@ public class SecurityConfig {
             .headers().frameOptions().disable(); //xframe 방어 해제
 
         /**
-         * 인가 API(나머지는 인증 API)
+         * 인가 API - 요청에 의한 보안검사 시작
          * 페이지 권한 설정 - URL 방식
          *
          * 3.0이후 버전에서는 변경사항들이 있으니 주의!
+         * Spring Security에서 prefix를 자동으로 "ROLE_"을 넣어주므로 이 때 hasRole에는 ROLE을 제외하고 뒷 부분인 USER만 써주면 된다
          * .authorizeRequests() → .authorizeHttpRequests()
          * .antMatchers() → .requestMatchers()
          * .access("hasAnyRole('ROLE_A','ROLE_B')") → .hasAnyRole("A", "B")
          */
-
-        http.authorizeRequests() //요청에 의한 보안검사 시작
+        http.authorizeRequests()
                 .antMatchers("/signup", "/find/**", "/login/**").anonymous()
-                .antMatchers("/post/add").hasAnyRole("USER", "SOCIAL", "ADMIN") //Spring Security에서 prefix를 자동으로 "ROLE_"을 넣어주므로 이 때 hasRole에는 ROLE을 제외하고 뒷 부분인 USER만 써주면 된다
-                .antMatchers("/member/leave").hasAnyRole("USER", "SOCIAL")
+                .antMatchers("/post/add","/post/{postId}/edit","/post/{postId}/delete","/post/like/**","/member/**","/api/post/**").authenticated()
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/", "/posts", "/post/{postId}", "/post/search", "/member/authAccount", "/error/**").permitAll()
-                .anyRequest().authenticated(); //그 외 요청들은 인증필요
+                .anyRequest().permitAll(); //그 외 요청들은 모두 접근허용
 
 
         //로그인 설정
