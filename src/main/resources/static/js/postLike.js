@@ -25,25 +25,24 @@ function likePost(postId) {
                 let like = result.isLike;
                 let likeCount = result.likeCount;
                 let postId = result.postId;
-                let newContainer = `<div class="like-container">
-                                        <div class="d-flex justify-content-center mt-5">
-                                            <div class="likeButtonGroup">
-                                                <input type="hidden" id="like_check" value="${like}">
-                                                <button type="button" class="btn btn-outline-primary" onclick="likePost(${postId});">
-                                                    추천
-                                                    <i class="bi bi-hand-thumbs-up"></i>
-                                                </button>
-                                            </div>
-                                        </div>
 
-                                        <div class="d-flex justify-content-center mt-3 mb-5">
-                                            <span class="like_count"
-                                                style="color:#1171cc;font:bold 14px georgia,sans-serif;border:1px solid #ccc;border-radius:3px;white-space:nowrap;padding:3px 7px 0;height:28px">
-                                            ${likeCount}</span>
-                                        </div>
+                let newLikeButton = `<div class="likeButtonGroup">
+                                        <input type="hidden" id="like_check" value="${like}">
+
+                                        <button type="button" class="btn btn-outline-primary" onclick="likePost(${postId});">
+                                            추천
+                                            <i class="bi bi-hand-thumbs-up"></i>
+                                        </button>
                                     </div>`;
 
-                $(".like-container").replaceWith(newContainer);
+                let newLikeCount = `<div class="like_count d-flex justify-content-center mt-3">
+                                    <span style="color:#1171cc;font:bold 14px georgia,sans-serif;border:1px solid #ccc;border-radius:3px;white-space:nowrap;padding:3px 7px 0;height:28px">
+                                    ${likeCount}</span>
+                                    </div>`;
+
+                $(".likeButtonGroup").replaceWith(newLikeButton);
+                $(".like_count").replaceWith(newLikeCount);
+
             }).fail(function (error) {
                 const result = error.responseJSON;
                 alert(JSON.stringify(result));
@@ -66,26 +65,24 @@ function likePost(postId) {
                 let like = result.isLike;
                 let likeCount = result.likeCount;
                 let postId = result.postId;
-                let newContainer = `<div class="like-container">
-                                        <div class="d-flex justify-content-center mt-5">
-                                            <div class="likeButtonGroup">
-                                                <input type="hidden" id="like_check" value="${like}">
 
-                                                <button type="button" class="btn btn-primary" onclick="likePost(${postId});">
-                                                    추천
-                                                    <i class="bi bi-hand-thumbs-up-fill"></i>
-                                                </button>
-                                            </div>
-                                        </div>
+                let newLikeButton = `<div class="likeButtonGroup">
+                                        <input type="hidden" id="like_check" value="${like}">
 
-                                        <div class="d-flex justify-content-center mt-3 mb-5">
-                                            <span class="like_count"
-                                                style="color:#1171cc;font:bold 14px georgia,sans-serif;border:1px solid #ccc;border-radius:3px;white-space:nowrap;padding:3px 7px 0;height:28px">
-                                            ${likeCount}</span>
-                                        </div>
+                                        <button type="button" class="btn btn-primary" onclick="likePost(${postId});">
+                                            추천
+                                            <i class="bi bi-hand-thumbs-up-fill"></i>
+                                        </button>
                                     </div>`;
 
-                $(".like-container").replaceWith(newContainer);
+                let newLikeCount = `<div class="like_count d-flex justify-content-center mt-3">
+                                    <span style="color:#1171cc;font:bold 14px georgia,sans-serif;border:1px solid #ccc;border-radius:3px;white-space:nowrap;padding:3px 7px 0;height:28px">
+                                    ${likeCount}</span>
+                                    </div>`;
+
+                $(".likeButtonGroup").replaceWith(newLikeButton);
+                $(".like_count").replaceWith(newLikeCount);
+
             }).fail(function (error) {
                 const result = error.responseJSON;
                 alert(JSON.stringify(result));
