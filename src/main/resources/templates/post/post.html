@@ -15,7 +15,7 @@
 
         <!-- 게시물 내용 -->
         <div class="content_wrapper">
-            <div class="nav_cate">
+            <div class="nav_cate px-2">
                 <h5>
                     <a class="text-underline-hover" th:text="${post.categoryName}" th:href="@{/posts(category=${post.categoryCode})}"
                        style="color:#555">카테고리</a>
@@ -50,7 +50,7 @@
                     </div>
                 </div>
             </div>
-            <div class="body">
+            <div class="body p-2">
                 <article>
                     <div th:class="'document_'+${post.id}" th:text="${post.content}">내용</div>
                 </article>

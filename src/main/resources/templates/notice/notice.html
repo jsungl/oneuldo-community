@@ -11,48 +11,62 @@
 <!--<body>-->
 <th:block layout:fragment="content">
 
-    <div class="container">
+    <div class="container py-5">
 
-        <div class="py-5 text-center">
-            <h2>게시물 상세</h2>
+        <!-- 게시물 내용 -->
+        <div class="content_wrapper">
+            <div class="nav_cate px-2">
+                <h5>
+                    <a class="text-underline-hover" th:text="${post.categoryName}" th:href="@{/posts(category=${post.categoryCode})}"
+                       style="color:#555;">카테고리</a>
+                </h5>
+            </div>
+
+            <div class="header">
+
+                <div class="d-flex bd-highlight" style="border-top:1px solid #ccc;border-bottom:1px solid #ccc;background:#fcfcfc;">
+                    <div class="me-auto p-2 bd-highlight">
+                        <span class="title" th:text="${post.title}" style="font-size: large;font-weight:bold;">제목</span>
+                    </div>
+                    <div class="p-2 bd-highlight" style="white-space:nowrap;word-break:break-all;">
+                        <small class="createdDate" th:text="${post.createdDate}">2013-03-12</small>
+                    </div>
+                </div>
+
+                <div class="d-flex bd-highlight mb-3" style="border-bottom:1px solid #eee;">
+                    <div class="me-auto p-1 bd-highlight">
+                        <div class="btn-group dropend">
+                            <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown"
+                               th:text="${post.nickname}">작성자</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" th:href="@{/post/search(searchType=memberId,keyword=${post.member.id})}">작성글</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="p-1 bd-highlight">
+                        <span style="color:#888">
+                            조회수
+                            <b th:text="${post.viewCount}" style="color:#666">조회수</b>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="body p-2">
+                <article>
+                    <div th:class="'document_'+${post.id}" th:text="${post.content}">내용</div>
+                </article>
+            </div>
         </div>
 
-        <div class="my-3">
+        <!-- 목록으로 -->
+        <div class="d-flex align-items-end" style="height:100px">
             <button class="w-100 btn btn-secondary"
+                    onclick="location.href='posts.html'"
                     th:onclick="|location.href='@{/posts}'|"
                     type="button">
                 목록으로
             </button>
         </div>
-
-        <div>
-            <label for="cate">카테고리</label>
-            <input type="text" id="cate" name="cate" class="form-control" value="카테고리" th:value="${post.categoryName}" readonly>
-        </div>
-        <div>
-            <label for="title">제목</label>
-            <input type="text" id="title" name="title" class="form-control" value="제목" th:value="${post.title}" readonly>
-        </div>
-        <div>
-            <label for="content">내용</label>
-            <textarea id="content" name="content" class="form-control" rows="7" th:value="${post.content}" th:text="${post.content}" readonly></textarea>
-        </div>
-        <div>
-            <label for="author">작성자</label>
-            <input type="text" id="author" name="author" class="form-control" value="작성자" th:value="${post.nickname}" readonly>
-
-        </div>
-        <div>
-            <label for="createdDate">작성일</label>
-            <input type="text" id="createdDate" name="createdDate" class="form-control"
-                   value="작성일" th:value="${post.createdDate}" readonly>
-        </div>
-        <div>
-            <label for="viewCount">조회</label>
-            <input type="text" id="viewCount" name="viewCount" class="form-control"
-                   value="조회" th:value="${post.viewCount}" readonly>
-        </div>
-
 
         <hr class="my-4">
 
