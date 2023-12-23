@@ -8,8 +8,8 @@
 <th:block layout:fragment="content">
     <div class="container">
 
-        <div class="py-5 text-center">
-            <h2>회원 정보</h2>
+        <div class="d-flex justify-content-center align-items-center" style="height:100px">
+            <h4>회원 정보</h4>
         </div>
 
         <div>
@@ -43,7 +43,7 @@
             </button>
           </div>
           <div class="col">
-            <button class="w-100 btn btn-info btn-lg"
+            <button class="w-100 btn btn-primary btn-lg"
                     onclick="location.href='editPasswordForm.html'"
                     th:onclick="|location.href='@{/edit/password}'|" type="button">
               비밀번호 변경

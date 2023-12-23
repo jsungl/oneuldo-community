@@ -20,11 +20,10 @@
 
   <div class="container">
     <div class="col-md-12">
-      <div class="py-5 text-center">
-        <h2>나의 게시물</h2>
-      </div>
 
-      <hr class="my-4">
+      <div class="d-flex justify-content-center align-items-center" style="height:100px">
+        <h4>나의 게시물</h4>
+      </div>
 
       <div>
         <table class="table">
@@ -55,7 +54,7 @@
               <td class="like_cnt" th:text="${post.likeCount}">추천수</td>
             </tr>
             <tr th:unless="${posts.getTotalElements() != 0}">
-              <td colspan="6" class="text-center">작성한 게시물이 존재하지 않습니다.</td>
+              <td colspan="6" style="border:none">작성한 게시물이 존재하지 않습니다.</td>
             </tr>
           </tbody>
         </table>

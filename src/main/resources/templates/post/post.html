@@ -11,20 +11,7 @@
 <!--<body>-->
 <th:block layout:fragment="content">
 
-    <div class="container">
-
-        <div class="py-5 text-center">
-            <h2>게시물 상세</h2>
-        </div>
-
-        <div class="mb-2">
-            <button class="w-100 btn btn-secondary"
-                    onclick="location.href='posts.html'"
-                    th:onclick="|location.href='@{/posts}'|"
-                    type="button">
-                목록으로
-            </button>
-        </div>
+    <div class="container py-5">
 
         <!-- 게시물 내용 -->
         <div class="content_wrapper">
@@ -63,64 +50,70 @@
                     </div>
                 </div>
             </div>
-            <div class="body mb-3">
+            <div class="body">
                 <article>
                     <div th:class="'document_'+${post.id}" th:text="${post.content}">내용</div>
                 </article>
             </div>
         </div>
 
-        <!-- 여백 -->
-        <div class="dummy_wrapper" style="height:100px"></div>
 
         <!-- 추천버튼 -->
-        <div class="like-container">
+        <div class="like-container d-flex align-items-center justify-content-center" style="height:200px">
 
-            <div class="d-flex justify-content-center">
-                <!-- 로그인 유저 -->
-                <th:block sec:authorize="isAuthenticated()">
-                    <div class="likeButtonGroup">
-                        <input type="hidden" id="like_check" th:value="${like}">
+            <div>
+                <div class="d-flex justify-content-center">
+                    <!-- 로그인 유저 -->
+                    <th:block sec:authorize="isAuthenticated()">
+                        <div class="likeButtonGroup">
+                            <input type="hidden" id="like_check" th:value="${like}">
 
-                        <button type="button" class="btn btn-primary" th:onclick="likePost([[${post.id}]]);"
-                                th:if="${like}">
-                            추천
-                            <i class="bi bi-hand-thumbs-up-fill"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-primary" th:onclick="likePost([[${post.id}]]);"
-                                th:unless="${like}">
-                            추천
-                            <i class="bi bi-hand-thumbs-up"></i>
-                        </button>
-                    </div>
-                </th:block>
+                            <button type="button" class="btn btn-primary" th:onclick="likePost([[${post.id}]]);"
+                                    th:if="${like}">
+                                추천
+                                <i class="bi bi-hand-thumbs-up-fill"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" th:onclick="likePost([[${post.id}]]);"
+                                    th:unless="${like}">
+                                추천
+                                <i class="bi bi-hand-thumbs-up"></i>
+                            </button>
+                        </div>
+                    </th:block>
 
-                <!-- 비로그인 유저 -->
-                <th:block sec:authorize="isAnonymous()">
-                    <div>
-                        <button type="button" class="btn btn-outline-primary" onclick="loginCheck();">
-                            추천
-                            <i class="bi bi-hand-thumbs-up"></i>
-                        </button>
-                    </div>
-                </th:block>
-            </div>
+                    <!-- 비로그인 유저 -->
+                    <th:block sec:authorize="isAnonymous()">
+                        <div>
+                            <button type="button" class="btn btn-outline-primary" onclick="loginCheck();">
+                                추천
+                                <i class="bi bi-hand-thumbs-up"></i>
+                            </button>
+                        </div>
+                    </th:block>
+                </div>
 
-            <!-- 추천수 -->
-            <div class="d-flex justify-content-center mt-3 mb-5" th:if="${post.likeCount} != 0">
-            <span class="like_count"
-                  th:text="${post.likeCount}"
-                  style="color:#1171cc;
-                        font:bold 14px georgia,sans-serif;
-                        border:1px solid #ccc;
-                        border-radius:3px;
-                        white-space:nowrap;
-                        padding:3px 7px 0;
-                        height:28px">0</span>
+                <!-- 추천수 -->
+                <div class="like_count d-flex justify-content-center mt-3" th:if="${post.likeCount} != 0">
+                    <span th:text="${post.likeCount}" style="color:#1171cc;
+                                font:bold 14px georgia,sans-serif;
+                                border:1px solid #ccc;
+                                border-radius:3px;
+                                white-space:nowrap;
+                                padding:3px 7px 0;
+                                height:28px">0</span>
+                </div>
             </div>
         </div>
 
-
+        <!-- 목록으로 -->
+        <div>
+            <button class="w-100 btn btn-secondary"
+                    onclick="location.href='posts.html'"
+                    th:onclick="|location.href='@{/posts}'|"
+                    type="button">
+                목록으로
+            </button>
+        </div>
 
         <hr class="my-4">
 

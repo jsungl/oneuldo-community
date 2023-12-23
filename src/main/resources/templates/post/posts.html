@@ -25,6 +25,10 @@
       word-break:break-all;
     }
 
+    .search:hover {
+        filter: brightness(0.9);
+    }
+
   </style>
 </head>
 
@@ -32,160 +36,155 @@
 
   <div class="container">
     <div class="col-md-12">
-      <div class="pt-5 pb-3 text-center">
-        <h2>게시물 목록</h2>
-      </div>
 
-      <!-- 검색바 -->
-      <div class="d-flex justify-content-center">
-        <form action="/post/search" method="get" class="form-inline" autocomplete="off">
-          <div class="row row-cols-auto">
-            <div class="col">
-              <select class="form-select" id="searchType" name="searchType">
-                <option value="">검색 조건</option>
-                <option value="title">제목</option>
-                <option value="content">내용</option>
-                <option value="nickname">작성자</option>
-              </select>
-            </div>
-            <div class="col">
-              <input type="text" id="keyword" name="keyword" class="form-control" />
-            </div>
-            <div class="col">
-              <button type="submit" class="btn btn-light" style="border-color: #adb5bd;">검색</button>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <!-- 여백 -->
-      <div class="dummy_wrapper" style="height:100px"></div>
+        <!-- 검색 바 -->
+        <div class="d-flex align-items-start justify-content-center py-4" style="height:200px">
+            <form action="/post/search" method="get" class="form-inline" autocomplete="off">
+                <div class="row row-cols-auto">
+                    <div class="col">
+                        <select class="form-select" id="searchType" name="searchType">
+                            <option value="">검색 조건</option>
+                            <option value="title">제목</option>
+                            <option value="content">내용</option>
+                            <option value="nickname">작성자</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <input type="text" id="keyword" name="keyword" class="form-control" />
+                    </div>
+                    <div class="col">
+                        <button type="submit" class="search btn btn-light" style="border-color: #adb5bd;">검색</button>
+                    </div>
+                </div>
+            </form>
+        </div>
 
 
-      <div>
-        <button class="btn btn-secondary"
-                th:onclick="|location.href='@{/}'|" type="button">
-          홈으로
-        </button>
-        <button class="btn btn-primary"
-                th:onclick="|location.href='@{/post/add}'|" type="button">
-          게시물 등록
-        </button>
-      </div>
+        <!-- 홈 버튼, 등록 버튼 -->
+        <div>
+            <button class="btn btn-secondary"
+                    th:onclick="|location.href='@{/}'|" type="button">
+              홈으로
+            </button>
+            <button class="btn btn-primary"
+                    th:onclick="|location.href='@{/post/add}'|" type="button">
+              게시물 등록
+            </button>
+        </div>
 
-      <hr class="mt-4">
+        <hr>
 
-      <!-- 게시물 목록 -->
-      <div>
-        <table class="table">
-          <thead>
-          <tr>
-            <th>탭</th>
-            <th>제목</th>
-            <th>작성자</th>
-            <th>작성일</th>
-            <th>
-                <!-- 정렬된 상태 -->
-                <a class="text-underline-hover text-dark" th:href="@{/posts(category=${listCategory})}"
-                   th:if="${sort_index} == 'viewCount' and ${listCategory} != null">
-                    조회
-                    <i class="bi bi-caret-down-fill"></i>
-                </a>
-                <a class="text-underline-hover text-dark" th:href="@{/posts}"
-                   th:if="${sort_index} == 'viewCount' and ${listCategory} == null">
-                    조회
-                    <i class="bi bi-caret-down-fill"></i>
-                </a>
+        <!-- 게시물 목록 -->
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>탭</th>
+                        <th>제목</th>
+                        <th>작성자</th>
+                        <th>작성일</th>
+                        <th>
+                            <!-- 정렬된 상태 -->
+                            <a class="text-underline-hover text-dark" th:href="@{/posts(category=${listCategory})}"
+                               th:if="${sort_index} == 'viewCount' and ${listCategory} != null">
+                                조회
+                                <i class="bi bi-caret-down-fill"></i>
+                            </a>
+                            <a class="text-underline-hover text-dark" th:href="@{/posts}"
+                               th:if="${sort_index} == 'viewCount' and ${listCategory} == null">
+                                조회
+                                <i class="bi bi-caret-down-fill"></i>
+                            </a>
 
-                <!-- 정렬되지 않은 상태 -->
-                <a class="text-underline-hover text-dark" th:href="@{/posts(category=${listCategory},sort_index=viewCount)}"
-                   th:if="${sort_index} != 'viewCount' and ${listCategory} != null">조회</a>
-                <a class="text-underline-hover text-dark" th:href="@{/posts(sort_index=viewCount)}"
-                   th:if="${sort_index} != 'viewCount' and ${listCategory} == null">조회</a>
-            </th>
-            <th>
-                <!-- 정렬된 상태 -->
-                <a class="text-underline-hover text-dark" th:href="@{/posts(category=${listCategory})}"
-                   th:if="${sort_index} == 'likeCount' and ${listCategory} != null">
-                    추천
-                    <i class="bi bi-caret-down-fill"></i>
-                </a>
-                <a class="text-underline-hover text-dark" th:href="@{/posts}"
-                   th:if="${sort_index} == 'likeCount' and ${listCategory} == null">
-                  추천
-                  <i class="bi bi-caret-down-fill"></i>
-                </a>
+                            <!-- 정렬되지 않은 상태 -->
+                            <a class="text-underline-hover text-dark" th:href="@{/posts(category=${listCategory},sort_index=viewCount)}"
+                               th:if="${sort_index} != 'viewCount' and ${listCategory} != null">조회</a>
+                            <a class="text-underline-hover text-dark" th:href="@{/posts(sort_index=viewCount)}"
+                               th:if="${sort_index} != 'viewCount' and ${listCategory} == null">조회</a>
+                        </th>
+                        <th>
+                            <!-- 정렬된 상태 -->
+                            <a class="text-underline-hover text-dark" th:href="@{/posts(category=${listCategory})}"
+                               th:if="${sort_index} == 'likeCount' and ${listCategory} != null">
+                                추천
+                                <i class="bi bi-caret-down-fill"></i>
+                            </a>
+                            <a class="text-underline-hover text-dark" th:href="@{/posts}"
+                               th:if="${sort_index} == 'likeCount' and ${listCategory} == null">
+                              추천
+                              <i class="bi bi-caret-down-fill"></i>
+                            </a>
 
-                <!-- 정렬되지 않은 상태 -->
-                <a class="text-underline-hover text-dark" th:href="@{/posts(category=${listCategory},sort_index=likeCount)}"
-                   th:if="${sort_index} != 'likeCount' and ${listCategory} != null">추천</a>
-                <a class="text-underline-hover text-dark" th:href="@{/posts(sort_index=likeCount)}"
-                   th:if="${sort_index} != 'likeCount' and ${listCategory} == null">추천</a>
-            </th>
-          </tr>
-          </thead>
-          <tbody>
+                            <!-- 정렬되지 않은 상태 -->
+                            <a class="text-underline-hover text-dark" th:href="@{/posts(category=${listCategory},sort_index=likeCount)}"
+                               th:if="${sort_index} != 'likeCount' and ${listCategory} != null">추천</a>
+                            <a class="text-underline-hover text-dark" th:href="@{/posts(sort_index=likeCount)}"
+                               th:if="${sort_index} != 'likeCount' and ${listCategory} == null">추천</a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
 
-            <!-- 공지 -->
-            <th:block th:if="${topNotice}">
-              <tr class="notice" th:each="post:${topNotice}">
-                <td class="cate">
-                  <a class="text-underline-hover" th:href="@{/posts(category=${post.categoryCode})}" th:text="${post.categoryName}">제목</a>
-                </td>
-                <td class="title">
-                  <a class="text-underline-hover" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
-                </td>
-                <td class="author">
-                  <div class="btn-group dropend">
-                    <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${post.nickname}">작성자</a>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" th:href="@{/post/search(searchType=nickname,keyword=${post.nickname})}">작성글</a></li>
-                    </ul>
-                  </div>
-                </td>
-                <td class="reg_time" th:text="${post.createdDate}">2023-09-11</td>
-                <td class="view_cnt" th:text="${post.viewCount}">100</td>
-                <td class="like_cnt" th:text="${post.likeCount == 0 ? '' : post.likeCount}"></td>
-              </tr>
-            </th:block>
+                    <!-- 공지 -->
+                    <th:block th:if="${topNotice}">
+                      <tr class="notice" th:each="post:${topNotice}">
+                        <td class="cate">
+                          <a class="text-underline-hover" th:href="@{/posts(category=${post.categoryCode})}" th:text="${post.categoryName}">제목</a>
+                        </td>
+                        <td class="title">
+                          <a class="text-underline-hover" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
+                        </td>
+                        <td class="author">
+                          <div class="btn-group dropend">
+                            <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${post.nickname}">작성자</a>
+                            <ul class="dropdown-menu">
+                              <li><a class="dropdown-item" th:href="@{/post/search(searchType=nickname,keyword=${post.nickname})}">작성글</a></li>
+                            </ul>
+                          </div>
+                        </td>
+                        <td class="reg_time" th:text="${post.createdDate}">2023-09-11</td>
+                        <td class="view_cnt" th:text="${post.viewCount}">100</td>
+                        <td class="like_cnt" th:text="${post.likeCount == 0 ? '' : post.likeCount}"></td>
+                      </tr>
+                    </th:block>
 
-            <!-- 게시물 -->
-            <th:block th:each="post:${posts}">
-                  <tr>
-                    <td class="cate">
-                      <a class="text-underline-hover" th:href="@{/posts(category=${post.categoryCode})}" th:text="${post.categoryName}"
-                         th:style="${post.categoryCode} == 'NOTICE' ? 'color:#ff0000;' : 'color:#003f7f;'">카테고리</a>
-                    </td>
-                    <td class="title">
-                      <a class="text-underline-hover" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
-                      <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
-                    </td>
-                    <td class="author">
-                      <div class="btn-group dropend">
-  <!--                  <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${#strings.abbreviate(post.nickname,10)}">작성자</a>-->
-                        <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${post.nickname}">작성자</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" th:href="@{/post/search(searchType=memberId,keyword=${post.member.id})}">작성글</a></li>
-                        </ul>
-                      </div>
-                    </td>
-                    <td class="reg_time" th:text="${post.createdDate}">작성일</td>
-                    <td class="view_cnt" th:text="${post.viewCount}">조회수</td>
-                    <td class="like_cnt" th:text="${post.likeCount == 0 ? '' : post.likeCount}">추천수</td>
-                </tr>
+                    <!-- 게시물 -->
+                    <th:block th:each="post:${posts}">
+                          <tr th:if="${posts.getTotalElements() != 0}">
+                            <td class="cate">
+                              <a class="text-underline-hover" th:href="@{/posts(category=${post.categoryCode})}" th:text="${post.categoryName}"
+                                 th:style="${post.categoryCode} == 'NOTICE' ? 'color:#ff0000;' : 'color:#003f7f;'">카테고리</a>
+                            </td>
+                            <td class="title">
+                              <a class="text-underline-hover" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
+                              <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
+                            </td>
+                            <td class="author">
+                              <div class="btn-group dropend">
+          <!--                  <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${#strings.abbreviate(post.nickname,10)}">작성자</a>-->
+                                <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${post.nickname}">작성자</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" th:href="@{/post/search(searchType=memberId,keyword=${post.member.id})}">작성글</a></li>
+                                </ul>
+                              </div>
+                            </td>
+                            <td class="reg_time" th:text="${post.createdDate}">작성일</td>
+                            <td class="view_cnt" th:text="${post.viewCount}">조회수</td>
+                            <td class="like_cnt" th:text="${post.likeCount == 0 ? '' : post.likeCount}">추천수</td>
+                        </tr>
 
-                <tr th:unless="${posts.getTotalElements() != 0}">
-                    <td colspan="4" class="text-center">게시물이 존재하지 않습니다.</td>
-                </tr>
-            </th:block>
-          </tbody>
-        </table>
-      </div>
+                        <tr th:unless="${posts.getTotalElements() != 0}">
+                            <td colspan="6" style="border:none">게시물이 존재하지 않습니다.</td>
+                        </tr>
+                    </th:block>
+                </tbody>
+            </table>
+        </div>
 
 
-      <!-- 페이징 버튼 -->
-      <div th:if="${!posts.isEmpty()}">
-          <ul class="pagination justify-content-center"
+        <!-- 페이징 버튼 -->
+        <div th:if="${!posts.isEmpty()}">
+            <ul class="pagination justify-content-center"
               th:with="
                   pageNumber = ${posts.pageable.pageNumber},
                   pageSize = ${posts.pageable.pageSize},
@@ -194,114 +193,113 @@
                   tempEndPage = ${startPage + pageSize - 1},
                   endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})">
 
-            <!-- 처음으로 이동 -->
-            <!-- 현재 페이지 인덱스(0부터 시작)가 페이지 사이즈보다 작을 경우 첫 페이지 라인(1~5페이지)에 머물러 있는 경우이므로 비활성화 한다 -->
-            <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
-                <a class="page-link" th:href="@{/posts(page=0,category=${listCategory},sort_index=${sort_index})}"
-                   th:if="${sort_index} != 'id' and ${listCategory} != null">
-                  <span>&laquo;</span>
-                </a>
-                <a class="page-link" th:href="@{/posts(page=0,sort_index=${sort_index})}"
-                   th:if="${sort_index} != 'id' and ${listCategory} == null">
-                  <span>&laquo;</span>
-                </a>
+                <!-- 처음으로 이동 -->
+                <!-- 현재 페이지 인덱스(0부터 시작)가 페이지 사이즈보다 작을 경우 첫 페이지 라인(1~5페이지)에 머물러 있는 경우이므로 비활성화 한다 -->
+                <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
+                    <a class="page-link" th:href="@{/posts(page=0,category=${listCategory},sort_index=${sort_index})}"
+                       th:if="${sort_index} != 'id' and ${listCategory} != null">
+                      <span>&laquo;</span>
+                    </a>
+                    <a class="page-link" th:href="@{/posts(page=0,sort_index=${sort_index})}"
+                       th:if="${sort_index} != 'id' and ${listCategory} == null">
+                      <span>&laquo;</span>
+                    </a>
 
-                <a class="page-link" th:href="@{/posts(page=0,category=${listCategory})}"
-                   th:if="${sort_index} == 'id' and ${listCategory} != null">
-                  <span>&laquo;</span>
-                </a>
-                <a class="page-link" th:href="@{/posts(page=0)}" th:if="${sort_index} == 'id' and ${listCategory} == null">
-                  <span>&laquo;</span>
-                </a>
-            </li>
+                    <a class="page-link" th:href="@{/posts(page=0,category=${listCategory})}"
+                       th:if="${sort_index} == 'id' and ${listCategory} != null">
+                      <span>&laquo;</span>
+                    </a>
+                    <a class="page-link" th:href="@{/posts(page=0)}" th:if="${sort_index} == 'id' and ${listCategory} == null">
+                      <span>&laquo;</span>
+                    </a>
+                </li>
 
-            <!-- 이전으로 이동 -->
-            <!-- 첫 페이지인 경우 비활성화, 첫 페이지가 아니라면 현재 페이지 인덱스(0부터 시작) - 1 -->
-            <li th:classappend="${posts.first} ? 'disabled'" class="page-item">
-                <a class="page-link" th:href="${posts.first} ? '#' : @{/posts(page=${pageNumber - 1},category=${listCategory},sort_index=${sort_index})}"
-                   aria-label="Previous" th:if="${sort_index} != 'id' and ${listCategory} != null">
-                  <span aria-hidden="true">&lt;</span>
-                </a>
-                <a class="page-link" th:href="${posts.first} ? '#' : @{/posts(page=${pageNumber - 1},sort_index=${sort_index})}"
-                   aria-label="Previous" th:if="${sort_index} != 'id' and ${listCategory} == null">
-                  <span aria-hidden="true">&lt;</span>
-                </a>
+                <!-- 이전으로 이동 -->
+                <!-- 첫 페이지인 경우 비활성화, 첫 페이지가 아니라면 현재 페이지 인덱스(0부터 시작) - 1 -->
+                <li th:classappend="${posts.first} ? 'disabled'" class="page-item">
+                    <a class="page-link" th:href="${posts.first} ? '#' : @{/posts(page=${pageNumber - 1},category=${listCategory},sort_index=${sort_index})}"
+                       aria-label="Previous" th:if="${sort_index} != 'id' and ${listCategory} != null">
+                      <span aria-hidden="true">&lt;</span>
+                    </a>
+                    <a class="page-link" th:href="${posts.first} ? '#' : @{/posts(page=${pageNumber - 1},sort_index=${sort_index})}"
+                       aria-label="Previous" th:if="${sort_index} != 'id' and ${listCategory} == null">
+                      <span aria-hidden="true">&lt;</span>
+                    </a>
 
-                <a class="page-link" th:href="${posts.first} ? '#' : @{/posts(page=${pageNumber - 1},category=${listCategory})}"
-                   aria-label="Previous" th:if="${sort_index} == 'id' and ${listCategory} != null">
-                  <span aria-hidden="true">&lt;</span>
-                </a>
-                <a class="page-link" th:href="${posts.first} ? '#' : @{/posts(page=${pageNumber - 1})}" aria-label="Previous"
-                   th:if="${sort_index} == 'id' and ${listCategory} == null">
-                  <span aria-hidden="true">&lt;</span>
-                </a>
-            </li>
+                    <a class="page-link" th:href="${posts.first} ? '#' : @{/posts(page=${pageNumber - 1},category=${listCategory})}"
+                       aria-label="Previous" th:if="${sort_index} == 'id' and ${listCategory} != null">
+                      <span aria-hidden="true">&lt;</span>
+                    </a>
+                    <a class="page-link" th:href="${posts.first} ? '#' : @{/posts(page=${pageNumber - 1})}" aria-label="Previous"
+                       th:if="${sort_index} == 'id' and ${listCategory} == null">
+                      <span aria-hidden="true">&lt;</span>
+                    </a>
+                </li>
 
-            <!-- 현재 페이지 -->
-            <!-- 페이지 리스트 루프(5페이지씩 분리)로 startPage 부터 endPage까지 반복 -->
-            <!-- 페이지 번호 누르면 해당 페이지로 이동 -->
-            <!-- page(페이지 번호) 와 현재 페이지 인덱스(0부터 시작) + 1 이 같으면 현재 보고있는 페이지이므로 활성화 -->
-            <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
-                <span th:if="${page == pageNumber + 1}" th:text="${page}" class="page-link"></span>
+                <!-- 현재 페이지 -->
+                <!-- 페이지 리스트 루프(5페이지씩 분리)로 startPage 부터 endPage까지 반복 -->
+                <!-- 페이지 번호 누르면 해당 페이지로 이동 -->
+                <!-- page(페이지 번호) 와 현재 페이지 인덱스(0부터 시작) + 1 이 같으면 현재 보고있는 페이지이므로 활성화 -->
+                <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
+                    <span th:if="${page == pageNumber + 1}" th:text="${page}" class="page-link"></span>
 
-                <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link"
-                   th:href="@{/posts(page=${page - 1},category=${listCategory},sort_index=${sort_index})}"
-                   th:if="${sort_index} != 'id' and ${listCategory} != null">page</a>
+                    <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link"
+                       th:href="@{/posts(page=${page - 1},category=${listCategory},sort_index=${sort_index})}"
+                       th:if="${sort_index} != 'id' and ${listCategory} != null">page</a>
 
-                <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link" th:href="@{/posts(page=${page - 1},sort_index=${sort_index})}"
-                   th:if="${sort_index} != 'id' and ${listCategory} == null">page</a>
+                    <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link" th:href="@{/posts(page=${page - 1},sort_index=${sort_index})}"
+                       th:if="${sort_index} != 'id' and ${listCategory} == null">page</a>
 
-                <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link" th:href="@{/posts(page=${page - 1},category=${listCategory})}"
-                   th:if="${sort_index} == 'id' and ${listCategory} != null">page</a>
+                    <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link" th:href="@{/posts(page=${page - 1},category=${listCategory})}"
+                       th:if="${sort_index} == 'id' and ${listCategory} != null">page</a>
 
-                <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link" th:href="@{/posts(page=${page - 1})}"
-                   th:if="${sort_index} == 'id' and ${listCategory} == null">page</a>
-            </li>
+                    <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link" th:href="@{/posts(page=${page - 1})}"
+                       th:if="${sort_index} == 'id' and ${listCategory} == null">page</a>
+                </li>
 
-            <!-- 다음으로 이동 -->
-            <li th:classappend="${posts.last} ? 'disabled'" class="page-item">
-                <a class="page-link" th:href="${posts.last} ? '#' : @{/posts(page=${pageNumber + 1},category=${listCategory},sort_index=${sort_index})}"
-                   aria-label="Next" th:if="${sort_index} != 'id' and ${listCategory} != null">
-                  <span aria-hidden="true">&gt;</span>
-                </a>
-                <a class="page-link" th:href="${posts.last} ? '#' : @{/posts(page=${pageNumber + 1},sort_index=${sort_index})}"
-                   aria-label="Next" th:if="${sort_index} != 'id' and ${listCategory} == null">
-                  <span aria-hidden="true">&gt;</span>
-                </a>
+                <!-- 다음으로 이동 -->
+                <li th:classappend="${posts.last} ? 'disabled'" class="page-item">
+                    <a class="page-link" th:href="${posts.last} ? '#' : @{/posts(page=${pageNumber + 1},category=${listCategory},sort_index=${sort_index})}"
+                       aria-label="Next" th:if="${sort_index} != 'id' and ${listCategory} != null">
+                      <span aria-hidden="true">&gt;</span>
+                    </a>
+                    <a class="page-link" th:href="${posts.last} ? '#' : @{/posts(page=${pageNumber + 1},sort_index=${sort_index})}"
+                       aria-label="Next" th:if="${sort_index} != 'id' and ${listCategory} == null">
+                      <span aria-hidden="true">&gt;</span>
+                    </a>
 
-                <a class="page-link" th:href="${posts.last} ? '#' : @{/posts(page=${pageNumber + 1},category=${listCategory})}"
-                   aria-label="Next" th:if="${sort_index} == 'id' and ${listCategory} != null">
-                  <span aria-hidden="true">&gt;</span>
-                </a>
-                <a class="page-link" th:href="${posts.last} ? '#' : @{/posts(page=${pageNumber + 1})}" aria-label="Next"
-                   th:if="${sort_index} == 'id' and ${listCategory} == null">
-                  <span aria-hidden="true">&gt;</span>
-                </a>
-            </li>
+                    <a class="page-link" th:href="${posts.last} ? '#' : @{/posts(page=${pageNumber + 1},category=${listCategory})}"
+                       aria-label="Next" th:if="${sort_index} == 'id' and ${listCategory} != null">
+                      <span aria-hidden="true">&gt;</span>
+                    </a>
+                    <a class="page-link" th:href="${posts.last} ? '#' : @{/posts(page=${pageNumber + 1})}" aria-label="Next"
+                       th:if="${sort_index} == 'id' and ${listCategory} == null">
+                      <span aria-hidden="true">&gt;</span>
+                    </a>
+                </li>
 
-            <!-- 마지막으로 이동 -->
-            <!-- startPage 가 왼쪽 연산보다 이상일 경우 마지막 페이지 라인에 있는 경우이므로 비활성화, 그게 아니면 전체 페이지수(totalPages) - 1 만큼 이동하여 마지막 페이지로 이동한다 -->
-            <li th:classappend="${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
-                <a class="page-link" th:href="@{/posts(page=${totalPages - 1},category=${listCategory},sort_index=${sort_index})}"
-                   th:if="${sort_index} != 'id' and ${listCategory} != null">
-                  <span>&raquo;</span>
-                </a>
-                <a class="page-link" th:href="@{/posts(page=${totalPages - 1},sort_index=${sort_index})}"
-                   th:if="${sort_index} != 'id' and ${listCategory} == null">
-                  <span>&raquo;</span>
-                </a>
+                <!-- 마지막으로 이동 -->
+                <!-- startPage 가 왼쪽 연산보다 이상일 경우 마지막 페이지 라인에 있는 경우이므로 비활성화, 그게 아니면 전체 페이지수(totalPages) - 1 만큼 이동하여 마지막 페이지로 이동한다 -->
+                <li th:classappend="${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
+                    <a class="page-link" th:href="@{/posts(page=${totalPages - 1},category=${listCategory},sort_index=${sort_index})}"
+                       th:if="${sort_index} != 'id' and ${listCategory} != null">
+                      <span>&raquo;</span>
+                    </a>
+                    <a class="page-link" th:href="@{/posts(page=${totalPages - 1},sort_index=${sort_index})}"
+                       th:if="${sort_index} != 'id' and ${listCategory} == null">
+                      <span>&raquo;</span>
+                    </a>
 
-                <a class="page-link" th:href="@{/posts(page=${totalPages - 1},category=${listCategory})}"
-                   th:if="${sort_index} == 'id' and ${listCategory} != null">
-                  <span>&raquo;</span>
-                </a>
-                <a class="page-link" th:href="@{/posts(page=${totalPages - 1})}" th:if="${sort_index} == 'id' and ${listCategory} == null">
-                  <span>&raquo;</span>
-                </a>
-            </li>
-
-          </ul>
-      </div>
+                    <a class="page-link" th:href="@{/posts(page=${totalPages - 1},category=${listCategory})}"
+                       th:if="${sort_index} == 'id' and ${listCategory} != null">
+                      <span>&raquo;</span>
+                    </a>
+                    <a class="page-link" th:href="@{/posts(page=${totalPages - 1})}" th:if="${sort_index} == 'id' and ${listCategory} == null">
+                      <span>&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
 
     </div>
   </div> <!-- /container -->

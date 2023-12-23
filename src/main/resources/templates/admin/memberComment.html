@@ -21,10 +21,10 @@
   <div class="container">
     <div class="col-md-12">
 
-      <div class="d-flex justify-content-center py-5">
+      <div class="d-flex justify-content-center align-items-center" style="height:100px">
         <div class="row row-cols-auto align-items-center">
           <div class="col">
-            <h2 th:text="${#strings.abbreviate(nickname,10)}"></h2>
+            <h4 th:text="${nickname}"></h4>
           </div>
           <div class="col">
             님의 댓글
@@ -32,7 +32,6 @@
         </div>
       </div>
 
-      <hr class="my-4">
 
       <div>
         <table class="table">
@@ -61,7 +60,7 @@
               <td class="reg_time" th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd')}">작성일</td>
             </tr>
             <tr th:unless="${comments.getTotalElements() != 0}">
-              <td colspan="4" class="text-center">작성한 댓글이 존재하지 않습니다.</td>
+              <td colspan="4" style="border:none">작성한 댓글이 존재하지 않습니다.</td>
             </tr>
           </tbody>
         </table>

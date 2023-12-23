@@ -16,8 +16,9 @@
 
     <div class="container">
         <div class="col-md-12">
-            <div class="py-5 text-center">
-                <h2>회원 목록</h2>
+
+            <div class="d-flex justify-content-center align-items-center" style="height:100px">
+                <h4>회원 목록</h4>
             </div>
 
             <div>
@@ -33,7 +34,7 @@
                     </thead>
                     <tbody>
 
-                        <tr th:each="member, memberStat :${members}">
+                        <tr th:each="member, memberStat :${members}" th:if="${members.getTotalElements() != 0}">
                             <td class="no" th:text="${members.getTotalElements() - memberStat.index}">0</td>
                             <td>
                                 <div class="btn-group dropend">
@@ -50,6 +51,10 @@
                             <td th:text="${member.activated} ? '활성' : '비활성'">회원상태</td>
                             <td th:text="${member.role} == 'ROLE_USER' ? '일반' : '소셜'">가입상태</td>
                             <td th:text="${member.createdDate}">가입일</td>
+                        </tr>
+
+                        <tr th:unless="${members.getTotalElements() != 0}">
+                            <td colspan="5" style="border:none">회원이 존재하지 않습니다.</td>
                         </tr>
                     </tbody>
                 </table>

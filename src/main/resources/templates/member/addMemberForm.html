@@ -15,11 +15,12 @@
 <th:block layout:fragment="content">
 
     <div class="container">
-        <div class="py-5 text-center">
-            <h2>회원 가입</h2>
+
+        <div class="d-flex justify-content-center align-items-center" style="height:100px">
+            <h4>회원가입</h4>
         </div>
 
-        <h4 class="mb-3">회원 정보 입력</h4>
+        <h5 class="mb-3">회원 정보 입력</h5>
         <form id="addMemberForm" th:action th:object="${memberSaveRequestDTO}" method="post">
 
             <div th:if="${#fields.hasGlobalErrors()}">

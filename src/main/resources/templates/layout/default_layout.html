@@ -8,6 +8,22 @@
 
     <th:block th:insert="layout/fragments/header :: headerFragment"></th:block>
     <body>
+        <header>
+<!--            <div class="d-flex justify-content-center p-3" style="background-color:#456bc1">-->
+<!--                <a href="/posts" class="text-decoration-none text-white fs-1 fw-bold">-->
+<!--                    MIND MATRIX-->
+<!--                </a>-->
+<!--            </div>-->
+            <div class="top-header" style="height:30px"></div>
+            <div class="container">
+                <div class="d-flex justify-content-center">
+                    <a href="/posts" class="text-decoration-none">
+                        <img th:src="@{/img/logo/oneuldo_logo_short.png}" alt="logo" width="200">
+                    </a>
+                </div>
+            </div>
+        </header>
+
         <th:block layout:fragment="content"></th:block>
 
         <!-- Bootstrap Bundle with Popper -->
