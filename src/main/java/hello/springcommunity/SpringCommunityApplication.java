@@ -1,6 +1,6 @@
 package hello.springcommunity;
 
-import hello.springcommunity.dao.member.MemberRepositoryOld;
+import hello.springcommunity.dao.member.MemberRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
@@ -28,8 +28,8 @@ public class SpringCommunityApplication {
 
 //	@Bean
 //	@Profile("local")
-	public TestDataInit testDataInit(MemberRepositoryOld memberRepositoryOld) {
-		return new TestDataInit(memberRepositoryOld);
+	public TestDataInit testDataInit(MemberRepository memberRepository) {
+		return new TestDataInit(memberRepository);
 	}
 
 }

@@ -1,6 +1,6 @@
 package hello.springcommunity;
 
-import hello.springcommunity.dao.member.MemberRepositoryOld;
+import hello.springcommunity.dao.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -13,7 +13,7 @@ import org.springframework.context.event.EventListener;
 @RequiredArgsConstructor
 public class TestDataInit {
 
-    private final MemberRepositoryOld memberRepositoryOld;
+    private final MemberRepository memberRepository;
 
     /**
      * 스프링 컨테이너가 완전히 초기화를 다 끝내고, 실행준비가 되었을 때 발생하는 이벤트
@@ -25,10 +25,9 @@ public class TestDataInit {
      * @EventListener를 통해 이벤트를 처리해주기 위해서는 해당 에노테이션이 붙은 메서드를 가진 클래스가 스프링 빈으로 등록되어야 한다
      */
 //    @PostConstruct
-    @EventListener(ApplicationReadyEvent.class)
+//    @EventListener(ApplicationReadyEvent.class)
     public void init() {
         log.info("test data init~!");
-//
 //        Member member = Member.builder().loginId("test").password("test123!").name("테스터").build();
 //        memberRepository.save(member);
     }
