@@ -1,8 +1,7 @@
 # 오늘도 커뮤
-![logo](https://github.com/jsungl/spring-community/assets/79460509/1691744b-58be-4e18-9590-5984eeb765ef)
 
 ### [개요]
-
+![logo](https://github.com/jsungl/spring-community/assets/79460509/1691744b-58be-4e18-9590-5984eeb765ef)
 
 ### [요구사항]
 
