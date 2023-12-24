@@ -117,8 +117,9 @@
 
         <hr class="my-4">
 
+
         <!-- 게시물 수정 삭제 버튼 -->
-        <th:block sec:authorize="isAuthenticated()" th:if="${#authentication.name == post.loginId}">
+        <th:block sec:authorize="isAuthenticated()" th:if="${#authentication.name == post.loginId} or ${#authentication.principal.member.role.getValue() == 'ROLE_ADMIN'}">
             <form th:action="@{/post/{postId}/delete(postId=${post.id})}" method="post" onsubmit="return confirm('게시물을 삭제하시겠습니까?')">
 
                 <button class="btn btn-primary mb-5"
@@ -174,9 +175,9 @@
                                 <small class="text-muted" th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd HH:mm')}">registerDate</small>
 
                                 <!-- 답글 여부, 본인이 작성한 댓글 수정/삭제 여부 -->
-                                <th:block sec:authorize="isAuthenticated()">
+                                <th:block sec:authorize="isAuthenticated()" th:if="${!comment.isDeleted}">
                                     <!-- 자기 댓글 수정/삭제 -->
-                                    <th:block th:if="${comment.member.loginId == #authentication.name} and ${comment.isDeleted} == false">
+                                    <th:block th:if="${comment.member.loginId == #authentication.name} or ${#authentication.principal.member.role.getValue() == 'ROLE_ADMIN'}">
                                         <a href="javascript:;" class="text-decoration-none" th:onclick="editComment([[${comment.id}]]);">
                                             수정
                                         </a>
@@ -186,32 +187,41 @@
                                     </th:block>
 
                                     <!-- 다른사람 댓글 답글달기 -->
-                                    <th:block th:if="${comment.member.loginId != #authentication.name}">
-                                        <a href="javascript:;" class="text-decoration-none text-secondary" th:onclick="replyComment([[${comment.id}]]);">
-                                            답글
-                                            <i class="bi bi-chat-dots"></i>
-                                        </a>
-                                    </th:block>
+<!--                                    <th:block th:if="${comment.member.loginId != #authentication.name}">-->
+<!--                                        <a href="javascript:;" class="text-decoration-none text-secondary" th:onclick="replyComment([[${comment.id}]]);">-->
+<!--                                            답글-->
+<!--                                            <i class="bi bi-chat-dots"></i>-->
+<!--                                        </a>-->
+<!--                                    </th:block>-->
+
+                                    <!-- 다른사람 댓글 답글달기 -->
+                                    <a href="javascript:;" class="text-decoration-none text-secondary" th:onclick="replyComment([[${comment.id}]]);">
+                                        답글
+                                        <i class="bi bi-chat-dots"></i>
+                                    </a>
                                 </th:block>
 
                             </div>
 
                             <!-- 댓글내용 -->
+
+                            <!-- 관리자 -->
                             <th:block th:if="${comment.member.getRoleValue()} == 'ROLE_ADMIN'">
                                 <div class="content-wrapper my-3" th:id="'commentContent' + ${comment.id}" style="color:#dc3545">
                                     <a class="findParent text-decoration-none" href="javascript:;" th:if="${comment.parent} != null"
-                                       th:text="${comment.parent.member.nickname == null ? '알수없음' : comment.parent.member.nickname}"
+                                       th:text="${comment.parent.member.nickname}"
                                        th:onclick="moveToParent([[${comment.parent.id}]]);"
                                        style="color:#aaa;">부모댓글 닉네임</a>
                                     [(${#strings.replace(#strings.escapeXml(content), '&#10;', '&lt;br /&gt;')})]
                                 </div>
                             </th:block>
 
+                            <!-- 일반 유저 -->
                             <th:block th:unless="${comment.member.getRoleValue()} == 'ROLE_ADMIN'">
                                 <div class="content-wrapper my-3" th:id="'commentContent' + ${comment.id}"
                                      th:style="${comment.member.loginId == post.loginId} ? 'color:#045cdf'">
                                     <a class="findParent text-decoration-none" href="javascript:;" th:if="${comment.parent} != null"
-                                       th:text="${comment.parent.member.nickname == null ? '알수없음' : comment.parent.member.nickname}"
+                                       th:text="${comment.parent.member.nickname}"
                                        th:onclick="moveToParent([[${comment.parent.id}]]);"
                                        style="color:#aaa;">부모댓글 닉네임</a>
                                     [(${#strings.replace(#strings.escapeXml(content), '&#10;', '&lt;br /&gt;')})]
