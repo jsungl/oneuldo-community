@@ -43,11 +43,12 @@
                   <option value="">검색 조건</option>
                   <option value="title" th:selected="${searchType} == 'title'">제목</option>
                   <option value="content" th:selected="${searchType} == 'content'">내용</option>
-                  <option value="nickname" th:selected="${searchType} == 'nickname'">작성자</option>
+                  <option value="nickname" th:selected="${searchType} == 'nickname'">닉네임</option>
+                  <option value="memberId" th:selected="${searchType} == 'memberId'" th:if="${searchType} == 'memberId'">회원번호</option>
                 </select>
               </div>
               <div class="col">
-                <input type="text" id="keyword" name="keyword" th:value="${keyword}" class="form-control"/>
+                <input class="form-control" type="text" id="keyword" name="keyword" th:value="${keyword}"/>
               </div>
               <div class="col">
                 <button type="submit" class="btn btn-light" style="border-color: #adb5bd;">검색</button>
@@ -57,7 +58,6 @@
 
           <!-- 검색결과 -->
           <div class="search_result text-center mt-3">
-            <h4 th:if="${searchType} == 'memberId'">검색 결과</h4>
             <h4 th:if="${searchType} != 'memberId'">"[[${keyword}]]"에 대한 검색 결과</h4>
           </div>
         </div>
