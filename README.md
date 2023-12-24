@@ -1,5 +1,5 @@
 # 오늘도 커뮤
-![logo](https://github.com/jsungl/spring-community/assets/79460509/9f192dbd-4729-4990-9b2d-bafe2036b4ed)
+![logo](https://github.com/jsungl/spring-community/assets/79460509/1691744b-58be-4e18-9590-5984eeb765ef)
 
 ### [개요]
 
