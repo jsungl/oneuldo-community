@@ -13,6 +13,9 @@
       white-space:normal;
       word-break:break-all;
     }
+    tbody tr:not(.no_content):hover {
+        background-color: rgba(0,0,0,.075);
+    }
   </style>
 </head>
 
@@ -59,7 +62,7 @@
               </td>
               <td class="reg_time" th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd')}">작성일</td>
             </tr>
-            <tr th:unless="${comments.getTotalElements() != 0}">
+            <tr class="no_content" th:unless="${comments.getTotalElements() != 0}">
               <td colspan="4" style="border:none">작성한 댓글이 존재하지 않습니다.</td>
             </tr>
           </tbody>

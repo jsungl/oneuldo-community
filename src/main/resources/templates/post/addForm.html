@@ -4,12 +4,7 @@
       layout:decorate="~{layout/default_layout}">
 <head>
     <script th:inline="javascript">
-         window.addEventListener('pageshow', function(event) {
-              const form = document.getElementById('addPostForm');
-              form.reset();
-         });
-
-         function viewNotice(option, role) {
+         function viewCheckBox(option, role) {
             if(role == 'ROLE_ADMIN') {
                 const container = document.getElementById('notice_fixed');
                 if(option == 'NOTICE') {
@@ -35,7 +30,7 @@
             <div class="row mb-3">
                 <div class="col-md-auto">
                     <select th:field="*{categoryCode}" class="form-select" th:classappend="${valid_categoryCode} ? 'select-error'"
-                            th:onchange="viewNotice(this.value,[[${role}]])">
+                            th:onchange="viewCheckBox(this.value,[[${role}]])">
                         <option value="">탭</option>
                         <th:block th:each="cate:${categoryCodes}">
                             <option th:value="${cate.name()}" th:text="${cate.displayName}"

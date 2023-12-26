@@ -3,8 +3,6 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
 <head>
-  <!-- Include the Google Sign-In library -->
-<!--  <script src="https://accounts.google.com/gsi/client" async></script>-->
 
   <style>
     .divide-line {
@@ -51,10 +49,7 @@
   </style>
   <title>로그인</title>
   <script th:inline="javascript">
-    window.addEventListener('pageshow', function() {
-      const form = document.getElementById('loginForm');
-      form.reset(); // Reset the form
-    });
+
     function popup(url) {
       window.open(url,"","width=700px,height=500px,top=200px,left=200px;");
     }
@@ -66,61 +61,6 @@
 
     <div class="d-flex justify-content-center align-items-center" style="height:100px">
       <h4>로그인</h4>
-    </div>
-
-    <!-- social login -->
-    <div class="login-social mb-3">
-      <div class="login-social-title d-flex justify-content-center">
-        <div style="color:#a2a2a2">SNS 계정으로 간편 로그인/회원가입</div>
-      </div>
-      <div class="login-social-btn d-flex justify-content-center mt-3">
-        <div class="row" th:with="nlogin_url=|@{/oauth2/authorization/naver}|, glogin_url=|@{/oauth2/authorization/google}|">
-          <div class="col">
-<!--            <button class="n-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/naver}'|"></button>-->
-            <button class="n-signin-btn p-3" type="button" th:onclick="popup([[${nlogin_url}]])"></button>
-
-          </div>
-          <div class="col">
-<!--            <button class="g-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/google}'|"></button>-->
-            <button class="g-signin-btn p-3" type="button" th:onclick="popup([[${glogin_url}]])"></button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-<!--    <div class="d-flex flex-column my-3">-->
-<!--      <button class="btn btn-outline-primary btn-lg mb-3"-->
-<!--              th:onclick="|location.href='@{/oauth2/authorization/google}'|"-->
-<!--              type="button">구글 로그인</button>-->
-<!--      <button class="btn btn-outline-primary btn-lg mb-3"-->
-<!--              th:onclick="|location.href='@{/oauth2/authorization/naver}'|"-->
-<!--              type="button">네이버 로그인</button>-->
-<!--    </div>-->
-
-
-    <!-- 구글 로그인 버튼 -->
-<!--    <div style="width:100%;max-width:300px">-->
-<!--      <div id="g_id_onload"-->
-<!--           th:data-client_id="${@environment.getProperty('spring.security.oauth2.client.registration.google.client-id')}"-->
-<!--           th:data-login_uri="@{/oauth2/authorization/google}"-->
-<!--           data-auto_prompt="false">-->
-<!--      </div>-->
-<!--      <div class="g_id_signin"-->
-<!--           data-width="250"-->
-<!--           data-type="standard"-->
-<!--           data-size="large"-->
-<!--           data-theme="outline"-->
-<!--           data-text="sign_in_with"-->
-<!--           data-shape="rectangular"-->
-<!--           data-logo_alignment="left">-->
-<!--      </div>-->
-<!--    </div>-->
-
-    <div class="divide-line my-4">
-      <hr class="bar">
-      <span class="txt">OR</span>
-      <hr class="bar">
     </div>
 
     <!-- 일반 로그인 -->
@@ -150,31 +90,62 @@
         <div class="field-error" th:errors="*{password}" />
       </div>
 
-      <hr class="my-4">
-
-      <div class="row">
+      <div class="row mt-3">
         <div class="col">
           <button class="w-100 btn btn-primary btn-lg" type="submit">
             로그인
           </button>
         </div>
       </div>
-
-      <div class="row my-3 text-center">
-        <p>
-          <a th:href="@{/signup}" class="text-decoration-none">
-            회원가입
-          </a>
-        </p>
-
-        <p>
-          <a th:href="@{/find/id}" class="text-decoration-none">
-            아이디/비밀번호 찾기
-          </a>
-        </p>
-      </div>
-
     </form>
+
+
+    <div class="d-flex justify-content-center my-3">
+      <div class="me-3 ms-3">
+        <a th:href="@{/signup}" class="text-decoration-none text-dark">
+          회원가입
+        </a>
+      </div>
+      <div class="me-3 ms-3">
+        <a th:href="@{/find/id}" class="text-decoration-none text-dark">
+          아이디 찾기
+        </a>
+      </div>
+      <div class="ms-3">
+        <a th:href="@{/find/password}" class="text-decoration-none text-dark">
+          비밀번호 찾기
+        </a>
+      </div>
+    </div>
+
+    <div class="divide-line my-4">
+      <hr class="bar">
+      <span class="txt">OR</span>
+      <hr class="bar">
+    </div>
+
+    <!-- social login -->
+    <div class="login-social mb-3">
+      <div class="login-social-title d-flex justify-content-center">
+        <div style="color:#a2a2a2">SNS 계정으로 간편 로그인/회원가입</div>
+      </div>
+      <div class="login-social-btn d-flex justify-content-center mt-3">
+        <div class="row" th:with="nlogin_url=|@{/oauth2/authorization/naver}|, glogin_url=|@{/oauth2/authorization/google}|">
+          <div class="col">
+            <!--            <button class="n-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/naver}'|"></button>-->
+            <button class="n-signin-btn p-3" type="button" th:onclick="popup([[${nlogin_url}]])"></button>
+
+          </div>
+          <div class="col">
+            <!--            <button class="g-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/google}'|"></button>-->
+            <button class="g-signin-btn p-3" type="button" th:onclick="popup([[${glogin_url}]])"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
   </div> <!-- /container -->
 
 </th:block>

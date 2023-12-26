@@ -2,11 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <!-- 각 화면의 하단 부분에 공통으로 들어갈 영역 -->
     <th:block th:fragment="footerFragment">
-        <div class="container mt-5">
-            <div class="border-bottom mb-3"></div>
-            <p class="text-center">
-                <small class="text-muted">Copyright © oneuldo-communication.com All rights reserved.</small>
-            </p>
-        </div>
+        <footer>
+            <div class="d-flex justify-content-center align-items-end" style="height:200px">
+                <p class="text-center">
+                    <small class="text-muted">Copyright © oneuldo-communication.com All rights reserved.</small>
+                </p>
+            </div>
+        </footer>
     </th:block>
 </html>

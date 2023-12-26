@@ -4,11 +4,6 @@
       layout:decorate="~{layout/default_layout}">
 <head>
     <script th:inline="javascript">
-        window.addEventListener('pageshow', function(event) {
-          const form = document.getElementById('editPostForm');
-          form.reset();
-        });
-
         function submitEditForm(form,event) {
             event.preventDefault();
             $("#categoryCode").removeAttr("disabled");

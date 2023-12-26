@@ -9,6 +9,9 @@
           white-space:nowrap;
           text-align:center;
         }
+        tbody tr:not(.no_content):hover {
+            background-color: rgba(0,0,0,.075);
+        }
   </style>
 </head>
 
@@ -53,7 +56,7 @@
                             <td th:text="${member.createdDate}">가입일</td>
                         </tr>
 
-                        <tr th:unless="${members.getTotalElements() != 0}">
+                        <tr class="no_content" th:unless="${members.getTotalElements() != 0}">
                             <td colspan="5" style="border:none">회원이 존재하지 않습니다.</td>
                         </tr>
                     </tbody>

@@ -6,14 +6,13 @@
 
     <!-- 각 화면의 구성에 대한 설정 -->
 
+    <!-- Header -->
     <th:block th:insert="layout/fragments/header :: headerFragment"></th:block>
+
+    <!-- Body -->
     <body>
+        <!-- 로고 -->
         <header>
-<!--            <div class="d-flex justify-content-center p-3" style="background-color:#456bc1">-->
-<!--                <a href="/posts" class="text-decoration-none text-white fs-1 fw-bold">-->
-<!--                    MIND MATRIX-->
-<!--                </a>-->
-<!--            </div>-->
             <div class="top-header" style="height:30px"></div>
             <div class="container">
                 <div class="d-flex justify-content-center">
@@ -33,7 +32,24 @@
         <script th:src="@{/js/comment.js}" th:inline="javascript"></script>
         <script th:src="@{/js/loading.js}" th:inline="javascript"></script>
         <script th:src="@{/js/postLike.js}" th:inline="javascript"></script>
+        <script th:src="@{/js/resetForm.js}" th:inline="javascript"></script>
+        <script th:inline="javascript">
+            window.addEventListener('pageshow', function() {
+                const forms = document.getElementsByTagName('form');
+                if (forms.length > 0) {
+                    //console.log('폼(form) 태그가 존재합니다.');
+                    resetForm(forms);
+                }
+            });
 
+            //로그인 체크
+            function loginCheck() {
+                alert("로그인 후 이용할 수 있습니다.");
+                location.href = "/login";
+            }
+        </script>
     </body>
-    <th:block th:replace="layout/fragments/footer :: footerFragment"></th:block>
+
+    <!-- Footer -->
+    <th:block th:replace="layout/fragments/footerV2 :: footerFragment"></th:block>
 </html>
