@@ -44,7 +44,7 @@
 
         <!-- 검색 바 -->
         <div class="d-flex align-items-start justify-content-center py-4" style="height:200px">
-            <form action="/post/search" method="get" class="form-inline" autocomplete="off">
+            <form th:action="@{/post/search}" method="get" class="form-inline" autocomplete="off">
                 <div class="row row-cols-auto">
                     <div class="col">
                         <select class="form-select" id="searchType" name="searchType">

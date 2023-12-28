@@ -6,6 +6,9 @@ function addComment(form, event) {
     let data = form.content.value;
     let postId = form.postId.value;
     let contextPath = form.contextPath.value;
+    let header = $("meta[name='_csrf_header']").attr('content');
+    let csrf_token = $("meta[name='_csrf']").attr('content');
+    //let csrf_token = form._csrf.value;
     let parentId;
     let comment;
 
@@ -27,7 +30,10 @@ function addComment(form, event) {
         url: '/api/post/' + postId + '/comment/add',
 //        dataType: 'JSON',
         contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify(comment)
+        data: JSON.stringify(comment),
+        beforeSend: function(xhr){
+            xhr.setRequestHeader(header, csrf_token);
+        }
     }).done(function(result) {
         $("#commentTextarea").val('');
         contextPath = contextPath + "?commentId=" + result + "#comment_" + result;
@@ -93,6 +99,9 @@ function editCommentSave(form) {
 //    const oldContent = document.getElementById('commentContent').textContent;
     let contextPath = form.contextPath.value;
 
+    let header = $("meta[name='_csrf_header']").attr('content');
+    let csrf_token = $("meta[name='_csrf']").attr('content');
+
     if(!newContent || newContent.trim() === "") {
         alert("공백 또는 입력하지 않은 부분이 있습니다");
         return false;
@@ -105,7 +114,10 @@ function editCommentSave(form) {
             url: '/api/post/' + postId + '/comment/' + commentId + '/edit',
             //dataType: 'JSON',
             contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify({content: newContent})
+            data: JSON.stringify({content: newContent}),
+            beforeSend: function(xhr){
+                xhr.setRequestHeader(header, csrf_token);
+            }
         }).done(function(result) {
             contextPath = contextPath + "?commentId=" + result + "#comment_" + result;
 
@@ -142,12 +154,18 @@ function deleteComment(commentId, postId) {
     let pathname = window.location.pathname;
     let contextPath = origin + pathname;
 
+    let header = $("meta[name='_csrf_header']").attr('content');
+    let csrf_token = $("meta[name='_csrf']").attr('content');
+
     const check = confirm("댓글을 삭제하시겠습니까?");
     if(check) {
         $.ajax({
             type: 'delete',
             url: '/api/post/' + postId + '/comment/' + commentId + '/delete',
-            dataType: 'JSON'
+            dataType: 'JSON',
+            beforeSend: function(xhr){
+                xhr.setRequestHeader(header, csrf_token);
+            }
         }).done(function(result) {
             $(".comment-list").load(contextPath + " .comment-list");
         }).fail(function(error) {

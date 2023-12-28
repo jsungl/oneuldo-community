@@ -25,6 +25,7 @@ import org.springframework.security.oauth2.core.http.converter.OAuth2AccessToken
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.ServletException;
@@ -90,8 +91,16 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        /*
         http.cors().disable() //cors 방지
             .csrf().disable() //csrf 방지(post 요청마다 token이 필요한 과정을 생략하겠다는 의미)
+            .headers().frameOptions().disable(); //xframe 방어 해제
+
+
+         */
+        http.cors().disable() //cors 방지
+            .csrf().ignoringAntMatchers("/post/like/**")
+            .and()
             .headers().frameOptions().disable(); //xframe 방어 해제
 
         /**
@@ -110,6 +119,16 @@ public class SecurityConfig {
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll(); //그 외 요청들은 모두 접근허용
 
+        /*
+        http.authorizeRequests() //요청에 의한 보안검사 시작
+                .antMatchers("/signup", "/find/**", "/login/**").anonymous()
+                .antMatchers("/post/add").hasAnyRole("USER", "SOCIAL", "ADMIN") //Spring Security에서 prefix를 자동으로 "ROLE_"을 넣어주므로 이 때 hasRole에는 ROLE을 제외하고 뒷 부분인 USER만 써주면 된다
+                .antMatchers("/member/leave").hasAnyRole("USER", "SOCIAL")
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/", "/posts", "/post/{postId}", "/post/search", "/member/authAccount", "/error/**").permitAll()
+                .anyRequest().authenticated(); //그 외 요청들은 인증필요
+
+         */
 
         //로그인 설정
         http.formLogin() //보안 검증방식은 form login 방식

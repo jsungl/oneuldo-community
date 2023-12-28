@@ -3,6 +3,8 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
 <head>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <meta name="_csrf" th:content="${_csrf.token}">
     <th:block th:if="${post}">
         <title>[[${post.title}]]</title>
     </th:block>
@@ -93,7 +95,7 @@
                 </div>
 
                 <!-- 추천수 -->
-                <div class="like_count d-flex justify-content-center mt-3" th:if="${post.likeCount} != 0">
+                <div class="like_count d-flex justify-content-center mt-3">
                     <span th:text="${post.likeCount}" style="color:#1171cc;
                                 font:bold 14px georgia,sans-serif;
                                 border:1px solid #ccc;
