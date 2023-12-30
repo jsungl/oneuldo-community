@@ -1,6 +1,7 @@
 package hello.springcommunity.domain.post;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import hello.springcommunity.domain.BaseTimeEntity;
 import hello.springcommunity.domain.TimeEntity;
 import hello.springcommunity.domain.comment.Comment;
 import hello.springcommunity.domain.member.Member;
@@ -20,7 +21,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Post extends TimeEntity {
+public class Post extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
@@ -75,36 +76,52 @@ public class Post extends TimeEntity {
 
 
     /**
-     * 비즈니스 메서드
+     * 카테고리 이름 가져오기
+     * 잡담, 유머, 공지,,,
      */
-    //게시물 수정
-    public void updatePost(String title, String content) {
-        this.title = title;
-        this.content = content;
-        this.onPreUpdate();
-    }
-
-    //조회수 증가
-    public void updateViewCount() {
-        this.viewCount = this.viewCount + 1;
-    }
-
-    //추천수 증가
-    public void plusLikeCount() {
-        this.likeCount = this.likeCount + 1;
-    }
-
-    //추천수 감소
-    public void minusLikeCount() {
-        this.likeCount = this.likeCount - 1;
-    }
-
-    //카테고리 이름
     public String getCategoryName() {
         return this.categoryCode.getDisplayName();
     }
 
-    //Notice 설정
+    /**
+     * Setter 대신 비즈니스 메서드 작성
+     */
+
+    /**
+     * 게시물 수정
+     */
+    public void updatePost(String title, String content) {
+        this.title = title;
+        this.content = content;
+        //this.onPreUpdate();
+    }
+
+
+    /**
+     * 조회수 증가
+     */
+    public void updateViewCount() {
+        this.viewCount = this.viewCount + 1;
+    }
+
+
+    /**
+     * 추천수 증가
+     */
+    public void plusLikeCount() {
+        this.likeCount = this.likeCount + 1;
+    }
+
+    /**
+     * 추천수 감소
+     */
+    public void minusLikeCount() {
+        this.likeCount = this.likeCount - 1;
+    }
+
+    /**
+     * 공지 등록
+     */
     public void setNotice(Notice notice) {
         this.notice = notice;
     }

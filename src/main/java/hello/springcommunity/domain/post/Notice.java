@@ -1,6 +1,7 @@
 package hello.springcommunity.domain.post;
 
 
+import hello.springcommunity.domain.BaseTimeEntity;
 import hello.springcommunity.domain.TimeEntity;
 import lombok.*;
 
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Notice extends TimeEntity {
+public class Notice extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

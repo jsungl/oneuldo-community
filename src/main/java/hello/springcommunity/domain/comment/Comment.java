@@ -1,6 +1,7 @@
 package hello.springcommunity.domain.comment;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import hello.springcommunity.domain.BaseTimeEntity;
 import hello.springcommunity.domain.TimeEntity;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.post.Post;
@@ -19,7 +20,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Comment extends TimeEntity {
+public class Comment extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
@@ -37,8 +38,6 @@ public class Comment extends TimeEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-//    @CreatedDate
-//    private LocalDate regDate;
 
     /**
      * 댓글 삭제 유무(true면 삭제된 댓글)
@@ -68,12 +67,15 @@ public class Comment extends TimeEntity {
     @Builder.Default
     private Integer step = 0;
 
+
+    /** Setter 대신 비즈니스 메서드 작성 **/
+
     /**
      * 댓글 수정
      */
     public void updateComment(String content) {
         this.content = content;
-        this.onPreUpdate();
+        //this.onPreUpdate();
     }
 
     /**
