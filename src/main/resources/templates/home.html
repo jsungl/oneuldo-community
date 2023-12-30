@@ -13,21 +13,6 @@
     <!-- favicon -->
     <link rel="shortcut icon" th:href="@{/img/favicon.ico}" type="image/x-icon"/>
 
-    <script th:inline="javascript">
-        window.addEventListener('load', function() {
-            const openerWindow = window.opener;
-            if(openerWindow) {
-                openerWindow.location.href = "/";
-                //openerWindow.document.location.href = "/";
-                window.close();
-            }
-
-            const msg = [[${errorMessage}]];
-            if(msg) {
-                alert(msg);
-            }
-        });
-    </script>
     <title>홈</title>
 </head>
 
@@ -124,5 +109,19 @@
         </footer>
     </div> <!-- /container -->
 
+    <script th:inline="javascript">
+        window.addEventListener('load', function() {
+            const openerWindow = window.opener;
+            if(openerWindow) {
+                openerWindow.location.href = "/";
+                window.close();
+            }
+
+            const msg = [[${errorMessage}]];
+            if(msg) {
+                alert(msg);
+            }
+        });
+    </script>
 </body>
 </html>

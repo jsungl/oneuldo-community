@@ -100,4 +100,17 @@
 
     </div> <!-- /container -->
 </th:block>
+
+<th:block layout:fragment="addMemberFormScript">
+    <script th:inline="javascript">
+        window.addEventListener('pageshow', function() {
+            const form = document.getElementById('addMemberForm');
+            if(form !== null && form !== undefined) {
+                form.reset();
+            }
+        });
+    </script>
+</th:block>
+
+
 </html>

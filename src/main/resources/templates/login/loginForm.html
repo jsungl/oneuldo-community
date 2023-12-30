@@ -48,12 +48,6 @@
     }
   </style>
   <title>로그인</title>
-  <script th:inline="javascript">
-
-    function popup(url) {
-      window.open(url,"","width=700px,height=500px,top=200px,left=200px;");
-    }
-  </script>
 </head>
 
 <th:block layout:fragment="content">
@@ -149,4 +143,35 @@
   </div> <!-- /container -->
 
 </th:block>
+
+<th:block layout:fragment="loginFormScript">
+  <script th:inline="javascript">
+        window.addEventListener('load', function() {
+            // 페이지 로드 후 실행
+            const openerWindow = window.opener;
+            if(openerWindow) {
+                openerWindow.location.href = "/login?error=true";
+                window.close();
+            }
+
+            const msg = [[${msg}]];
+            if(msg) {
+                alert(msg);
+            }
+        });
+
+        window.addEventListener('pageshow', function() {
+            // 페이지가 화면에 보여질 때 실행
+            const form = document.getElementById('loginForm');
+            if(form !== null && form !== undefined) {
+                form.reset();
+            }
+        });
+
+        function popup(url) {
+          window.open(url,"","width=700px,height=500px,top=200px,left=200px;");
+        }
+    </script>
+</th:block>
+
 </html>

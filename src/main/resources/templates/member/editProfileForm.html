@@ -77,4 +77,15 @@
     </div> <!-- /container -->
 </th:block>
 
+<th:block layout:fragment="editProfileScript">
+    <script th:inline="javascript">
+        window.addEventListener('pageshow', function() {
+            const form = document.getElementById('editProfileForm');
+            if(form !== null && form !== undefined) {
+                form.reset();
+            }
+        });
+    </script>
+</th:block>
+
 </html>

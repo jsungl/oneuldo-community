@@ -3,18 +3,6 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
 <head>
-    <script th:inline="javascript">
-         function viewCheckBox(option, role) {
-            if(role == 'ROLE_ADMIN') {
-                const container = document.getElementById('notice_fixed');
-                if(option == 'NOTICE') {
-                   container.style.display = 'block';
-                } else {
-                    container.style.display = 'none';
-                }
-            }
-         }
-    </script>
     <title>게시물 등록</title>
 </head>
 <th:block layout:fragment="content">
@@ -86,4 +74,27 @@
 
     </div> <!-- /container -->
 </th:block>
+
+<th:block layout:fragment="addFormScript">
+    <script th:inline="javascript">
+        window.addEventListener('pageshow', function() {
+            const form = document.getElementById('addPostForm');
+            if(form !== null && form !== undefined) {
+                form.reset();
+            }
+        });
+
+        function viewCheckBox(option, role) {
+            if(role == 'ROLE_ADMIN') {
+                const container = document.getElementById('notice_fixed');
+                if(option == 'NOTICE') {
+                   container.style.display = 'block';
+                } else {
+                    container.style.display = 'none';
+                }
+            }
+        }
+    </script>
+</th:block>
+
 </html>

@@ -50,23 +50,6 @@
                 }
 
             </style>
-
-            <script th:inline="javascript">
-
-               window.addEventListener('load', function() {
-
-                    const msg = [[${msg}]];
-                    if(msg) {
-                        alert(msg);
-                    }
-
-                    const openerWindow = window.opener;
-                    if(openerWindow) {
-                        openerWindow.location.href = "/login?error=true";
-                        window.close();
-                    }
-                });
-            </script>
         </head>
     </th:block>
 </html>

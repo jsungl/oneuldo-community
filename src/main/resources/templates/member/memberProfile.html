@@ -83,4 +83,16 @@
 
     </div> <!-- /container -->
 </th:block>
+
+<th:block layout:fragment="memberProfileScript">
+    <script th:inline="javascript">
+        window.addEventListener('load', function() {
+            const msg = [[${msg}]];
+            if(msg) {
+                alert(msg);
+            }
+        });
+    </script>
+</th:block>
+
 </html>

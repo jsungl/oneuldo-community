@@ -53,4 +53,16 @@
     </div>
 
 </th:block>
+
+<th:block layout:fragment="findIdScript">
+    <script th:inline="javascript">
+        window.addEventListener('pageshow', function() {
+            const form = document.getElementById('findIdForm');
+            if(form !== null && form !== undefined) {
+                form.reset();
+            }
+        });
+    </script>
+</th:block>
+
 </html>
