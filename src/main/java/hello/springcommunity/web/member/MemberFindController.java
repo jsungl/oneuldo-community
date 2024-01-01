@@ -5,6 +5,7 @@ import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.dto.email.FindIdDTO;
 import hello.springcommunity.dto.email.FindPasswordDTO;
 import hello.springcommunity.dto.member.MemberResponseDTO;
+import hello.springcommunity.service.member.MemberAuthService;
 import hello.springcommunity.service.member.MemberFindService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ import static hello.springcommunity.common.SessionConst.FIND_MEMBER_PASSWORD;
 public class MemberFindController {
 
     private final MemberFindService memberFindService;
+    private final MemberAuthService memberAuthService;
 
     /**
      * 아이디 찾기
@@ -70,6 +72,13 @@ public class MemberFindController {
         try {
             String email = findIdDTO.getEmail();
             MemberResponseDTO member = memberFindService.getMemberDtoByEmail(email);
+            boolean authenticated = memberAuthService.isAuthenticated(member.getId());
+            //이메일 미인증 회원은 서비스를 이용할 수 없다
+            if(!authenticated) {
+                redirectAttributes.addFlashAttribute("valid_email", "이메일이 인증되지 않았습니다.");
+                redirectAttributes.addFlashAttribute("prevEmailDTO", findIdDTO);
+                return "redirect:/find/id";
+            }
 
             //소셜 계정으로 가입한 사람인지 검사
             if("ROLE_SOCIAL".equals(member.getRole())) {
@@ -152,6 +161,13 @@ public class MemberFindController {
         try {
             String userMail = findPasswordDTO.getEmail();
             Member member = memberFindService.getMemberByEmail(userMail);
+            boolean authenticated = memberAuthService.isAuthenticated(member.getId());
+            //이메일 미인증 회원은 서비스를 이용할 수 없다
+            if(!authenticated) {
+                redirectAttributes.addFlashAttribute("valid_email", "이메일이 인증되지 않았습니다.");
+                redirectAttributes.addFlashAttribute("prevFindPasswordDTO", findPasswordDTO);
+                return "redirect:/find/password";
+            }
 
             //아이디 검사
             if(!member.getLoginId().equals(findPasswordDTO.getLoginId())) {

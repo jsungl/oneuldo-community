@@ -17,6 +17,14 @@ public class MemberAuthService {
 
     private final MemberAuthRepository memberAuthRepository;
 
+    /**
+     * 인증여부
+     */
+    public boolean isAuthenticated(Long memberId) {
+        MemberAuth memberAuth = memberAuthRepository.findByMemberId(memberId).orElseThrow(() -> new NoSuchElementException("존재하지 않는 인증정보입니다."));
+        return memberAuth.getIsAuthenticated();
+    }
+
 
     /**
      * 인증키 검증

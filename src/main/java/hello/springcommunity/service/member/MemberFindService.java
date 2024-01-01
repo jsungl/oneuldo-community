@@ -65,7 +65,9 @@ public class MemberFindService {
 
     }
 
-
+    /**
+     * thymeleaf 를 통한 html 적용
+     */
     private String setContext(String password) {
         Context context = new Context();
         context.setVariable("data", password);
@@ -80,7 +82,7 @@ public class MemberFindService {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
         mimeMessageHelper.setTo(to);
-        mimeMessageHelper.setSubject("비밀번호 찾기 결과 메일입니다.");
+        mimeMessageHelper.setSubject("오늘도 커뮤 임시 비밀번호 안내 메일입니다.");
         mimeMessageHelper.setText(setContext(password), true); //메일 본문 내용, HTML 여부
         javaMailSender.send(mimeMessage);
     }
