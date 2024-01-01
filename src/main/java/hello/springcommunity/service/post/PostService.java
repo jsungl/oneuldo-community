@@ -388,8 +388,8 @@ public class PostService {
 
             //쿠키가 없으면 처음 접속한 것이므로 새로 생성
             post.updateViewCount();
-            Cookie cookie = new Cookie("viewCookie", post.getId().toString());
 
+            Cookie cookie = new Cookie("viewCookie", post.getId().toString());
             Cookie newCookie = createCookieForNotOverlap(cookie);
             response.addCookie(newCookie);
 

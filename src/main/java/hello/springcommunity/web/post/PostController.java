@@ -65,7 +65,6 @@ public class PostController {
         try {
 
             if(StringUtils.hasText(searchType)) {
-                //Page<PostResponseDTO> list = postService.findPost(searchType, keyword, pageable);
 
                 Map<String, Object> param = new HashMap<>();
                 param.put("searchType", searchType);

@@ -57,10 +57,13 @@ public class PostResponseDTO {
         this.loginId = post.getMember().getLoginId();
         this.nickname = post.getMember().getNickname();
         this.commentNumber = post.getComments().size();
-        //this.nickname = post.getMember().getActivated() ? post.getMember().getNickname() : "알수없음";
         //this.comments = post.getComments().stream().map(CommentResponseDTO::entityToDto).collect(Collectors.toList());
     }
 
+    /**
+     * 생성자의 접근제어자를 protected로 선언하면 new Post() 작성이 불가하기 때문에 객체 자체의 일관성 유지력을 높일 수 있다.
+     * 하지만 DTO 클래스이기 때문에 public으로 해도 무방하다
+     */
     public PostResponseDTO(String title, String content, CategoryCode categoryCode, Boolean fixed) {
         this.title = title;
         this.content = content;
