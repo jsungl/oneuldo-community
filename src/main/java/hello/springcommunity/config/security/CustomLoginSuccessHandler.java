@@ -27,7 +27,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
-        List<String> whitelist = List.of("/signup", "/find", "/login", "/?logout=true","/member/authAccount", "/error");
+        List<String> whitelist = List.of("/signup", "/find", "/login", "/?logout=true","/memberAuthMail", "/error");
 
         log.info("로그인 성공 핸들러 실행!");
 
