@@ -63,16 +63,21 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
         //log.info("attributes={}", attributes);
 
-        //TODO: test
         if (!StringUtils.hasText(attributes.getEmail())) {
             throw new RuntimeException("Email not found from OAuth2 provider");
         }
 
         Member member = saveOrUpdate(attributes);
 
+        //같은 이메일로 이미 회원가입 한 경우 기존 회원 데이터를 유지한채 로그인처리
+        if(member.getRoleValue().equals("ROLE_USER")) {
+            return new UserDetailsDTO(member);
+        }
+
+
         //DB에 refresh token 저장
         refreshTokenRepository.findByMemberId(member.getId()).ifPresentOrElse(
-                r -> r.update(refreshToken), () -> refreshTokenRepository.save(new RefreshToken(member,refreshToken))
+                r -> r.update(refreshToken), () -> refreshTokenRepository.save(new RefreshToken(member, refreshToken))
         );
 
         //회원 탈퇴시 사용(MemberController)
@@ -84,16 +89,13 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
     }
 
     private Member saveOrUpdate(OAuthAttributes attributes) {
-        Optional<Member> socialMember = memberRepository.findByLoginId(attributes.getOauth2Id());
+        Optional<Member> member = memberRepository.findByEmail(attributes.getEmail());
 
-        if(socialMember.isPresent()) {
-            //기존에 가입되어있는 회원이라면 수정날짜만 변경
-            return socialMember.get().updateModifiedDate();
+        if(member.isPresent()) {
+            return member.get().updateModifiedDate();
 
         } else {
-            //처음 가입하는 경우
-            Member member = attributes.toEntity();
-            return memberRepository.save(member);
+            return memberRepository.save(attributes.toEntity());
         }
 
     }
