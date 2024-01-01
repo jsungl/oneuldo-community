@@ -24,12 +24,13 @@ public class GlobalExceptionHandler{
         String requestURI = request.getRequestURI();
         log.info("requestURI={}", requestURI);
 
-        request.getSession().setAttribute("errorMessage", "서버내부에서 오류가 발생하였습니다.");
+        request.getSession().setAttribute("runtimeExMessage", "서버내부에서 오류가 발생하였습니다.");
         response.sendRedirect("/");
 
     }
 
     //Exception 발생
+    /*
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleException(Exception e, HttpServletRequest request) {
@@ -39,6 +40,8 @@ public class GlobalExceptionHandler{
 
         return "error/500";
     }
+
+     */
 
 
     //유저가 존재하지 않을 때 발생
@@ -80,17 +83,5 @@ public class GlobalExceptionHandler{
         return "error/400";
     }
      */
-
-    /*
-    @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    protected String handleRuntimeEx(RuntimeException e, HttpServletRequest request) throws IOException {
-        log.info("[handleRuntimeEx 실행]");
-        String requestURI = request.getRequestURI();
-        log.info("requestURI={}", requestURI);
-        return "error/500";
-    }
-     */
-
 
 }

@@ -24,10 +24,10 @@ public class HomeController {
                        @AuthenticationPrincipal UserDetailsDTO dto,
                        Model model) {
 
-        if(request.getSession().getAttribute("errorMessage") != null) {
-            String msg = (String) request.getSession().getAttribute("errorMessage");
+        if(request.getSession().getAttribute("runtimeExMessage") != null) {
+            String msg = (String) request.getSession().getAttribute("runtimeExMessage");
             model.addAttribute("errorMessage", msg);
-            request.getSession().removeAttribute("errorMessage");
+            request.getSession().removeAttribute("runtimeExMessage");
         }
 
         /**
