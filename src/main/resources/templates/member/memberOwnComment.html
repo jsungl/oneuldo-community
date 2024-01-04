@@ -13,9 +13,6 @@
       white-space:normal;
       word-break:break-all;
     }
-    tbody tr:not(.no_content):hover {
-        background-color: rgba(0,0,0,.075);
-    }
   </style>
 </head>
 
@@ -43,9 +40,9 @@
             <tr th:each="comment,stat:${comments}" th:if="${comments.getTotalElements() != 0} and ${comment.post.member.activated} != false">
               <td class="no" th:text="${comments.getTotalElements() - stat.index}">0</td>
               <td class="cate">
-                <a class="text-decoration-none" th:text="${comment.post.categoryName}"
+                <a class="text-underline-hover" th:text="${comment.post.categoryName}"
                    th:href="@{/posts(category=${comment.post.categoryCode})}"
-                   th:style="${comment.post.categoryCode} == 'NOTICE' ? 'color:#ff0000;' : 'color:#003f7f;'">카테고리</a>
+                   th:classappend="${comment.post.categoryCode}">카테고리</a>
               </td>
               <td class="content">
                 <div class="word">
@@ -53,7 +50,7 @@
                      th:text="${comment.content}">내용</a>
                 </div>
               </td>
-              <td class="reg_time" th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd')}">작성일</td>
+              <td class="reg_time" th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd')}">2024-01-01</td>
             </tr>
             <tr class="no_content" th:unless="${comments.getTotalElements() != 0}">
               <td colspan="4" class="text-center">작성한 댓글이 존재하지 않습니다.</td>

@@ -1,0 +1,48 @@
+
+/* 공통 */
+/* 테이블 데이터가 없을경우 */
+tbody tr:not(.notice,.no_content):hover {
+    background-color: rgba(0,0,0,.075);
+}
+
+/* 검색 버튼 */
+.search:hover {
+    filter: brightness(0.9);
+}
+
+/* ------------------------------------------------------------------ */
+/* posts.html */
+/* 카테고리 색상 */
+.NOTICE, .NOTICE:hover {
+    color:#ff0000;
+}
+
+.CHAT, .CHAT:hover {
+    color:#003f7f;
+}
+
+.HUMOR, .HUMOR:hover {
+    color:#B22A2A;
+}
+
+
+/* 상단 네비게이션 바 */
+.breadcrumb-item a {
+  color:#777;
+  font-weight:700;
+}
+.breadcrumb-item a:hover {
+  filter: brightness(0.7);
+}
+
+/* 테이블 공지 배경색상 */
+.notice {
+  background-color: rgba(0,0,0,.075);
+}
+/* 테이블 공지 제목 폰트 */
+.notice .title {
+  font-weight:bold;
+}
+
+
+/* ------------------------------------------------------------------ */

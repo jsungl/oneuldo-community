@@ -10,30 +10,10 @@
       text-align:center;
     }
 
-    tbody tr:not(.notice):hover {
-        background-color: rgba(0,0,0,.075);
-    }
-
-    .notice {
-      //background:#f6f6f6;
-      background-color: rgba(0,0,0,.075);
-    }
-    .notice .cate a, .notice .title a {
-      color:#ff0000;
-    }
-    .notice .title {
-      font-weight:bold;
-    }
-
     .title {
       white-space:normal;
       word-break:break-all;
     }
-
-    .search:hover {
-        filter: brightness(0.9);
-    }
-
   </style>
 </head>
 
@@ -67,22 +47,38 @@
 
         <!-- 홈 버튼, 등록 버튼 -->
         <div>
-            <button class="btn btn-secondary"
-                    th:onclick="|location.href='@{/}'|" type="button">
-              홈으로
-            </button>
-            <button class="btn btn-primary"
-                    th:onclick="|location.href='@{/post/add}'|" type="button">
-              게시물 등록
-            </button>
+
+<!--            <button class="btn btn-outline-secondary" th:onclick="|location.href='@{/}'|" type="button">-->
+<!--                <i class="bi bi-house-fill"></i>-->
+<!--            </button>-->
+<!--            <button class="btn btn-secondary"-->
+<!--                    th:onclick="|location.href='@{/posts?category=NOTICE}'|" type="button">-->
+<!--                공지-->
+<!--            </button>-->
+<!--            <button class="btn btn-primary"-->
+<!--                    th:onclick="|location.href='@{/post/add}'|" type="button">-->
+<!--              게시물 등록-->
+<!--            </button>-->
+
+            <nav style="--bs-breadcrumb-divider: '∣';" aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a class="text-decoration-none" th:href="@{/}">
+                            <i class="bi bi-house-fill"></i>
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/posts?category=NOTICE}">공지</a></li>
+                    <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/post/add}">게시물 등록</a></li>
+                </ol>
+            </nav>
         </div>
 
-        <hr>
+
 
         <!-- 게시물 목록 -->
         <div>
             <table class="table">
-                <thead>
+                <thead class="table-light">
                     <tr>
                         <th>탭</th>
                         <th>제목</th>
@@ -133,10 +129,12 @@
                     <!-- 공지 -->
                     <tr class="notice" th:each="post:${topNotice}" th:if="${topNotice}">
                         <td class="cate">
-                          <a class="text-underline-hover" th:href="@{/posts(category=${post.categoryCode})}" th:text="${post.categoryName}">제목</a>
+                          <a class="text-underline-hover" th:href="@{/posts(category=${post.categoryCode})}" th:text="${post.categoryName}"
+                             th:classappend="${post.categoryCode}">카테고리</a>
                         </td>
                         <td class="title">
-                          <a class="text-underline-hover" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
+                          <a class="text-underline-hover" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}"
+                             th:classappend="${post.categoryCode}">제목</a>
                         </td>
                         <td class="author">
                           <div class="btn-group dropend">
@@ -148,14 +146,14 @@
                         </td>
                         <td class="reg_time" th:text="${post.createdDate}">2023-09-11</td>
                         <td class="view_cnt" th:text="${post.viewCount}">100</td>
-                        <td class="like_cnt" th:text="${post.likeCount == 0 ? '' : post.likeCount}"></td>
+                        <td class="like_cnt" th:text="${post.likeCount == 0 ? '' : post.likeCount}">100</td>
                     </tr>
 
                     <!-- 게시물 -->
                     <tr th:each="post:${posts}" th:if="${posts.getTotalElements() != 0}">
                         <td class="cate">
                           <a class="text-underline-hover" th:href="@{/posts(category=${post.categoryCode})}" th:text="${post.categoryName}"
-                             th:style="${post.categoryCode} == 'NOTICE' ? 'color:#ff0000;' : 'color:#003f7f;'">카테고리</a>
+                            th:classappend="${post.categoryCode}">카테고리</a>
                         </td>
                         <td class="title">
                           <a class="text-underline-hover text-dark" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
@@ -174,7 +172,7 @@
                         <td class="like_cnt" th:text="${post.likeCount == 0 ? '' : post.likeCount}">추천수</td>
                     </tr>
 
-                    <tr th:unless="${posts.getTotalElements() != 0}">
+                    <tr class="no_content" th:unless="${posts.getTotalElements() != 0}">
                         <td colspan="6" style="border:none">게시물이 존재하지 않습니다.</td>
                     </tr>
                 </tbody>

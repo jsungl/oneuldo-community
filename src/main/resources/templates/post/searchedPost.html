@@ -14,9 +14,6 @@
       white-space:normal;
       word-break:break-all;
     }
-    tbody tr:not(.no_content):hover {
-        background-color: rgba(0,0,0,.075);
-    }
   </style>
 </head>
 
@@ -44,7 +41,7 @@
                 <input class="form-control" type="text" id="keyword" name="keyword" th:value="${keyword}"/>
               </div>
               <div class="col">
-                <button type="submit" class="btn btn-light" style="border-color: #adb5bd;">검색</button>
+                <button type="submit" class="search btn btn-light" style="border-color: #adb5bd;">검색</button>
               </div>
             </div>
           </form>
@@ -57,21 +54,23 @@
       </div>
 
       <div>
-        <button class="btn btn-secondary"
-                th:onclick="|location.href='@{/}'|" type="button">
-          홈으로
-        </button>
-        <button class="btn btn-primary"
-                th:onclick="|location.href='@{/post/add}'|" type="button">
-          게시물 등록
-        </button>
+        <nav style="--bs-breadcrumb-divider: '∣';" aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a class="text-decoration-none" th:href="@{/}">
+                <i class="bi bi-house-fill"></i>
+              </a>
+            </li>
+            <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/posts?category=NOTICE}">공지</a></li>
+            <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/post/add}">게시물 등록</a></li>
+          </ol>
+        </nav>
       </div>
 
-      <hr>
 
       <div>
         <table class="table">
-          <thead>
+          <thead class="table-light">
             <tr>
               <th>탭</th>
               <th>제목</th>
@@ -87,7 +86,7 @@
             <tr th:each="post:${posts}" th:if="${posts.getTotalElements() != 0}">
               <td class="cate">
                 <a class="text-underline-hover" th:href="@{/posts(category=${post.categoryCode})}" th:text="${post.categoryName}"
-                   th:style="${post.categoryCode} == 'NOTICE' ? 'color:#ff0000;' : 'color:#003f7f;'">카테고리</a>
+                   th:classappend="${post.categoryCode}">카테고리</a>
               </td>
               <td class="title">
                 <a class="text-underline-hover text-dark" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>

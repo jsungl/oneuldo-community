@@ -9,9 +9,6 @@
           white-space:nowrap;
           text-align:center;
         }
-        tbody tr:not(.no_content):hover {
-            background-color: rgba(0,0,0,.075);
-        }
   </style>
 </head>
 
@@ -51,9 +48,9 @@
                                     </ul>
                                 </div>
                             </td>
-                            <td th:text="${member.activated} ? '활성' : '비활성'">회원상태</td>
-                            <td th:text="${member.role} == 'ROLE_USER' ? '일반' : '소셜'">가입상태</td>
-                            <td th:text="${member.createdDate}">가입일</td>
+                            <td th:text="${member.activated} ? '활성' : '비활성'">활성</td>
+                            <td th:text="${member.role} == 'ROLE_USER' ? '일반' : '소셜'">일반</td>
+                            <td th:text="${member.createdDate}">2024-01-01</td>
                         </tr>
 
                         <tr class="no_content" th:unless="${members.getTotalElements() != 0}">

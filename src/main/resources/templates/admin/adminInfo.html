@@ -43,12 +43,13 @@
         </div>
 
         <div class="row">
-            <p class="col">
-                <button class="w-100 btn btn-lg btn-outline-primary" type="button"
-                        th:onclick="|location.href='@{/logout}'|">
-                    로그아웃
-                </button>
-            </p>
+            <div class="col">
+                <form th:action="@{/logout}" method="post">
+                    <button class="w-100 btn btn-outline-primary btn-lg" type="submit">
+                        로그아웃
+                    </button>
+                </form>
+            </div>
         </div>
 
     </div> <!-- /container -->
