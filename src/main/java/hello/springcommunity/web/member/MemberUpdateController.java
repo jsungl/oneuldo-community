@@ -219,7 +219,7 @@ public class MemberUpdateController {
 
 
     /**
-     * 시큐리티 세션 재설정(사용자 정보 변경시 변경된 정보 반영)
+     * 시큐리티 세션 재설정(사용자 정보 변경시 변경된 정보 바로 반영)
      * 서비스에서 트랜잭션 종료 후 실행되는 컨트롤러에서 설정
      */
     private void resetSecuritySession(Member member) {

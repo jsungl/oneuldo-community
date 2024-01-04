@@ -355,7 +355,6 @@ public class PostController {
             response.put("isLike", like);
             response.put("likeCount",likeCount);
 
-            //return ResponseEntity.status(HttpStatus.OK).body(postLikeCount);
             return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } catch (UsernameNotFoundException e) {

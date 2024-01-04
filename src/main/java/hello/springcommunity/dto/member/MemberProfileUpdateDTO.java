@@ -20,7 +20,6 @@ import static hello.springcommunity.common.validation.ValidationGroups.*;
 public class MemberProfileUpdateDTO {
 
     @NotBlank(message = "아이디를 입력해주세요.")
-    @Pattern(regexp = "^[a-z0-9]{4,12}$", message = "아이디는 영어 소문자와 숫자만 사용하여 4~12자리여야 합니다.")
     private String loginId;
 
     @NotBlank(message = "닉네임을 입력해주세요.", groups = NotBlankGroup.class)

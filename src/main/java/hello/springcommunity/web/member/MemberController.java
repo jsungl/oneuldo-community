@@ -72,7 +72,7 @@ public class MemberController {
     }
 
     /**
-     * 회원 작성 글
+     * 회원 작성 게시물
      */
     @GetMapping("/myDocument")
     public String myDocument(@AuthenticationPrincipal UserDetailsDTO dto,

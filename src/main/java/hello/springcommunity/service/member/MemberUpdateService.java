@@ -103,10 +103,11 @@ public class MemberUpdateService {
         map.put("path", path);
         map.put("memberId", member.getId());
         map.put("authKey", authKey);
+        map.put("subject", "오늘도 커뮤 회원정보 변경 인증 메일입니다.");
 
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
         mimeMessageHelper.setTo(member.getEmail());
-        mimeMessageHelper.setSubject("이메일 인증 메일입니다.");
+        mimeMessageHelper.setSubject("오늘도 커뮤 회원정보 변경 인증 메일입니다.");
         mimeMessageHelper.setText(setContext(map), true); //메일 본문 내용, HTML 여부
         javaMailSender.send(mimeMessage);
 
@@ -118,6 +119,7 @@ public class MemberUpdateService {
         context.setVariable("path", map.get("path"));
         context.setVariable("memberId", map.get("memberId"));
         context.setVariable("authKey", map.get("authKey"));
+        context.setVariable("subject", map.get("subject"));
         return templateEngine.process("mail/confirmMail", context);
     }
 }

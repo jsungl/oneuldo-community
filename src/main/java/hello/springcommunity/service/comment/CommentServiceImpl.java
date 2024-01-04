@@ -264,7 +264,7 @@ public class CommentServiceImpl {
      * 해당 id를 가진 사용자가 작성한 댓글 모두 조회
      */
     public Page<CommentResponseDTO> getMemberCommentAll(Long id, Pageable pageable) {
-        //TODO: 댓글 조회시 탈퇴한 회원의 게시물에 작성한 댓글은 조회시 빼도록 할것 -> 타임리프 수정
+
         Page<Comment> comments = commentRepository.findByMemberId(id, pageable);
 
         List<CommentResponseDTO> list = new ArrayList<>();

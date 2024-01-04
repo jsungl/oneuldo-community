@@ -73,7 +73,7 @@ public class PostQueryRepository {
 
     /**
      * 전체조회
-     * 탈퇴한 회원 제외 모든 게시물 조회
+     * 작성자가 탈퇴한 게시물,공지 제외 모든 게시물 조회
      */
     public Page<Post> findAll(Pageable pageable) {
 
@@ -238,7 +238,7 @@ public class PostQueryRepository {
 
 
     /**
-     * 해당 유저가 활성,비활성 유무
+     * 해당 유저 탈퇴유무
      */
     private BooleanExpression isMemberActivated() {
         return post.member.activated.eq(true);

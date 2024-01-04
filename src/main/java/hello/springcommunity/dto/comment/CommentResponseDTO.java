@@ -61,9 +61,9 @@ public class CommentResponseDTO {
         LocalDateTime createdTime = comment.getCreatedDate().truncatedTo(ChronoUnit.SECONDS);
         LocalDateTime modifiedTime = comment.getModifiedDate().truncatedTo(ChronoUnit.SECONDS);
         /** 수정여부 **/
-        Boolean displayModification = false;
+        boolean isModified = false;
 
-        /** 댓글 삭제 유무 **/
+        /** 삭제된 댓글인 경우 **/
         if(comment.getIsDeleted()) {
             return new CommentResponseDTO(
                     comment.getId(),
@@ -75,12 +75,12 @@ public class CommentResponseDTO {
                     comment.getParent(),
                     comment.getDepth(),
                     comment.getIsDeleted(),
-                    displayModification);
-        }else {
+                    false);
+        } else {
 
-            /** 자식댓글이 있는경우 **/
-            if(createdTime.compareTo(modifiedTime) < 0 && comment.getChildren().size() != 0) {
-                displayModification = true;
+            /** 자식댓글이 있고 수정시간이 더 늦다면 댓글이 수정되었다는것을 알 수 있다 **/
+            if(comment.getChildren().size() != 0 && createdTime.isBefore(modifiedTime)) {
+                isModified = true;
             }
 
             return new CommentResponseDTO(
@@ -93,7 +93,7 @@ public class CommentResponseDTO {
                     comment.getParent(),
                     comment.getDepth(),
                     comment.getIsDeleted(),
-                    displayModification);
+                    isModified);
         }
 
     }

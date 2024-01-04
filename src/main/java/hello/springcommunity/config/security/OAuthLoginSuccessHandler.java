@@ -1,7 +1,5 @@
 package hello.springcommunity.config.security;
 
-import hello.springcommunity.domain.member.Member;
-import hello.springcommunity.dto.security.UserDetailsDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -25,11 +23,6 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
         log.info("oauth2 로그인 성공!");
         log.info("authenticated={}", authentication.isAuthenticated());
 
-//        UserDetailsDTO userDetailsDTO = (UserDetailsDTO) authentication.getPrincipal();
-//        Member member = userDetailsDTO.getMember();
-//        log.info("닉네임={}", member.getNickname());
-
         response.sendRedirect("/");
-
     }
 }

@@ -238,7 +238,7 @@ public class PostService {
     /**
      * 게시물 전체 카테고리별 조회 - 페이징
      */
-    public Page<PostResponseDTO> getAllPostByCategory(String sort, CategoryCode category, int pageNo) {
+    public Page<PostResponseDTO> getAllPostWithCategory(String sort, CategoryCode category, int pageNo) {
 
         Pageable pageable;
 

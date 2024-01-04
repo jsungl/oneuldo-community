@@ -175,6 +175,7 @@ public class MemberService {
         map.put("path", path);
         map.put("memberId", member.getId());
         map.put("authKey", authKey);
+        map.put("subject", "오늘도 커뮤 회원가입 인증 메일입니다.");
 
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
         mimeMessageHelper.setTo(member.getEmail());
@@ -195,6 +196,7 @@ public class MemberService {
         context.setVariable("path", map.get("path"));
         context.setVariable("memberId", map.get("memberId"));
         context.setVariable("authKey", map.get("authKey"));
+        context.setVariable("subject", map.get("subject"));
         return templateEngine.process("mail/confirmMail", context);
     }
 
