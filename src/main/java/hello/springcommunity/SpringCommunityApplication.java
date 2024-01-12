@@ -19,7 +19,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  */
 
 
-@SpringBootApplication //@EnableJpaAuditing
+@SpringBootApplication
 @EnableJpaAuditing
 public class SpringCommunityApplication {
 
