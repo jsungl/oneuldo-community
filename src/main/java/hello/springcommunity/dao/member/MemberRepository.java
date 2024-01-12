@@ -1,6 +1,7 @@
 package hello.springcommunity.dao.member;
 
 import hello.springcommunity.domain.member.Member;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -37,6 +38,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     /**
      * 로그인 아이디로 회원 조회
      */
+    @EntityGraph(attributePaths = {"likePosts"})
     Optional<Member> findByLoginId(String loginId);
 
 

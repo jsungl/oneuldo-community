@@ -41,7 +41,6 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private Boolean activated = true;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberLikePost> likePosts;
 
