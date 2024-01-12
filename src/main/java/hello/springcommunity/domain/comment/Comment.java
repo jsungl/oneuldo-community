@@ -1,8 +1,6 @@
 package hello.springcommunity.domain.comment;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import hello.springcommunity.domain.BaseTimeEntity;
-import hello.springcommunity.domain.TimeEntity;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.post.Post;
 import lombok.*;
@@ -54,7 +52,6 @@ public class Comment extends BaseTimeEntity {
     /**
      * 빌더로 엔티티 객체 생성시 해당 필드 기본값 설정은 null 이 아닌 empty list 가 된다
      */
-    @JsonIgnore
     @Builder.Default
     @OneToMany(mappedBy = "parent", orphanRemoval = true)
     private List<Comment> children = new ArrayList<>();
@@ -79,14 +76,14 @@ public class Comment extends BaseTimeEntity {
     }
 
     /**
-     * 부모 댓글 연결
+     * 부모 댓글 설정
      */
     public void updateParent(Comment comment) {
         this.parent = comment;
     }
 
     /**
-     * 댓글 계층 level 연결
+     * 댓글 계층 level 설정
      */
     public void updateDepth(Integer depth) {
         this.depth = depth;
@@ -100,7 +97,7 @@ public class Comment extends BaseTimeEntity {
     }
 
     /**
-     * 댓글 그룹 연결
+     * 댓글 그룹번호 설정
      */
     public void updateGroupId(Long groupId) {
         this.groupId = groupId;

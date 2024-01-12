@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * REST 방식을 이용해 댓글 처리
+ * REST API 방식을 이용해 댓글 처리
  *
  */
 
@@ -37,10 +37,7 @@ public class CommentController {
 
         try {
             Long id = commentService.addComment(commentRequestDTO, postId, dto.getUsername());
-
             //dataType 이 JSON이 아니여야 한다
-            //return ResponseEntity.ok("ok");
-            //return ResponseEntity.status(HttpStatus.OK).body("ok");
             return ResponseEntity.status(HttpStatus.OK).body(id);
 
         } catch (UsernameNotFoundException e) {
@@ -90,19 +87,14 @@ public class CommentController {
      * 댓글 삭제
      */
     @DeleteMapping("/{postId}/comment/{commentId}/delete")
-    public ResponseEntity<?> delete(@PathVariable Long postId, @PathVariable Long commentId) {
+    public ResponseEntity delete(@PathVariable Long postId, @PathVariable Long commentId) {
         try {
             commentService.deleteComment(commentId);
-            return ResponseEntity.status(HttpStatus.OK).body(commentId);
-
+            return new ResponseEntity(HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            Map<String, String> errorMap = new HashMap<>();
-            errorMap.put("INVALID_PARAMETER_INCLUDED", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMap);
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            Map<String, String> errorMap = new HashMap<>();
-            errorMap.put("UNEXPECTED_ERROR", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMap);
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }

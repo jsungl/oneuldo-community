@@ -3,7 +3,7 @@ package hello.springcommunity.service.comment;
 import hello.springcommunity.dao.comment.CommentQueryRepository;
 import hello.springcommunity.dao.comment.CommentRepository;
 import hello.springcommunity.dao.member.MemberRepository;
-import hello.springcommunity.dao.post.PostRepository;
+import hello.springcommunity.dao.post.PostQueryRepository;
 import hello.springcommunity.domain.comment.Comment;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.post.Post;
@@ -33,46 +33,62 @@ public class CommentServiceImpl {
 
     private final CommentRepository commentRepository;
     private final CommentQueryRepository commentQueryRepository;
-    private final PostRepository postRepository;
+    private final PostQueryRepository postQueryRepository;
     private final MemberRepository memberRepository;
 
 
     /**
-     * 댓글 조회 - 페이징
+     * 댓글 조회
      */
-    public Page<CommentResponseDTO> getPostComment(PostResponseDTO post, Pageable pageable) {
-        return commentQueryRepository.findCommentByPostId(post, pageable);
+    public Page<CommentResponseDTO> getComments(PostResponseDTO post, Pageable pageable, Long totalCount) {
+
+        List<Comment> comments = commentQueryRepository.findByPostId(post.getId(), pageable);
+
+        //comments.forEach(comment -> log.info("comment={}", comment.getId()));
+
+        return commentQueryRepository.convertNestedStructure(comments, pageable, totalCount);
     }
 
     /**
      * 댓글 마지막 페이지 번호
      */
     public int getLastPageNumber(PostResponseDTO post, Pageable pageable) {
-        int totalCount = commentQueryRepository.findTotalCount(post.getId()).intValue();
-        int pageNumber = totalCount / pageable.getPageSize();
-        int remainder = totalCount % pageable.getPageSize();
+        //int totalCount = commentQueryRepository.findTotalCount(post.getId()).intValue();
+        //댓글 총 갯수
+        Integer totalCount = post.getCommentCount();
+        log.info("totalCount={}", totalCount);
 
-        if(totalCount == 0) {
+        if(totalCount.equals(0)) {
             return 0;
         }
 
-        return remainder == 0 ? pageNumber - 1 : pageNumber;
+        int pageNumber = totalCount / pageable.getPageSize();
+        int remainder = totalCount % pageable.getPageSize();
+
+        return remainder ==  0 ? pageNumber - 1 : pageNumber;
     }
 
 
+
     /**
-     * 댓글의 현재 위치에 해당하는 페이지
+     * 댓글의 현재 위치에 해당하는 페이지 번호
      */
-    public int getCommentPageNumber(Long commentId, PostResponseDTO post, Pageable pageable) {
-        List<CommentResponseDTO> list = commentQueryRepository.findCommentByCommentId(post);
+    public int getPresentPageNumber(Long commentId, PostResponseDTO post, Pageable pageable) {
+        //List<CommentResponseDTO> list = commentQueryRepository.findCommentByCommentId(post);
+        List<Comment> list = commentRepository.findByPostId(post.getId());
+
         int num = 1;
         int temp = 0;
 
-        for(CommentResponseDTO dto : list) {
-            if(dto.getId().equals(commentId)) {
+        for(Comment comment : list) {
+            if(comment.getId().equals(commentId)) {
                 temp = num;
             }
             num++;
+        }
+
+        if(temp == 0) {
+            throw new IllegalArgumentException("존재하지 않는 댓글입니다.");
         }
 
         int pageNumber = temp / pageable.getPageSize();
@@ -89,7 +105,8 @@ public class CommentServiceImpl {
 
         Member member = memberRepository.findByLoginId(loginId).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
 
-        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+        //Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+        Post post = postQueryRepository.findOne(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
 
         int size = post.getComments().size();
 
@@ -112,7 +129,7 @@ public class CommentServiceImpl {
                 comment.updateParent(parent);
 
                 //댓글 그룹내 순서(step) 정하기
-                Integer result = updateCommentStep(parent);
+                Integer result = updateCommentStep(parent, postId);
 
                 //null이면 대댓글 작성 오류
                 if(result == null) {
@@ -148,7 +165,7 @@ public class CommentServiceImpl {
     /**
      * 댓글 그룹내 순서(step) 정하기
      */
-    private Integer updateCommentStep(Comment parent) {
+    private Integer updateCommentStep(Comment parent, Long postId) {
 
         //댓글의 계층
         //대댓글이므로 부모 댓글의 depth 값에 +1
@@ -169,7 +186,7 @@ public class CommentServiceImpl {
         Long commentGroupId = Optional.ofNullable(parent.getGroupId()).orElseThrow(NullPointerException::new);
 
         //댓글그룹 내 최대 depth 값
-        Integer groupMaxDepth = commentRepository.getMaxDepth(commentGroupId);
+        Integer groupMaxDepth = commentRepository.getMaxDepth(commentGroupId, postId);
 
         //댓글그룹 내 총 대댓글 수(최상위 부모 댓글 제외)
         Long childCount = commentRepository.getChildCount(commentGroupId);
@@ -184,15 +201,18 @@ public class CommentServiceImpl {
         } else if(commentDepth == groupMaxDepth) {
             log.info("그룹 내 최대 depth 와 같음");
             //그룹 내에서 commentStep + child 보다 큰 step 인 댓글들을 모두 +1
-            commentRepository.plusCommentStep(commentGroupId, commentStep + child);
+            //commentRepository.plusCommentStep(commentGroupId, commentStep + child);
+            commentQueryRepository.plusCommentStep(postId, commentGroupId, commentStep + child);
             // 그리고 step =  commentStep + child + 1
             return commentStep + child + 1;
 
         } else if(commentDepth > groupMaxDepth) {
             log.info("그룹 내 최대 depth 보다 큼");
             // 그룹 내에서 commentStep 보다 큰 step 인 댓글들을 모두 +1
+            //commentRepository.plusCommentStep(commentGroupId, commentStep);
+            commentQueryRepository.plusCommentStep(postId, commentGroupId, commentStep);
+
             // 그리고 step = commentStep + 1
-            commentRepository.plusCommentStep(commentGroupId, commentStep);
             return commentStep + 1;
         }
 
@@ -213,7 +233,7 @@ public class CommentServiceImpl {
      * 댓글 삭제
      */
     public void deleteComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+        Comment comment = commentRepository.findByCommentId(commentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
 
         if(comment.getChildren().size() != 0) {
             //자식 댓글이 있으면 댓글의 삭제 상태를 true 로 변경
@@ -221,8 +241,11 @@ public class CommentServiceImpl {
         }else {
             //자식 댓글이 없으면 삭제 가능한 부모 댓글이 있는지 확인 후 삭제
             Comment deletableComment = getDeletableParentComment(comment);
+            Integer deleteTotalCount = getDeleteTotalCount(deletableComment, 1);
+
             //댓글 그룹에서 삭제 하려는 댓글의 step 보다 큰 step 의 댓글들은 모두 -1
-            commentRepository.minusCommentStep(deletableComment.getGroupId(), deletableComment.getStep());
+            //commentRepository.minusCommentStep(deletableComment.getGroupId(), deletableComment.getStep());
+            commentQueryRepository.minusCommentStep(deletableComment, deleteTotalCount);
             commentRepository.delete(deletableComment);
         }
     }
@@ -238,7 +261,7 @@ public class CommentServiceImpl {
         //부모가 null이 아니고, 부모의 자식댓글이 1개(지금 삭제하는 댓글)이고, 부모의 삭제 상태가 true(이미 삭제처리된 상태)인 댓글이라면
         //재귀를 통해 삭제할 수 있는 조상 댓글까지 올라간다
         if(parent != null && parent.getIsDeleted() && parent.getChildren().size() == 1) {
-            return getDeletableParentComment(comment);
+            return getDeletableParentComment(parent);
         }
 
         //삭제해야 하는 댓글 반환
@@ -246,18 +269,21 @@ public class CommentServiceImpl {
     }
 
     /**
-     * 댓글 그룹 연결
+     * 조상 댓글 포함 삭제하려는 총 댓글 수
      */
-//    private void updateGroupId(Comment comment, Long commentId) {
-//        Comment findComment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
-//        Comment parent = findComment.getParent();
-//
-//        if(parent != null) {
-//            updateGroupId(comment, parent.getId());
-//        } else {
-//            comment.updateGroupId(findComment.getId());
-//        }
-//    }
+    private Integer getDeleteTotalCount(Comment comment, Integer count) {
+
+        if(comment.getChildren().size() != 0) {
+
+            for(Comment child : comment.getChildren()) {
+                count++;
+                return getDeleteTotalCount(child, count);
+            }
+
+        }
+
+        return count;
+    }
 
 
     /**
