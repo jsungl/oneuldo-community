@@ -8,6 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,12 +23,23 @@ public class HomeController {
     public String home(Authentication authentication,
                        HttpServletRequest request,
                        @AuthenticationPrincipal UserDetailsDTO dto,
+                       @RequestParam(value = "invalid", required = false) String invalid,
+                       @RequestParam(value = "expired", required = false) String expired,
                        Model model) {
 
         if(request.getSession().getAttribute("runtimeExMessage") != null) {
             String msg = (String) request.getSession().getAttribute("runtimeExMessage");
             model.addAttribute("errorMessage", msg);
             request.getSession().removeAttribute("runtimeExMessage");
+        }
+
+        /**
+         * 세션이 유효하지 않거나 만료시 에러 메시지 출력
+         */
+        if(invalid != null && invalid.equals("true")) {
+            model.addAttribute("errorMessage", "세션이 유효하지 않습니다.");
+        } else if (expired != null && expired.equals("true")) {
+            model.addAttribute("errorMessage", "세션이 만료되었습니다.");
         }
 
         /**
