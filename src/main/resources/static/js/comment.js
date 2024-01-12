@@ -28,7 +28,7 @@ function addComment(form, event) {
     $.ajax({
         type: 'post',
         url: '/api/post/' + postId + '/comment/add',
-//        dataType: 'JSON',
+        dataType: 'JSON',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(comment),
         beforeSend: function(xhr){
@@ -52,14 +52,12 @@ function addComment(form, event) {
 
 
     }).fail(function(error) {
-        const result = error.responseJSON;
+//        const result = error.responseJSON;
 //        for(var key in result) {
 //            alert("댓글을 등록할 수 없습니다. \n[에러메세지:" + result[key] + "]");
 //        }
 
         alert("댓글을 등록할 수 없습니다.");
-        window.location.reload();
-
     });
 
 }
@@ -133,12 +131,11 @@ function editCommentSave(form) {
             });
 
         }).fail(function(error) {
-            const result = error.responseJSON;
+//            const result = error.responseJSON;
 //            for(var key in result) {
 //                alert("댓글을 수정할 수 없습니다. \n[에러메세지:" + result[key] + "]");
 //            }
             alert("댓글을 수정할 수 없습니다.");
-            window.location.reload();
         });
 
     }else {
@@ -162,19 +159,13 @@ function deleteComment(commentId, postId) {
         $.ajax({
             type: 'delete',
             url: '/api/post/' + postId + '/comment/' + commentId + '/delete',
-            dataType: 'JSON',
             beforeSend: function(xhr){
                 xhr.setRequestHeader(header, csrf_token);
             }
-        }).done(function(result) {
+        }).done(function() {
             $(".comment-list").load(contextPath + " .comment-list");
         }).fail(function(error) {
-            const result = error.responseJSON;
-//            for(var key in result) {
-//                alert("댓글을 삭제할 수 없습니다. \n[에러메세지:" + result[key] + "]");
-//            }
             alert("댓글을 삭제할 수 없습니다.");
-            window.location.reload();
         });
     }
 }

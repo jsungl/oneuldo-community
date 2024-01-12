@@ -94,9 +94,9 @@
               </td>
               <td class="author">
                 <div class="btn-group dropend">
-                  <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${post.nickname}">작성자</a>
+                  <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown" th:text="${post.member.nickname}">작성자</a>
                   <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" th:href="@{/post/search(searchType=nickname,keyword=${post.nickname})}">작성글</a></li>
+                    <li><a class="dropdown-item" th:href="@{/post/search(searchType=nickname,keyword=${post.member.nickname})}">작성글</a></li>
                   </ul>
                 </div>
               </td>

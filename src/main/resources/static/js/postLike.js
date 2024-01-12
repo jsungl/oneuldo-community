@@ -16,7 +16,8 @@ function likePost(postId) {
             $.ajax({
                 type: 'POST',
                 url: '/post/like/' + postId,
-                contentType: 'application/json; charset=utf-8'
+                contentType: 'application/json; charset=utf-8',
+                dataType:'json'
             }).done(function (result) {
                 //클릭 해제된 이미지로 바꾸기 + 추천 숫자 갱신
                 //$(".like-container").load(contextPath + " .like-container");
@@ -45,7 +46,8 @@ function likePost(postId) {
 
             }).fail(function (error) {
                 const result = error.responseJSON;
-                alert(JSON.stringify(result));
+                alert(JSON.stringify(result.msg));
+                alert("추천을 취소할 수 업습니다.");
             })
         }
 
@@ -56,7 +58,8 @@ function likePost(postId) {
             $.ajax({
                 type: 'POST',
                 url: '/post/like/' + postId,
-                contentType: 'application/json; charset=utf-8'
+                contentType: 'application/json; charset=utf-8',
+                dataType:'json' //서버로부터의 응답결과의 형태가 json이라면 이를 javascript object로 변경
             }).done(function (result) {
                 //클릭된 이미지로 바꾸기 + 추천 숫자 갱신
                 //$(".like-container").load(contextPath + " .like-container");
@@ -85,7 +88,9 @@ function likePost(postId) {
 
             }).fail(function (error) {
                 const result = error.responseJSON;
-                alert(JSON.stringify(result));
+                //{msg: '존재하지 않는 회원입니다.'}
+                alert(JSON.stringify(result.msg));
+                alert("추천할 수 없습니다.");
             })
         }
     }

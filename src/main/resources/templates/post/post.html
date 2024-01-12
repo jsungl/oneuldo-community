@@ -38,7 +38,7 @@
                     <div class="me-auto p-1 bd-highlight">
                         <div class="btn-group dropend">
                             <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown"
-                               th:text="${post.nickname}">작성자</a>
+                               th:text="${post.member.nickname}">작성자</a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" th:href="@{/post/search(searchType=memberId,keyword=${post.member.id})}">작성글</a></li>
                             </ul>
@@ -121,7 +121,7 @@
 
 
         <!-- 게시물 수정 삭제 버튼 -->
-        <th:block sec:authorize="isAuthenticated()" th:if="${#authentication.name == post.loginId} or ${#authentication.principal.member.role.getValue() == 'ROLE_ADMIN'}">
+        <th:block sec:authorize="isAuthenticated()" th:if="${#authentication.name == post.member.loginId} or ${#authentication.principal.member.role.getValue() == 'ROLE_ADMIN'}">
             <form th:action="@{/post/{postId}/delete(postId=${post.id})}" method="post" onsubmit="return confirm('게시물을 삭제하시겠습니까?')">
 
                 <button class="btn btn-primary mb-5"
@@ -157,6 +157,7 @@
                     </th:block>
 
                     <!-- 템플릿 조각 -->
+                    <!-- 처음 로드할 때는 안보이게 했다가 댓글을 불러왔을 때 -->
                     <th:block th:if="${false}">
                         <li class="list-group-item" th:fragment="comments(comment)"
                             th:classappend="${comment.parent != null} ? 're' : ''"
@@ -216,7 +217,7 @@
                             <!-- 일반 유저 -->
                             <th:block th:unless="${comment.member.getRoleValue()} == 'ROLE_ADMIN'">
                                 <div class="content-wrapper my-3" th:id="'commentContent' + ${comment.id}"
-                                     th:style="${comment.member.loginId == post.loginId} ? 'color:#045cdf'">
+                                     th:style="${comment.member.loginId == post.member.loginId} ? 'color:#045cdf'">
                                     <a class="findParent text-decoration-none" href="javascript:;" th:if="${comment.parent} != null"
                                        th:text="${comment.parent.member.nickname}"
                                        th:onclick="moveToParent([[${comment.parent.id}]]);"

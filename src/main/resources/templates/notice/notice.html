@@ -37,7 +37,7 @@
                     <div class="me-auto p-1 bd-highlight">
                         <div class="btn-group dropend">
                             <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown"
-                               th:text="${post.nickname}">작성자</a>
+                               th:text="${post.member.nickname}">작성자</a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" th:href="@{/post/search(searchType=memberId,keyword=${post.member.id})}">작성글</a></li>
                             </ul>
@@ -71,7 +71,7 @@
         <hr class="my-4">
 
         <!-- 게시물 수정 삭제 버튼 -->
-        <th:block sec:authorize="isAuthenticated()" th:if="${#authentication.name == post.loginId}">
+        <th:block sec:authorize="isAuthenticated()" th:if="${#authentication.name == post.member.loginId}">
             <form th:action="@{/post/{postId}/delete(postId=${post.id})}" method="post" onsubmit="return confirm('게시물을 삭제하시겠습니까?')">
 
                 <button class="btn btn-primary mb-5"
