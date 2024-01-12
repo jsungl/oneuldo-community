@@ -50,7 +50,6 @@ public class PostQueryRepository {
     }
 
 
-
     /**
      * 게시물 1개 조회
      * @param postId
@@ -248,7 +247,7 @@ public class PostQueryRepository {
     /**
      * id 로 검색
      */
-    private Predicate findPostByMemberId(Long memberId) {
+    private BooleanExpression findPostByMemberId(Long memberId) {
         return post.member.id.eq(memberId);
     }
 

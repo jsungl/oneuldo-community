@@ -33,11 +33,9 @@ public class PostResponseDTO {
     private String categoryName; //"잡담","공지"
     private Boolean fixed;
     private Member member;
-    private String loginId;
-    private String nickname;
-    private int commentNumber;
-    //private List<CommentResponseDTO> comments;
-    //private List<MemberLikePost> likePosts;
+    private Integer commentCount;
+//    private String loginId;
+//    private String nickname;
 
     /**
      * Entity -> DTO
@@ -54,10 +52,7 @@ public class PostResponseDTO {
         this.categoryName = post.getCategoryName();
         this.fixed = post.getNotice() != null && post.getNotice().getFixed();
         this.member = post.getMember();
-        this.loginId = post.getMember().getLoginId();
-        this.nickname = post.getMember().getNickname();
-        this.commentNumber = post.getComments().size();
-        //this.comments = post.getComments().stream().map(CommentResponseDTO::entityToDto).collect(Collectors.toList());
+        this.commentCount = post.getComments().size();
     }
 
     /**
@@ -67,7 +62,7 @@ public class PostResponseDTO {
     public PostResponseDTO(String title, String content, CategoryCode categoryCode, Boolean fixed) {
         this.title = title;
         this.content = content;
-        this.categoryCode = categoryCode.name();
+        this.categoryCode = categoryCode.name(); //"CHAT","NOTICE"
         this.fixed = fixed;
     }
 

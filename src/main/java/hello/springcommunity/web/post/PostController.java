@@ -125,11 +125,11 @@ public class PostController {
             //null, 빈값, whitespace 로만 이루어져있는 String을 모두 체크
             if(!StringUtils.hasText(pageNumber)) {
                 int page;
-                //파라미터 commentId가 있다면 유저가 댓글목록에서 댓글을 조회하는 경우
+                //파라미터 commentId가 있다면 유저가 댓글목록에서 댓글을 조회하는 경우, 댓글 등록,수정 후 댓글 리스트 갱신시
                 //조회하려는 댓글의 위치를 파악해 페이지를 계산한다
                 if(StringUtils.hasText(commentId)) {
                     long id = Long.parseLong(commentId);
-                    page = commentService.getCommentPageNumber(id, post, pageable);
+                    page = commentService.getPresentPageNumber(id, post, pageable);
 
                 } else {
                     //가장 최신페이지
@@ -140,12 +140,14 @@ public class PostController {
                 pageable = PageRequest.of(page, 5);
             }
 
-            Page<CommentResponseDTO> commentList = commentService.getPostComment(post, pageable);
+            /** Page<CommentResponseDTO> commentList = commentService.getPostComment(post, pageable); **/
+            Page<CommentResponseDTO> commentList = commentService.getComments(post, pageable, Long.valueOf(post.getCommentCount()));
 
             model.addAttribute("post", post);
             model.addAttribute("comments", commentList);
             //해당 게시물 댓글 총 갯수(대댓글 포함)
-            model.addAttribute("totalCount", post.getCommentNumber());
+            model.addAttribute("totalCount", post.getCommentCount());
+
             //로그인 유저면 해당 게시물 추천유무, 비로그인 유저면 무조건 false
             model.addAttribute("like", like);
 
@@ -154,12 +156,13 @@ public class PostController {
             return "post/post";
 
         } catch (IllegalArgumentException e) {
-            model.addAttribute("msg", "존재하지 않는 게시물입니다.");
+            model.addAttribute("msg", e.getMessage());
             return "post/notFound";
 
         } catch (UsernameNotFoundException e) {
             model.addAttribute("msg", "게시물을 조회할 수 없습니다.");
         }
+
         return "error/redirect";
     }
 
@@ -241,7 +244,7 @@ public class PostController {
             } else {
                 PostResponseDTO post = postService.getPostDto(postId);
                 //게시물 작성자만 수정 페이지로 접근가능
-                if(!Objects.equals(post.getLoginId(), dto.getUsername())) {
+                if(!Objects.equals(post.getMember().getLoginId(), dto.getUsername())) {
                     model.addAttribute("msg", "게시물 작성자만 수정할 수 있습니다.");
                     return "error/redirect";
                 }

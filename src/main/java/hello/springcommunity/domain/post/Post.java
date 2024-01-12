@@ -65,12 +65,9 @@ public class Post extends BaseTimeEntity {
      * 게시글이 삭제되면 댓글 또한 삭제되어야 하기 때문에 orphanRemoval = true 속성을 사용하여 조상 댓글 삭제시 고아가 된 하위 댓글들은 연쇄적으로 삭제한다
      * @OrderBy 어노테이션을 이용하여 간단히 정렬 처리 = @OrderBy("id asc")
      */
-    @JsonIgnore
-    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Comment> comments;
 
-
-    @JsonIgnore
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberLikePost> likePosts;
 

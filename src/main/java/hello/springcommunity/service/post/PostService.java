@@ -182,17 +182,17 @@ public class PostService {
         Post post = postQueryRepository.findOne(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
 
         if(!post.getMember().getActivated()) {
-            throw new IllegalArgumentException("탈퇴한 회원입니다.");
+            throw new IllegalArgumentException("게시물을 조회할 수 없습니다.");
         }
 
         /** 조회수 증가 **/
         updateViews(post, request, response);
 
-        //Entity -> DTO
         return PostResponseDTO.builder()
                 .post(post)
                 .build();
     }
+
 
     /**
      * 상단에 고정된 공지 조회
@@ -463,7 +463,11 @@ public class PostService {
      */
     public boolean getMemberLikePost(Long postId, String username) {
         Member member = memberRepository.findByLoginId(username).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
-        return memberLikePostRepository.existsByPostIdAndMemberId(postId, member.getId());
+
+        return member.getLikePosts().stream().anyMatch(memberLikePost -> postId.equals(memberLikePost.getPost().getId()));
+        //log.info("isLike={}", isLike);
+
+        //return memberLikePostRepository.existsByPostIdAndMemberId(postId, member.getId());
     }
 
 
