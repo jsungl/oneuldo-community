@@ -25,7 +25,6 @@ import org.springframework.security.oauth2.core.http.converter.OAuth2AccessToken
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.ServletException;
@@ -91,12 +90,9 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        /*
-        http.cors().disable() //cors 방지
-            .csrf().disable() //csrf 방지(post 요청마다 token이 필요한 과정을 생략하겠다는 의미)
-            .headers().frameOptions().disable(); //xframe 방어 해제
 
-
+        /**
+         * CSRF, CORS 설정
          */
         http.cors().disable() //cors 방지
             .csrf().ignoringAntMatchers("/post/like/**")
@@ -119,18 +115,11 @@ public class SecurityConfig {
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll(); //그 외 요청들은 모두 접근허용
 
-        /*
-        http.authorizeRequests() //요청에 의한 보안검사 시작
-                .antMatchers("/signup", "/find/**", "/login/**").anonymous()
-                .antMatchers("/post/add").hasAnyRole("USER", "SOCIAL", "ADMIN") //Spring Security에서 prefix를 자동으로 "ROLE_"을 넣어주므로 이 때 hasRole에는 ROLE을 제외하고 뒷 부분인 USER만 써주면 된다
-                .antMatchers("/member/leave").hasAnyRole("USER", "SOCIAL")
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/", "/posts", "/post/{postId}", "/post/search", "/member/authAccount", "/error/**").permitAll()
-                .anyRequest().authenticated(); //그 외 요청들은 인증필요
 
+
+        /**
+         * Form Login 설정
          */
-
-        //로그인 설정
         http.formLogin() //보안 검증방식은 form login 방식
             .loginPage("/login") //사용자 정의 로그인 페이지
             .usernameParameter("loginId") //login form에 적힌 아이디 name 설정
@@ -138,10 +127,6 @@ public class SecurityConfig {
             .loginProcessingUrl("/login/process")
             .successHandler(loginSuccessHandler)
             .failureHandler(loginFailureHandler);
-
-
-        //필터 추가
-        //http.apply(new CustomFilterApply());
                 
                 
         /**
@@ -225,8 +210,14 @@ public class SecurityConfig {
 
         /**
          * OAuth2 로그인 설정
-         * userInfoEndpoint() : OAuth2 로그인 성공 후 가져올 설정들(로그인된 유저의 정보를 가져온다)
+         *
+         * tokenEndPoint().accessTokenResponseClient() : 토큰 요청시 사용되는 ResponseClient를 설정한다
+         *
+         * userInfoEndpoint() : OAuth2 로그인 성공 후 사용자 정보를 가져올 때 설정(로그인된 유저의 정보를 가져온다)
          * userService(customOauth2UserService) : 소셜 로그인 성공 시 후속 조치를 진행할 UserService 인터페이스 구현체 등록, 서버에서 사용자 정보를 가져온 상태에서 추가로 진행하고자 하는 기능 명시
+         * 
+         * successHandler : oauth 인증 성공시 호출
+         * failureHandler : oauth 인증 실패시 호출
          */
         http.oauth2Login()
                 .tokenEndpoint()
@@ -243,14 +234,12 @@ public class SecurityConfig {
     }
 
     /**
-     * 토큰을 요청하는데 사용되는 ResponseClient를 설정한다
+     * 토큰을 요청하는데 사용되는 ResponseClient 설정
      */
     @Bean
     public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
-        //기본적으로 사용하는 DefaultAuthorizationCodeTokenResponseClient를 생성
         DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
 
-        //response 도 커스텀
         OAuth2AccessTokenResponseHttpMessageConverter tokenResponseHttpMessageConverter = new OAuth2AccessTokenResponseHttpMessageConverter();
         tokenResponseHttpMessageConverter.setTokenResponseConverter(new CustomTokenResponseConverter());
 
