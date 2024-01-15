@@ -47,6 +47,13 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      */
     Optional<Member> findByEmail(String email);
 
+    /**
+     * 회원 id 로 조회
+     */
+    @EntityGraph(attributePaths = {"posts","likePosts"})
+    @Query("select m from Member m where m.id = :memberId")
+    Optional<Member> findByMemberId(@Param("memberId") Long id);
+
 
     /**
      * 회원탈퇴 처리 - 계정 비활성화

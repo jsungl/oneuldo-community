@@ -1,12 +1,12 @@
 package hello.springcommunity.domain.member;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import hello.springcommunity.domain.BaseTimeEntity;
-import hello.springcommunity.domain.TimeEntity;
+import hello.springcommunity.domain.post.Post;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Member Entity
@@ -40,6 +40,9 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false)
     @Builder.Default
     private Boolean activated = true;
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, orphanRemoval = true)
+    private Set<Post> posts;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberLikePost> likePosts;
