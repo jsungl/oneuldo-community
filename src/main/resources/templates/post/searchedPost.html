@@ -90,7 +90,7 @@
               </td>
               <td class="title">
                 <a class="text-underline-hover text-dark" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
-                <span th:text="|[${post.commentNumber}]|" th:if="${post.commentNumber} != 0">댓글개수</span>
+                <span th:text="|[${post.commentCount}]|" th:if="${post.commentCount} != 0">댓글개수</span>
               </td>
               <td class="author">
                 <div class="btn-group dropend">

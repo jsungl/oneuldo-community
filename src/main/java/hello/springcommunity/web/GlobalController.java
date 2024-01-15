@@ -83,9 +83,9 @@ public class GlobalController {
             model.addAttribute("posts", posts);
 
         } else {
-            Page<PostResponseDTO> categoryPosts = postService.getAllPostWithCategory(sort, categoryCode, pageNo);
+            Page<PostResponseDTO> posts = postService.getAllPostWithCategory(sort, categoryCode, pageNo);
             model.addAttribute("listCategory", categoryCode.name());
-            model.addAttribute("posts", categoryPosts);
+            model.addAttribute("posts", posts);
         }
 
         model.addAttribute("sort_index", sort);
