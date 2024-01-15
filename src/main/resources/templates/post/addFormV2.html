@@ -1,0 +1,171 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>게시물 등록</title>
+    <!-- ckeditor5 cdn -->
+<!--    <script src="https://cdn.ckeditor.com/ckeditor5/40.2.0/classic/ckeditor.js"></script>-->
+
+    <!-- CKEditor 5의 스타일 및 자바스크립트 추가 -->
+    <link rel="stylesheet" th:href="@{/js/ckeditor5/sample/styles.css}">
+    <script th:src="@{/js/ckeditor5/build/ckeditor.js}" th:inline="javascript"></script>
+    <style>
+        .ck.ck-editor {
+            width:inherit;
+        }
+    </style>
+
+</head>
+<th:block layout:fragment="content">
+
+    <div class="container">
+
+        <div class="d-flex justify-content-center align-items-center" style="height:100px">
+            <h4>게시물 등록</h4>
+        </div>
+
+        <form id="addPostForm" th:action th:object="${postForm}" method="post">
+
+            <div class="p-2" style="background:#f3f3f3;border:1px solid #ddd;border-radius:5px">
+                <div class="row mb-3">
+                    <div class="col-md-auto">
+                        <select th:field="*{categoryCode}" class="form-select" th:classappend="${valid_categoryCode} ? 'form-error'"
+                                th:onchange="viewCheckBox(this.value,[[${role}]])">
+                            <option value="">탭</option>
+                            <th:block th:each="cate:${categoryCodes}">
+                                <option th:value="${cate.name()}" th:text="${cate.displayName}"
+                                        th:disabled="${cate.name() == 'NOTICE' && role != 'ROLE_ADMIN'}">CHAT</option>
+                            </th:block>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <input type="text" th:field="*{title}" class="form-control" th:classappend="${valid_title} ? 'form-error'" placeholder="제목을 입력하세요">
+                    </div>
+                </div>
+
+
+                <!--  CKEditor  -->
+                <div class="editor-container mb-3" th:classappend="${valid_content} ? 'form-error'">
+                    <textarea class="form-control" th:field="*{content}" id="editor"></textarea>
+                </div>
+
+                <!-- 공지일 경우 상단에 등록할건지 -->
+                <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+                    <div id="notice_fixed" style="display:none">
+                        <div class="form-check">
+                            <input type="checkbox" id="fixed" name="fixed" class="form-check-input">
+                            <input type="hidden" name="_fixed" value="on"/>
+                            <label for="fixed" class="form-check-label">상단에 등록</label>
+                        </div>
+                    </div>
+                </th:block>
+
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row">
+                <div class="col">
+                    <button class="w-100 btn btn-primary btn-lg" type="submit">게시물 등록</button>
+                </div>
+                <div class="col">
+                    <button class="w-100 btn btn-secondary btn-lg"
+                            onclick="location.href='posts.html'"
+                            th:onclick="|location.href='@{/posts}'|"
+                            type="button">취소</button>
+                </div>
+            </div>
+
+        </form>
+
+
+    </div> <!-- /container -->
+</th:block>
+
+<th:block layout:fragment="addFormV2Script">
+    <script th:inline="javascript">
+        window.addEventListener('load', function() {
+            const msg = [[${errorMessage}]];
+            if(msg) {
+                alert(msg);
+            }
+        });
+    </script>
+    <script th:inline="javascript">
+        ClassicEditor
+            .create(document.getElementById("editor"), {
+                toolbar: {
+                    items: [
+                        'undo',
+                        'redo',
+                        '|',
+                        'bold',
+                        'italic',
+                        'link',
+                        'bulletedList',
+                        'numberedList',
+                        '|',
+                        'fontFamily',
+                        'fontSize',
+                        'fontColor',
+                        '|',
+                        'outdent',
+                        'indent',
+                        '|',
+                        'imageUpload',
+                        'blockQuote',
+                        'insertTable'
+                    ]
+                },
+                language: 'ko',
+                placeholder: '내용을 입력하세요',
+                image: {
+                    toolbar: [
+                        'imageTextAlternative',
+                        'toggleImageCaption',
+                        'imageStyle:inline',
+                        'imageStyle:block',
+                        'imageStyle:side'
+                    ]
+                },
+                table: {
+                    contentToolbar: [
+                        'tableColumn',
+                        'tableRow',
+                        'mergeTableCells'
+                    ]
+                }
+            })
+            .then(editor => {
+                window.editor = editor;
+            })
+            .catch(handleSampleError);
+
+        function handleSampleError(error) {
+            const issueUrl = 'https://github.com/ckeditor/ckeditor5/issues';
+
+            const message = [
+                'Oops, something went wrong!',
+                `Please, report the following error on ${issueUrl} with the build id "y9ylhgvx2qa3-7raeafrec2to" and the error stack trace:`
+            ].join('\n');
+
+            console.error(message);
+            console.error(error);
+        }
+    </script>
+    <script th:inline="javascript">
+        function viewCheckBox(option, role) {
+            if(role == 'ROLE_ADMIN') {
+                const container = document.getElementById('notice_fixed');
+                if(option == 'NOTICE') {
+                   container.style.display = 'block';
+                } else {
+                    container.style.display = 'none';
+                }
+            }
+        }
+    </script>
+</th:block>
+
+</html>

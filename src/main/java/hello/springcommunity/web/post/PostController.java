@@ -182,8 +182,9 @@ public class PostController {
         }
         model.addAttribute("role", dto.getMember().getRoleValue());
 
-        return "post/addForm";
+        return "post/addFormV2";
     }
+
 
     /**
      * 게시물 등록
@@ -202,6 +203,7 @@ public class PostController {
         }
 
         try {
+            log.info("postForm.getContent()={}", postForm.getContent());
             Post savedPost = postService.addPost(postForm, dto.getUsername());
 
             redirectAttributes.addAttribute("postId", savedPost.getId()); //IDENTITY 방식에 의해 DB에 저장후 id 값과 등록날짜(regDate)를 확인할 수 있다
@@ -253,7 +255,7 @@ public class PostController {
 
             model.addAttribute("role", dto.getMember().getRoleValue());
             model.addAttribute("postId", postId);
-            return "post/editForm";
+            return "post/editFormV2";
 
         } catch (IllegalArgumentException e) {
             model.addAttribute("msg", "존재하지 않는 게시물입니다.");
@@ -261,6 +263,7 @@ public class PostController {
         }
 
     }
+
 
     /**
      * 게시물 수정
@@ -384,6 +387,7 @@ public class PostController {
             Map<String, String> errorMap = new HashMap<>();
             for(FieldError error : result.getFieldErrors()) {
                 errorMap.put("valid_"+error.getField(), error.getDefaultMessage());
+                errorMap.put("errorMessage", error.getDefaultMessage());
             }
             /* Model에 담아 view resolve */
             for(String key : errorMap.keySet()) {

@@ -54,7 +54,7 @@
             </div>
             <div class="body p-2">
                 <article>
-                    <div th:class="'document_'+${post.id}" th:text="${post.content}">내용</div>
+                    <div th:class="'document_'+${post.id}" th:utext="${post.content}">내용</div>
                 </article>
             </div>
         </div>
@@ -110,7 +110,6 @@
         <!-- 목록으로 -->
         <div>
             <button class="w-100 btn btn-secondary"
-                    onclick="location.href='posts.html'"
                     th:onclick="|location.href='@{/posts}'|"
                     type="button">
                 목록으로
@@ -125,7 +124,6 @@
             <form th:action="@{/post/{postId}/delete(postId=${post.id})}" method="post" onsubmit="return confirm('게시물을 삭제하시겠습니까?')">
 
                 <button class="btn btn-primary mb-5"
-                        onclick="location.href='editForm.html'"
                         th:onclick="|location.href='@{/post/{postId}/edit(postId=${post.id})}'|"
                         type="button">
                     <i class="bi bi-pencil-square"></i>
