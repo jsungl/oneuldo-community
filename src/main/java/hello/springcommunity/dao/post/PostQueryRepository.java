@@ -23,6 +23,7 @@ import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static hello.springcommunity.domain.comment.QComment.*;
 import static hello.springcommunity.domain.member.QMember.*;
@@ -97,6 +98,33 @@ public class PostQueryRepository {
         return new PageImpl<>(list, pageable, totalCount);
     }
 
+    public Page<Post> findAllV2(Pageable pageable) {
+
+        Long totalCount = query.select(Wildcard.count)
+                .from(post)
+                .where(post.categoryCode.ne(NOTICE), isMemberActivated())
+                .fetchOne();
+
+
+        List<Long> ids = query.select(post.id)
+                .from(post)
+                .where(post.categoryCode.ne(NOTICE), isMemberActivated())
+                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        List<Post> list = query.selectFrom(post)
+                .leftJoin(post.member).fetchJoin()
+                .leftJoin(post.comments).fetchJoin()
+                .where(post.id.in(ids))
+                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
+                .fetch().stream().distinct().collect(Collectors.toList());
+
+
+        return new PageImpl<>(list, pageable, totalCount);
+    }
+
     /**
      * 상단에 고정된 공지 조회(fixed = true)
      */
@@ -122,12 +150,28 @@ public class PostQueryRepository {
                 .where(post.categoryCode.eq(category), isMemberActivated())
                 .fetchOne();
 
-        List<Post> list =  query.selectFrom(post)
+//        List<Post> list =  query.selectFrom(post)
+//                .where(post.categoryCode.eq(category), isMemberActivated())
+//                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetch();
+
+        List<Long> ids = query.select(post.id)
+                .from(post)
                 .where(post.categoryCode.eq(category), isMemberActivated())
                 .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+        List<Post> list = query.selectFrom(post)
+                .leftJoin(post.member).fetchJoin()
+                .leftJoin(post.comments).fetchJoin()
+                .where(post.id.in(ids))
+                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
+                .fetch().stream().distinct().collect(Collectors.toList());
+
 
         return new PageImpl<>(list, pageable, totalCount);
     }
@@ -179,16 +223,33 @@ public class PostQueryRepository {
                 .where(post.member.id.eq(id))
                 .fetchOne();
 
-        List<Post> list =  query.selectFrom(post)
+//        List<Post> list =  query.selectFrom(post)
+//                .where(post.member.id.eq(id))
+//                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetch();
+
+        List<Long> ids = query.select(post.id)
+                .from(post)
                 .where(post.member.id.eq(id))
+                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                //.orderBy(post.id.desc())
-                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .fetch();
+
+        List<Post> list = query.selectFrom(post)
+                .leftJoin(post.member).fetchJoin()
+                .leftJoin(post.comments).fetchJoin()
+                .where(post.id.in(ids))
+                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
+                .fetch().stream().distinct().collect(Collectors.toList());
+
 
         return new PageImpl<>(list, pageable, totalCount);
     }
+
+
 
 
     /**
@@ -204,34 +265,53 @@ public class PostQueryRepository {
                         findPostByNickname(cond.getNickname()))
                 .fetchOne();
 
-        List<Post> postList = query.selectFrom(post)
-                .where(isMemberActivated(),likePostTitle(cond.getTitle()), likePostContent(cond.getContent()),
+//        List<Post> postList = query.selectFrom(post)
+//                .where(isMemberActivated(),likePostTitle(cond.getTitle()), likePostContent(cond.getContent()),
+//                        findPostByNickname(cond.getNickname()))
+//                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetch();
+
+        List<Long> ids = query.select(post.id)
+                .from(post)
+                .where(isMemberActivated(), likePostTitle(cond.getTitle()), likePostContent(cond.getContent()),
                         findPostByNickname(cond.getNickname()))
                 .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        List<Post> postList = query.selectFrom(post)
+                .leftJoin(post.member).fetchJoin()
+                .leftJoin(post.comments).fetchJoin()
+                .where(post.id.in(ids))
+                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
+                .fetch().stream().distinct().collect(Collectors.toList());
+
 
         return new PageImpl<>(postList, pageable, totalCount);
 
     }
 
-    public Page<Post> findAllByMemberId(Long memberId, Pageable pageable) {
+    public Page<Post> findAllByMemberId(Long memberId, Pageable pageable, Long totalCount) {
 
-        Long totalCount = query.select(Wildcard.count)
+        List<Long> ids = query.select(post.id)
                 .from(post)
-                .where(findPostByMemberId(memberId))
-                .fetchOne();
-
-        List<Post> postList = query.selectFrom(post)
-                .where(findPostByMemberId(memberId))
+                .where(post.member.id.eq(memberId))
                 .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<>(postList, pageable, totalCount);
+        List<Post> list = query.selectFrom(post)
+                .leftJoin(post.member).fetchJoin()
+                .leftJoin(post.comments).fetchJoin()
+                .where(post.id.in(ids))
+                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
+                .fetch().stream().distinct().collect(Collectors.toList());
+
+        return new PageImpl<>(list, pageable, totalCount);
     }
 
 
@@ -247,9 +327,9 @@ public class PostQueryRepository {
     /**
      * id 로 검색
      */
-    private BooleanExpression findPostByMemberId(Long memberId) {
-        return post.member.id.eq(memberId);
-    }
+//    private BooleanExpression findPostByMemberId(Long memberId) {
+//        return post.member.id.eq(memberId);
+//    }
 
 
     /**

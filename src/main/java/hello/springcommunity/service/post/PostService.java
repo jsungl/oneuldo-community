@@ -229,7 +229,7 @@ public class PostService {
             pageable = PageRequest.of(pageNo, 5, Sort.by(Sort.Direction.DESC, sort, "id"));
         }
 
-        Page<Post> posts = postQueryRepository.findAll(pageable);
+        Page<Post> posts = postQueryRepository.findAllV2(pageable);
 
         return posts.map(post -> PostResponseDTO.builder().post(post).build());
     }
@@ -294,11 +294,20 @@ public class PostService {
                 return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(null, null, keyword), pageable));
             case "memberId":
                 Long id = Long.valueOf(keyword);
-                Member member = memberRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
+                //Member member = memberRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
+                Member member = memberRepository.findByMemberId(id).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
+                /**
+                 * 두개의 one to many 관계를 fetch join으로 가져오려고 하니 MultipleBagFetchException이 발생한다
+                 * 여기서는 해결방법으로 Set 을 사용한다
+                 * set의 경우 PersistentBag이 아닌 PersistentSet을 사용하기 때문에 Query 로드시 저 조건에 걸리지 않는다
+                 * 단, Set은 자료구조 특성상 중복허용과 순서 보장이 되지 않는 문제를 잘 생각하고 사용해야 한다
+                 */
+                Long totalPosts = Long.valueOf(member.getPosts().size());
+                //log.info("posts={}", member.getPosts().size());
                 if(!member.getActivated()) {
                     throw new IllegalArgumentException("이미 탈퇴된 회원입니다.");
                 }
-                return entityToDto(postQueryRepository.findAllByMemberId(id, pageable));
+                return entityToDto(postQueryRepository.findAllByMemberId(id, pageable, totalPosts));
             default:
                 return entityToDto(postQueryRepository.findAllBySearchCond(new PostSearchCond(), pageable));
         }
