@@ -45,7 +45,7 @@
                 </div>
 
 
-                <!--  CKEditor  -->
+                <!-- CKEditor 를 표시할 엘리먼트 추가 -->
                 <div class="editor-container mb-3" th:classappend="${valid_content} ? 'form-error'">
                     <textarea class="form-control" th:field="*{content}" id="editor"></textarea>
                 </div>
@@ -92,6 +92,8 @@
             }
         });
     </script>
+
+    <!-- CKEditor 초기화 스크립트 -->
     <script th:inline="javascript">
         ClassicEditor
             .create(document.getElementById("editor"), {
@@ -152,6 +154,7 @@
 
             console.error(message);
             console.error(error);
+            alert(message);
         }
     </script>
     <script th:inline="javascript">
