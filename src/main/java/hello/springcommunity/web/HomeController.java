@@ -37,9 +37,9 @@ public class HomeController {
          * 세션이 유효하지 않거나 만료시 에러 메시지 출력
          */
         if(invalid != null && invalid.equals("true")) {
-            model.addAttribute("errorMessage", "세션이 유효하지 않습니다.");
+            model.addAttribute("errorMessage", "세션이 유효하지 않아 로그아웃 처리 되었습니다.");
         } else if (expired != null && expired.equals("true")) {
-            model.addAttribute("errorMessage", "세션이 만료되었습니다.");
+            model.addAttribute("errorMessage", "세션이 만료되어 로그아웃 처리 되었습니다.");
         }
 
         /**
