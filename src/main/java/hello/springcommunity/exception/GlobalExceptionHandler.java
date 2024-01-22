@@ -2,7 +2,6 @@ package hello.springcommunity.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -10,13 +9,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.NoSuchElementException;
 
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler{
 
-    //RuntimeException 발생
+
+    /**
+     * RuntimeException 처리
+     */
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     protected void handleRuntimeEx(RuntimeException e, HttpServletRequest request, HttpServletResponse response) throws IOException {
