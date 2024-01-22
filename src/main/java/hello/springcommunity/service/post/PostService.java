@@ -11,11 +11,16 @@ import hello.springcommunity.domain.member.MemberLikePost;
 import hello.springcommunity.domain.post.CategoryCode;
 import hello.springcommunity.domain.post.Notice;
 import hello.springcommunity.domain.post.Post;
+import hello.springcommunity.domain.post.UploadImage;
 import hello.springcommunity.dto.post.PostResponseDTO;
 import hello.springcommunity.dto.post.PostSearchCond;
 import hello.springcommunity.dto.post.PostRequestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -47,6 +52,7 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final PostQueryRepository postQueryRepository;
     private final MemberLikePostRepository memberLikePostRepository;
+    private final ImageService imageService;
 
     /**
      * 게시물 등록
@@ -77,7 +83,7 @@ public class PostService {
     /**
      * 게시물 수정
      */
-    public Long updatePost(Long id, PostRequestDTO postRequestDTO) {
+    public Post updatePost(Long id, PostRequestDTO postRequestDTO) {
 
         //Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
         Post post = postQueryRepository.findOne(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
@@ -90,7 +96,8 @@ public class PostService {
             post.setNotice(notice);
         }
 
-        return post.getId();
+        //return post.getId();
+        return postRepository.save(post);
     }
 
 
@@ -480,5 +487,120 @@ public class PostService {
     }
 
 
+    public void parseContextAndMoveImages(Post post) {
 
+        String content = post.getContent();
+        //Jsoup 은 HTML 파싱 및 조작을 위한 라이브러리. HTML 문서에서 원하는 정보를 추출할 때 사용한다.(웹 크롤링)
+        Document doc = Jsoup.parse(post.getContent());
+        Elements images = doc.getElementsByTag("img");
+
+        if(images.size() > 0) {
+            for(Element image : images) {
+                String source = image.attr("src");
+                // https://oneuldo-communication.s3.ap-northeast-2.amazonaws.com/temp/5/f65b4e56-7824-44f8-b36c-523ea82e6abd.jpg
+
+                if(!source.contains("/temp/")) {
+                    continue;
+                }
+
+                source = source.replace("https://oneuldo-communication.s3.ap-northeast-2.amazonaws.com/", "");
+                //log.info("source={}", source);
+                // temp/5/f65b4e56-7824-44f8-b36c-523ea82e6abd.jpg
+
+                //s3에 올린 이미지가 있다면
+                String newSource = "post/" + post.getId() + "/" + source.split("/")[2];
+                //log.info("newSource={}", newSource);
+                // post/23/f65b4e56-7824-44f8-b36c-523ea82e6abd.jpg
+
+                content = content.replace(source, newSource);
+                //log.info("newContent={}", content);
+
+                imageService.update(source, newSource);
+
+            }
+
+            post.updatePost(post.getTitle(), content);
+            if(!post.getImageYn()) post.setImageYn(true);
+
+        } else {
+            //imageService.delete(삭제한 이미지 파일 소스);
+            //게시물 수정시 이미지를 삭제해서 이미지가 없다면
+            if(post.getImageYn()) post.setImageYn(false);
+        }
+
+        //post.updatePost(post.getTitle(), content);
+    }
+
+    public void parseContextAndDeleteImages(Post post) {
+        Document doc = Jsoup.parse(post.getContent());
+        Elements images = doc.getElementsByTag("img");
+        String source = "";
+
+        if(images.size() > 0) {
+            for(Element image : images) {
+                source = image.attr("src").replace("https://oneuldo-communication.s3.ap-northeast-2.amazonaws.com/", "");
+                imageService.delete(source);
+            }
+        }
+
+    }
+
+    public void parseContextAndEditImages(Long postId, PostRequestDTO postRequestDTO) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
+        String originContent = post.getContent();
+        Document originDoc = Jsoup.parse(post.getContent());
+        Document newDoc = Jsoup.parse(postRequestDTO.getContent());
+        Elements originDocimages = originDoc.getElementsByTag("img");
+        //log.info("origin document images={}", originDocimages.size());
+        Elements newDocimages = newDoc.getElementsByTag("img");
+        //log.info("new document images={}", newDocimages.size());
+
+        List<String> deletedImage = new ArrayList<>();
+
+        //수정 전 기존 게시물이 이미지가 있는경우
+        if(post.getImageYn()) {
+            //수정본에도 이미지가 있는경우
+            if(newDocimages.size() > 0) {
+
+                for(Element originImage : originDocimages) {
+                    String originSource = originImage.attr("src");
+                    originSource = originSource.replace("https://oneuldo-communication.s3.ap-northeast-2.amazonaws.com/", "");
+                    String originImageName = originSource.split("/")[2];
+                    boolean found = false;
+
+                    for(Element newImage : newDocimages) {
+                        String newSource = newImage.attr("src");
+                        if(newSource.contains("/temp/")) {
+                            continue;
+                        }
+
+                        newSource = newSource.replace("https://oneuldo-communication.s3.ap-northeast-2.amazonaws.com/", "");
+                        String newImageName = newSource.split("/")[2];
+
+                        if(originImageName.equals(newImageName)) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if(!found) {
+                        deletedImage.add(originSource);
+                    }
+                }
+
+                if(!deletedImage.isEmpty()) deletedImage.forEach(imageService::delete);
+
+            } else {
+                //모두 삭제한 경우
+                log.info("기존 이미지 모두 삭제");
+                for(Element image : originDocimages) {
+                    String source = image.attr("src").replace("https://oneuldo-communication.s3.ap-northeast-2.amazonaws.com/", "");
+                    imageService.delete(source);
+                }
+            }
+
+
+
+        }
+    }
 }

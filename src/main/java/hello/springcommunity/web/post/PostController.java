@@ -182,7 +182,7 @@ public class PostController {
         }
         model.addAttribute("role", dto.getMember().getRoleValue());
 
-        return "post/addFormV2";
+        return "post/addForm";
     }
 
 
@@ -203,8 +203,11 @@ public class PostController {
         }
 
         try {
-            log.info("postForm.getContent()={}", postForm.getContent());
+            //log.info("postForm.getContent()={}", postForm.getContent());
+            //<p><img src="https://oneuldo-communication.s3.ap-northeast-2.amazonaws.com/temp/2/ea2cbf2d-90bc-43da-96cd-af4455c77639.png" width="400" height="400"></p>
             Post savedPost = postService.addPost(postForm, dto.getUsername());
+            //이미지가 있을경우 경로 이동
+            postService.parseContextAndMoveImages(savedPost);
 
             redirectAttributes.addAttribute("postId", savedPost.getId()); //IDENTITY 방식에 의해 DB에 저장후 id 값과 등록날짜(regDate)를 확인할 수 있다
             redirectAttributes.addFlashAttribute("msg", "게시물이 등록되었습니다.");
@@ -224,6 +227,7 @@ public class PostController {
 //        }
 
     }
+
 
 
     /**
@@ -255,7 +259,7 @@ public class PostController {
 
             model.addAttribute("role", dto.getMember().getRoleValue());
             model.addAttribute("postId", postId);
-            return "post/editFormV2";
+            return "post/editForm";
 
         } catch (IllegalArgumentException e) {
             model.addAttribute("msg", "존재하지 않는 게시물입니다.");
@@ -284,9 +288,15 @@ public class PostController {
         }
 
         try {
-            Long id = postService.updatePost(postId, postRequestDTO);
+            //Long id = postService.updatePost(postId, postRequestDTO);
+            postService.parseContextAndEditImages(postId, postRequestDTO);
+            Post post = postService.updatePost(postId, postRequestDTO);
+
+            //이미지가 있을경우 경로 이동
+            postService.parseContextAndMoveImages(post);
+
             redirectAttributes.addFlashAttribute("msg", "게시물이 수정되었습니다.");
-            redirectAttributes.addAttribute("postId", id);
+            redirectAttributes.addAttribute("postId", post.getId());
             //상세페이지로 이동
             return "redirect:/post/{postId}";
 
@@ -320,6 +330,8 @@ public class PostController {
 
             //게시물 작성자가 맞다면 삭제
             if(Objects.equals(post.getMember().getLoginId(), dto.getUsername())) {
+                //이미지 삭제
+                postService.parseContextAndDeleteImages(post);
                 postService.deletePost(post);
             }
 

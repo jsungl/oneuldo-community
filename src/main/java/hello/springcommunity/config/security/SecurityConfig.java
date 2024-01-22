@@ -95,7 +95,7 @@ public class SecurityConfig {
          * CSRF, CORS 설정
          */
         http.cors().disable() //cors 방지
-            .csrf().ignoringAntMatchers("/post/like/**")
+            .csrf().ignoringAntMatchers("/post/like/**","/api/image/upload")
             .and()
             .headers().frameOptions().disable(); //xframe 방어 해제
 
