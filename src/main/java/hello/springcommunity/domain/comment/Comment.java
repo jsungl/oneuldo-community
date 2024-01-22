@@ -28,10 +28,12 @@ public class Comment extends BaseTimeEntity {
     private String content;
 
     /** 댓글의 입장에선 게시글과 사용자는 다대일 관계이므로 @ManyToOne 이 된다 **/
+    /** Post 엔티티와 @ManyToOne 양방향(@OneToMany 양방향) **/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
+    /** Member 엔티티와 @ManyToOne 단방향 **/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
@@ -45,12 +47,14 @@ public class Comment extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean isDeleted;
 
+    /** Comment 엔티티와 @ManyToOne 양방향(@OneToMany 양방향) **/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id") //@OnDelete(action = OnDeleteAction.CASCADE)
     private Comment parent; //부모 댓글(null 이면 최상위 댓글)
 
     /**
      * 빌더로 엔티티 객체 생성시 해당 필드 기본값 설정은 null 이 아닌 empty list 가 된다
+     * Comment 엔티티와 @ManyToOne 양방향(@OneToMany 양방향)
      */
     @Builder.Default
     @OneToMany(mappedBy = "parent", orphanRemoval = true)

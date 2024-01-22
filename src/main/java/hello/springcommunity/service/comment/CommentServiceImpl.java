@@ -56,7 +56,7 @@ public class CommentServiceImpl {
         //int totalCount = commentQueryRepository.findTotalCount(post.getId()).intValue();
         //댓글 총 갯수
         Integer totalCount = post.getCommentCount();
-        log.info("totalCount={}", totalCount);
+        //log.info("totalCount={}", totalCount);
 
         if(totalCount.equals(0)) {
             return 0;

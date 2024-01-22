@@ -16,10 +16,12 @@ public class MemberLikePost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /** Member 엔티티와 @ManyToOne 양방향(@OneToMany 양방향) **/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
+    /** Post 엔티티와 @ManyToOne 양방향(@OneToMany 양방향) **/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;

@@ -41,9 +41,11 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private Boolean activated = true;
 
+    /** Post 엔티티와 @ManyToOne 양방향(@OneToMany 양방향) **/
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Post> posts;
 
+    /** MemberLikePost 엔티티와 @ManyToOne 양방향(@OneToMany 양방향) **/
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberLikePost> likePosts;
 

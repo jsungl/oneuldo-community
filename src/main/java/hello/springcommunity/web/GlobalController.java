@@ -69,6 +69,7 @@ public class GlobalController {
                         @RequestParam(value = "category", required = false) String category,
                         Model model) {
 
+
         /** 첫 페이지는 공지 목록 가져오기 **/
         if(pageNo == 0) {
             List<PostResponseDTO> topNotice = postService.getTopNotice();
