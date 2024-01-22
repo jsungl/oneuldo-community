@@ -5,6 +5,8 @@
 
 import { ClassicEditor } from '@ckeditor/ckeditor5-editor-classic';
 
+import { CKFinderUploadAdapter } from '@ckeditor/ckeditor5-adapter-ckfinder';
+import { Alignment } from '@ckeditor/ckeditor5-alignment';
 import { Autoformat } from '@ckeditor/ckeditor5-autoformat';
 import { Bold, Italic } from '@ckeditor/ckeditor5-basic-styles';
 import { BlockQuote } from '@ckeditor/ckeditor5-block-quote';
@@ -15,6 +17,7 @@ import { FontColor, FontFamily, FontSize } from '@ckeditor/ckeditor5-font';
 import {
 	Image,
 	ImageCaption,
+	ImageResize,
 	ImageStyle,
 	ImageToolbar,
 	ImageUpload
@@ -25,7 +28,6 @@ import { List } from '@ckeditor/ckeditor5-list';
 import { Paragraph } from '@ckeditor/ckeditor5-paragraph';
 import { PasteFromOffice } from '@ckeditor/ckeditor5-paste-from-office';
 import { Table, TableToolbar } from '@ckeditor/ckeditor5-table';
-import { TextTransformation } from '@ckeditor/ckeditor5-typing';
 import { Undo } from '@ckeditor/ckeditor5-undo';
 
 // You can read more about extending the build with additional plugins in the "Installing plugins" guide.
@@ -33,9 +35,11 @@ import { Undo } from '@ckeditor/ckeditor5-undo';
 
 class Editor extends ClassicEditor {
 	public static override builtinPlugins = [
+		Alignment,
 		Autoformat,
 		BlockQuote,
 		Bold,
+		CKFinderUploadAdapter,
 		CloudServices,
 		Essentials,
 		FontColor,
@@ -43,6 +47,7 @@ class Editor extends ClassicEditor {
 		FontSize,
 		Image,
 		ImageCaption,
+		ImageResize,
 		ImageStyle,
 		ImageToolbar,
 		ImageUpload,
@@ -54,7 +59,6 @@ class Editor extends ClassicEditor {
 		PasteFromOffice,
 		Table,
 		TableToolbar,
-		TextTransformation,
 		Undo
 	];
 
@@ -76,6 +80,7 @@ class Editor extends ClassicEditor {
 				'|',
 				'outdent',
 				'indent',
+				'alignment',
 				'|',
 				'imageUpload',
 				'blockQuote',
