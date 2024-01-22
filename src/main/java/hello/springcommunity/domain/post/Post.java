@@ -7,6 +7,7 @@ import hello.springcommunity.domain.comment.Comment;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.member.MemberLikePost;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.util.List;
@@ -34,6 +35,7 @@ public class Post extends BaseTimeEntity {
     @Column(columnDefinition = "LONGTEXT")
     private String content;
 
+    /** Member 엔티티와 @ManyToOne 양방향(@OneToMany 양방향) **/
     @ManyToOne(fetch = FetchType.LAZY) //관계를 지연로딩으로 설정.
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
@@ -45,6 +47,10 @@ public class Post extends BaseTimeEntity {
     @Builder.Default
     private Integer likeCount = 0;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean imageYn = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CategoryCode categoryCode;
@@ -52,6 +58,7 @@ public class Post extends BaseTimeEntity {
     /**
      * Post 테이블(주 테이블)에 외래키, Notice 테이블(대상 테이블)과 단방향 연결
      * Post 객체에서 Post.notice 를 통해 접근할 수 있지만,
+     * Notice 엔티티와 @OneToOne 단방향
      * Notice 객체에서 post 객체를 접근할 수 없다
      */
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -65,11 +72,15 @@ public class Post extends BaseTimeEntity {
      * 게시글이 삭제되면 댓글 또한 삭제되어야 하기 때문에 orphanRemoval = true 속성을 사용하여 조상 댓글 삭제시 고아가 된 하위 댓글들은 연쇄적으로 삭제한다
      * @OrderBy 어노테이션을 이용하여 간단히 정렬 처리 = @OrderBy("id asc")
      */
+
+    /** Comment 엔티티와 @ManyToOne 양방향(@OneToMany 양방향) **/
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Comment> comments;
 
+    /** MemberLikePost 엔티티와 @ManyToOne 양방향(@OneToMany 양방향) **/
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberLikePost> likePosts;
+
 
 
     /**
@@ -121,6 +132,14 @@ public class Post extends BaseTimeEntity {
      */
     public void setNotice(Notice notice) {
         this.notice = notice;
+    }
+
+    /**
+     * 이미지 여부
+     * @param state
+     */
+    public void setImageYn(Boolean state) {
+        this.imageYn = state;
     }
 
 }

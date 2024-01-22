@@ -34,6 +34,7 @@ public class PostResponseDTO {
     private Boolean fixed;
     private Member member;
     private Integer commentCount;
+    private Boolean imageYn;
 //    private String loginId;
 //    private String nickname;
 
@@ -53,6 +54,7 @@ public class PostResponseDTO {
         this.fixed = post.getNotice() != null && post.getNotice().getFixed();
         this.member = post.getMember();
         this.commentCount = post.getComments().size();
+        this.imageYn = post.getImageYn();
     }
 
     /**

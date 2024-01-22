@@ -14,6 +14,12 @@
       white-space:normal;
       word-break:break-all;
     }
+
+    .upload_image {
+        display: inline-block;
+        width: 12px;
+        height: 11px;
+    }
   </style>
 </head>
 
@@ -135,6 +141,7 @@
                         <td class="title">
                           <a class="text-underline-hover" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}"
                              th:classappend="${post.categoryCode}">제목</a>
+                            <i class="upload_image" title="사진" th:if="${post.imageYn}" th:style="'background:url(' + @{/img/image.gif} + ');'"></i>
                         </td>
                         <td class="author">
                           <div class="btn-group dropend">
@@ -158,6 +165,7 @@
                         <td class="title">
                           <a class="text-underline-hover text-dark" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
                           <span th:text="|[${post.commentCount}]|" th:if="${post.commentCount} != 0">댓글개수</span>
+                          <i class="upload_image" title="사진" th:if="${post.imageYn}" th:style="'background:url(' + @{/img/image.gif} + ');'"></i>
                         </td>
                         <td class="author">
                           <div class="btn-group dropend">
@@ -301,6 +309,16 @@
 
     </div>
   </div> <!-- /container -->
+</th:block>
 
+<th:block layout:fragment="postsScript">
+    <script th:inline="javascript">
+        window.addEventListener('load', function() {
+            const msg = [[${errorMessage}]];
+            if(msg) {
+                alert(msg);
+            }
+        });
+    </script>
 </th:block>
 </html>
