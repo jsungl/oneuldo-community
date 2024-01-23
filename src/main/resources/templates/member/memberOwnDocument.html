@@ -4,16 +4,6 @@
       layout:decorate="~{layout/default_layout}">
 <head>
   <title>나의 게시물</title>
-  <style>
-    th,td:not(.title) {
-      white-space:nowrap;
-      text-align:center;
-    }
-    .title {
-      white-space:normal;
-      word-break:break-all;
-    }
-  </style>
 </head>
 
 <th:block layout:fragment="content">
@@ -50,13 +40,14 @@
               <td class="title">
                 <a class="text-underline-hover text-dark" th:href="@{/post/{postId}(postId=${post.id})}" th:text="${post.title}">제목</a>
                 <span th:text="|[${post.commentCount}]|" th:if="${post.commentCount} != 0">댓글개수</span>
+                <i class="upload_image" title="사진" th:if="${post.imageYn}" th:style="'background:url(' + @{/img/image.gif} + ');'"></i>
               </td>
               <td class="reg_time" th:text="${post.createdDate}">2024-01-01</td>
               <td class="view_cnt" th:text="${post.viewCount}">100</td>
               <td class="like_cnt" th:text="${post.likeCount == 0 ? '' : post.likeCount}">100</td>
             </tr>
             <tr class="no_content" th:unless="${posts.getTotalElements() != 0}">
-              <td colspan="6" class="text-center">작성한 게시물이 존재하지 않습니다.</td>
+              <td colspan="6" class="text-center" style="border: none">작성한 게시물이 존재하지 않습니다.</td>
             </tr>
           </tbody>
         </table>

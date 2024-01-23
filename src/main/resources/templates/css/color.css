@@ -14,15 +14,27 @@ tbody tr:not(.notice,.no_content):hover {
 /* posts.html */
 /* 카테고리 색상 */
 .NOTICE, .NOTICE:hover {
-    color:#ff0000;
+    color: #ff0000;
 }
 
-.CHAT, .CHAT:hover {
-    color:#003f7f;
+.FREE, .FREE:hover {
+    color: #000000;
 }
 
 .HUMOR, .HUMOR:hover {
-    color:#B22A2A;
+    color: #B22A2A;
+}
+
+.MYSTERY, .MYSTERY:hover {
+    color: #5f00bf;
+}
+
+.DIGITAL, .DIGITAL:hover {
+    color: #6B5BE5;
+}
+
+.FOOTBALL_WORLD, .FOOTBALL_WORLD:hover {
+    color: #007f7f;
 }
 
 

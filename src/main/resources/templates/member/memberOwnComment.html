@@ -9,10 +9,6 @@
       white-space:nowrap;
       text-align:center;
     }
-    .content .word {
-      white-space:normal;
-      word-break:break-all;
-    }
   </style>
 </head>
 
@@ -53,7 +49,7 @@
               <td class="reg_time" th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd')}">2024-01-01</td>
             </tr>
             <tr class="no_content" th:unless="${comments.getTotalElements() != 0}">
-              <td colspan="4" class="text-center">작성한 댓글이 존재하지 않습니다.</td>
+              <td colspan="4" class="text-center" style="border: none">작성한 댓글이 존재하지 않습니다.</td>
             </tr>
           </tbody>
         </table>

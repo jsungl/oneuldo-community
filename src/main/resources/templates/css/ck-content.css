@@ -49,10 +49,27 @@
 }
 
 /* 가운데 정렬 */
-.ck-content .image {
+/*.ck-content .image {
     display: grid;
     place-items: center;
+}*/
+
+.ck-content .image {
+    display: table;
+    clear: both;
+    text-align: center;
+    margin: 0.9em auto;
+    min-width: 50px;
 }
+
+.ck-content .image img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    min-width: 100%;
+    height: auto;
+}
+
 
 .ck-content .image > figcaption {
     display: table-caption;
