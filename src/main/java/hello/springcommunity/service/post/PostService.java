@@ -11,7 +11,6 @@ import hello.springcommunity.domain.member.MemberLikePost;
 import hello.springcommunity.domain.post.CategoryCode;
 import hello.springcommunity.domain.post.Notice;
 import hello.springcommunity.domain.post.Post;
-import hello.springcommunity.domain.post.UploadImage;
 import hello.springcommunity.dto.post.PostResponseDTO;
 import hello.springcommunity.dto.post.PostSearchCond;
 import hello.springcommunity.dto.post.PostRequestDTO;

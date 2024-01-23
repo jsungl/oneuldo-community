@@ -89,9 +89,6 @@ public class MemberService {
         } catch (MessagingException | MailException e) {
             throw new RuntimeException(e);
         }
-
-
-
     }
 
 
