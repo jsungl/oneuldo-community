@@ -23,7 +23,7 @@
       width: 48px;
       height: 48px;
       /* Set the background image */
-      background-image: url('img/naver/btnG_icon.png');
+      /* background-image: url('img/naver/btnG_icon.png'); */
       /* Make the background image cover the button */
       background-size: cover;
       /* Center the background image */
@@ -37,7 +37,7 @@
       width: 48px;
       height: 48px;
       /* Set the background image */
-      background-image: url('img/google/btn_icon.png');
+      /* background-image: url('img/google/btn_icon.png'); */
       /* Make the background image cover the button */
       background-size: cover;
       /* Center the background image */
@@ -51,7 +51,7 @@
 </head>
 
 <th:block layout:fragment="content">
-  <div class="container p-3">
+  <div class="container inform p-3">
 
     <div class="d-flex justify-content-center align-items-center" style="height:100px">
       <h4>로그인</h4>
@@ -127,12 +127,12 @@
         <div class="row" th:with="nlogin_url=|@{/oauth2/authorization/naver}|, glogin_url=|@{/oauth2/authorization/google}|">
           <div class="col">
             <!--            <button class="n-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/naver}'|"></button>-->
-            <button class="n-signin-btn p-3" type="button" th:onclick="popup([[${nlogin_url}]])"></button>
+            <button class="n-signin-btn p-3" type="button" th:onclick="popup([[${nlogin_url}]])" th:style="'background-image:url(' + @{/img/naver/btnG_icon.png} + ');'"></button>
 
           </div>
           <div class="col">
             <!--            <button class="g-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/google}'|"></button>-->
-            <button class="g-signin-btn p-3" type="button" th:onclick="popup([[${glogin_url}]])"></button>
+            <button class="g-signin-btn p-3" type="button" th:onclick="popup([[${glogin_url}]])" th:style="'background-image:url(' + @{/img/google/btn_icon.png} + ');'"></button>
           </div>
         </div>
       </div>
