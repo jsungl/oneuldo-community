@@ -18,7 +18,10 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class HomeController {
 
-
+    /**
+     * Spring Security 3.2 부터는 @AuthenticationPrincipal 어노테이션을 이용하여
+     * UserDetails를 구현하여 만든 인스턴스(현재 로그인한 사용자 객체)를 가져올 수 있다
+     */
     @GetMapping("/")
     public String home(Authentication authentication,
                        HttpServletRequest request,
@@ -63,15 +66,6 @@ public class HomeController {
             return "home";
         }
 
-
-        /**
-         * Spring Security 3.2 부터는 @AuthenticationPrincipal 어노테이션을 이용하여
-         * UserDetails를 구현하여 만든 인스턴스(현재 로그인한 사용자 객체)를 가져올 수 있다
-         */
-        //관리자 페이지로 이동
-        if(dto.getMember().getRoleValue().equals("ROLE_ADMIN")) {
-            return "redirect:/admin";
-        }
 
         return "home";
     }

@@ -1,5 +1,6 @@
 package hello.springcommunity.dao.post;
 
+import hello.springcommunity.domain.post.CategoryCode;
 import hello.springcommunity.domain.post.Post;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -56,4 +57,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("delete from Post p where p.member.id = :memberId")
     void deleteAllByMemberId(@Param("memberId") Long id);
 
+
+    /**
+     * 게시물 통계
+     * @return
+     */
+    @Query("select count(*) from Post p")
+    Integer countTotal();
+
+    @Query("select count(*) from Post p where p.categoryCode = :category")
+    Integer countByCategory(@Param("category") CategoryCode categoryCode);
 }

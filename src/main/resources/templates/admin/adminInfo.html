@@ -36,20 +36,10 @@
         <div class="row">
             <p class="col">
                 <button class="w-100 btn btn-lg btn-outline-primary" type="button"
-                        th:onclick="|location.href='@{/posts}'|">
-                    게시판
+                        th:onclick="|location.href='@{/admin/postStat}'|">
+                    게시판 통계
                 </button>
             </p>
-        </div>
-
-        <div class="row">
-            <div class="col">
-                <form th:action="@{/logout}" method="post">
-                    <button class="w-100 btn btn-outline-primary btn-lg" type="submit">
-                        로그아웃
-                    </button>
-                </form>
-            </div>
         </div>
 
     </div> <!-- /container -->

@@ -1,15 +1,12 @@
 package hello.springcommunity.dao.post;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.PathBuilder;
-import com.querydsl.core.types.dsl.Wildcard;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import hello.springcommunity.domain.post.CategoryCode;
 import hello.springcommunity.domain.post.Post;
-import hello.springcommunity.domain.post.QNotice;
 import hello.springcommunity.dto.post.PostSearchCond;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,9 +17,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static hello.springcommunity.domain.comment.QComment.*;
@@ -364,5 +361,95 @@ public class PostQueryRepository {
         return null;
     }
 
+    /**
+     * 오늘 등록한 게시물 총 갯수
+     */
+    public Integer countToday() {
+        StringTemplate currentDateTime = Expressions.stringTemplate("FUNCTION('DATE_FORMAT', {0}, '%Y-%m-%d')", LocalDateTime.now());
+        List<Post> result = query.selectFrom(post)
+                .where(Expressions.stringTemplate("FUNCTION('DATE_FORMAT', {0}, '%Y-%m-%d')", post.createdDate).eq(currentDateTime))
+                .fetch();
 
+        return result.size();
+    }
+
+    /**
+     * 어제 등록한 게시물 총 갯수
+     * SQL 함수를 사용하지 않고 자바 코드로 날짜 객체를 만들고 날짜 객체의 날을 하루 줄여서 파라미터로 전달
+     */
+    public Integer countYesterday() {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        LocalDateTime oneDayAgo = currentDateTime.minus(1, ChronoUnit.DAYS);
+        StringTemplate ondDayAgoTime = Expressions.stringTemplate("FUNCTION('DATE_FORMAT', {0}, '%Y-%m-%d')", oneDayAgo);
+
+        List<Post> result = query.selectFrom(post)
+                .where(Expressions.stringTemplate("FUNCTION('DATE_FORMAT', {0}, '%Y-%m-%d')", post.createdDate).eq(ondDayAgoTime))
+                .fetch();
+
+        return result.size();
+    }
+
+    /**
+     * 게시물 일주일 통계 데이터
+     * SQL 함수를 사용하지 않고 자바 코드로 날짜 객체를 만들고 날짜 객체의 날을 하루 줄여서 파라미터로 전달
+     */
+    public List<Map<String, Object>> findPostStat() {
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        LocalDateTime oneWeekAgo = currentDateTime.minus(1, ChronoUnit.WEEKS);
+
+        StringTemplate formattedDate = Expressions.stringTemplate("FUNCTION('DATE_FORMAT', {0}, '%Y-%m-%d')", post.createdDate);
+
+        /**
+         * Count() 함수 안에서 조건설정
+         * 공식 = count(case when '컬럼명'=1 then 1 end) as '별칭'
+         */
+        NumberExpression<Long> freeCountExpression = post.categoryCode.when(FREE).then(0).otherwise(Expressions.nullExpression()).count();
+        NumberExpression<Long> humorCountExpression = post.categoryCode.when(HUMOR).then(0).otherwise(Expressions.nullExpression()).count();
+        NumberExpression<Long> digitalCountExpression = post.categoryCode.when(DIGITAL).then(0).otherwise(Expressions.nullExpression()).count();
+        NumberExpression<Long> footballCountExpression = post.categoryCode.when(FOOTBALL_WORLD).then(0).otherwise(Expressions.nullExpression()).count();
+        NumberExpression<Long> mysteryCountExpression = post.categoryCode.when(MYSTERY).then(0).otherwise(Expressions.nullExpression()).count();
+        NumberExpression<Long> noticeCountExpression = post.categoryCode.when(NOTICE).then(0).otherwise(Expressions.nullExpression()).count();
+
+        StringTemplate cd = Expressions.stringTemplate("FUNCTION('DATE_FORMAT', {0}, '%Y-%m-%d')", post.createdDate);
+
+        /**
+         * select date(created_date) as cd,
+         * count(case when category_code = 'FREE' then 0 end) as free,
+         * count(case when category_code = 'HUMOR' then 0 end) as humor,
+         * count(case when category_code = 'MYSTERY' then 0 end) as mystery,
+         * count(case when category_code = 'DIGITAL' then 0 end) as digital,
+         * count(case when category_code = 'FOOTBALL_WORLD' then 0 end) as football,
+         * count(case when category_code = 'NOTICE' then 0 end) as notice
+         * from post where created_date between date_add(now(), interval - 1 week) and now()
+         * group by cd
+         * order by cd;
+         *
+         */
+        List<Tuple> result = query.select(formattedDate, freeCountExpression, humorCountExpression,
+                        digitalCountExpression, footballCountExpression, mysteryCountExpression, noticeCountExpression)
+                .from(post)
+                .where(post.createdDate.between(oneWeekAgo, currentDateTime))
+                .groupBy(cd)
+                .orderBy(cd.asc())
+                .fetch();
+
+
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        for(Tuple tuple : result) {
+            Map<String, Object> lineObj = new HashMap<>();
+            lineObj.put("create_date", tuple.get(formattedDate));
+            lineObj.put("free", tuple.get(freeCountExpression));
+            lineObj.put("humor", tuple.get(humorCountExpression));
+            lineObj.put("digital", tuple.get(digitalCountExpression));
+            lineObj.put("football_world", tuple.get(footballCountExpression));
+            lineObj.put("mystery", tuple.get(mysteryCountExpression));
+            lineObj.put("notice", tuple.get(noticeCountExpression));
+
+            list.add(lineObj);
+        }
+
+        return list;
+    }
 }

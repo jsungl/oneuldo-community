@@ -28,54 +28,91 @@
         <!-- 로그인 사용자 -->
         <th:block sec:authorize="isAuthenticated()">
 
-            <h5 class="mb-3">
-                <span th:text="${#authentication.principal.member.nickname}" class="fw-bold">닉네임</span>
-                님 로그인 하셨습니다
-            </h5>
+            <!-- 유저 -->
+            <th:block sec:authorize="hasAnyRole('ROLE_USER', 'ROLE_SOCIAL')">
+
+                <h5 class="mb-3">
+                    <span th:text="${#authentication.principal.member.nickname}" class="fw-bold">닉네임</span>
+                    님 로그인 하셨습니다
+                </h5>
 
 
-        <!--인증시 사용된 객체의 Username (ID)-->
-    <!--    <div sec:authentication="name"></div>-->
-        <!--인증시 사용된 객체에 대한 정보-->
-    <!--    <div sec:authentication="principal.member"></div>-->
+            <!--인증시 사용된 객체의 Username (ID)-->
+        <!--    <div sec:authentication="name"></div>-->
+            <!--인증시 사용된 객체에 대한 정보-->
+        <!--    <div sec:authentication="principal.member"></div>-->
 
 
-        <!--Spring Expression Language를 사용-->
-    <!--    <div th:text="${#authentication.name}"></div>-->
-<!--        <div th:text="${#authentication.principal.member.role}"></div>-->
+            <!--Spring Expression Language를 사용-->
+        <!--    <div th:text="${#authentication.name}"></div>-->
+    <!--        <div th:text="${#authentication.principal.member.role}"></div>-->
 
-            <hr>
+                <hr>
 
-            <div class="row">
-                <div class="col">
-                    <button class="w-100 btn btn-lg btn-outline-primary" type="button"
-                            th:onclick="|location.href='@{/posts}'|">
-                      게시판
-                    </button>
+                <div class="row">
+                    <div class="col">
+                        <button class="w-100 btn btn-lg btn-outline-primary" type="button"
+                                th:onclick="|location.href='@{/posts}'|">
+                          게시판
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="row mt-3">
-              <div class="col">
-                <button class="w-100 btn btn-outline-primary btn-lg" type="button"
-                        th:onclick="|location.href='@{/member/info}'|">
-                  마이페이지
-                </button>
-              </div>
-              <div class="col">
-                <form th:action="@{/logout}" method="post">
-                  <button class="w-100 btn btn-outline-primary btn-lg" type="submit">
-                    로그아웃
-                  </button>
-                </form>
-              </div>
-            </div>
+                <div class="row mt-3">
+                  <div class="col">
+                    <button class="w-100 btn btn-outline-primary btn-lg" type="button"
+                            th:onclick="|location.href='@{/member/info}'|">
+                      마이페이지
+                    </button>
+                  </div>
+                  <div class="col">
+                    <form th:action="@{/logout}" method="post">
+                      <button class="w-100 btn btn-outline-primary btn-lg" type="submit">
+                        로그아웃
+                      </button>
+                    </form>
+                  </div>
+                </div>
+            </th:block>
+
+            <!-- 관리자 -->
+            <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+                <h5 class="mb-3">
+                    <span th:text="${#authentication.principal.member.nickname}" class="fw-bold">닉네임</span>
+                    관리자님 반갑습니다
+                </h5>
+                <hr>
+                <div class="row">
+                    <div class="col">
+                        <button class="w-100 btn btn-lg btn-outline-primary" type="button"
+                                th:onclick="|location.href='@{/posts}'|">
+                            게시판
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col">
+                        <button class="w-100 btn btn-outline-primary btn-lg" type="button"
+                                th:onclick="|location.href='@{/admin}'|">
+                            관리자 페이지
+                        </button>
+                    </div>
+                    <div class="col">
+                        <form th:action="@{/logout}" method="post">
+                            <button class="w-100 btn btn-outline-primary btn-lg" type="submit">
+                                로그아웃
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </th:block>
+
 
         </th:block>
 
         <!-- 비로그인 사용자 -->
         <th:block sec:authorize="isAnonymous()">
-
             <div class="container px-4">
                 <button class="w-100 btn btn-lg btn-outline-primary" type="button"
                         th:onclick="|location.href='@{/posts}'|">
@@ -96,7 +133,6 @@
                     </div>
                 </div>
             </div>
-
         </th:block>
 
 
@@ -107,6 +143,7 @@
                 </p>
             </div>
         </footer>
+
     </div> <!-- /container -->
 
     <script th:inline="javascript">

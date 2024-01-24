@@ -485,7 +485,10 @@ public class PostService {
         //return memberLikePostRepository.existsByPostIdAndMemberId(postId, member.getId());
     }
 
-
+    /**
+     * HTML 파싱 및 이미지 경로 변경
+     * S3 임시 폴더 -> 실제 폴더
+     */
     public void parseContextAndMoveImages(Post post) {
 
         String content = post.getContent();
@@ -530,6 +533,10 @@ public class PostService {
         //post.updatePost(post.getTitle(), content);
     }
 
+    /**
+     * HTML 파싱 및 이미지 삭제
+     * S3에 저장되어 있는 이미지 파일 삭제
+     */
     public void parseContextAndDeleteImages(Post post) {
         Document doc = Jsoup.parse(post.getContent());
         Elements images = doc.getElementsByTag("img");
@@ -544,6 +551,10 @@ public class PostService {
 
     }
 
+    /**
+     * HTML 파싱 및 이미지 수정
+     * 게시물 수정시 삭제된 이미지 S3에서 삭제
+     */
     public void parseContextAndEditImages(Long postId, PostRequestDTO postRequestDTO) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
         String originContent = post.getContent();
@@ -598,8 +609,41 @@ public class PostService {
                 }
             }
 
-
-
         }
+    }
+
+    /**
+     * 오늘 등록한 게시물 총 갯수
+     */
+    public Integer countTodayPost() {
+        return postQueryRepository.countToday();
+    }
+
+    /**
+     * 어제 등록한 게시물 총 갯수
+     */
+    public Integer countYesterdayPost() {
+        return postQueryRepository.countYesterday();
+    }
+
+    /**
+     * 총 게시물 갯수
+     */
+    public Integer countTotalPost() {
+        return postRepository.countTotal();
+    }
+
+    /**
+     * 카테고리별 게시물 총 갯수
+     */
+    public Integer countByCategory(CategoryCode categoryCode) {
+        return postRepository.countByCategory(categoryCode);
+    }
+
+    /**
+     * 게시물 일주일 통계 데이터
+     */
+    public List<Map<String, Object>> getPostStat() {
+        return postQueryRepository.findPostStat();
     }
 }

@@ -1,0 +1,243 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>게시판 통계</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+</head>
+
+<th:block layout:fragment="content">
+
+    <div class="container">
+        <div class="col-md-12">
+
+            <div class="d-flex justify-content-center align-items-center" style="height:100px">
+                <h4>게시판 통계</h4>
+            </div>
+
+            <!-- content -->
+            <div class="container" id="content">
+                <div class="data">
+                    <div class="data-summary d-flex justify-content-evenly border border-2 mb-3 text-center">
+                        <div>
+                            <h6 class="fw-bold">오늘 작성글</h6>
+                            <span th:text="${countToday}"></span>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold">어제 작성글</h6>
+                            <span th:text="${countYesterday}">10</span>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold">누적 작성글</h6>
+                            <span th:text="${countTotal}">10</span>
+                        </div>
+                    </div>
+
+                    <div class="data-summary d-flex justify-content-evenly border border-2 text-center">
+
+                        <div>
+                            <h6 class="FREE fw-bold">자유</h6>
+                            <span th:text="${countFree}">10</span>
+                        </div>
+                        <div>
+                            <h6 class="HUMOR fw-bold">유머</h6>
+                            <span th:text="${countHumor}">10</span>
+                        </div>
+                        <div>
+                            <h6 class="MYSTERY fw-bold">미스터리/공포</h6>
+                            <span th:text="${countMystery}">10</span>
+                        </div>
+                        <div>
+                            <h6 class="DIGITAL fw-bold">디지털</h6>
+                            <span th:text="${countDigital}">10</span>
+                        </div>
+                        <div>
+                            <h6 class="FOOTBALL_WORLD fw-bold">해외축구</h6>
+                            <span th:text="${countFootball}">10</span>
+                        </div>
+                        <div>
+                            <h6 class="NOTICE fw-bold">공지</h6>
+                            <span th:text="${countNotice}">10</span>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+
+                    <div class="chart-title d-flex justify-content-center fw-bold">최근 7일 통계</div>
+
+                    <div id="Line_Controls_Chart">
+                        <!-- 라인 차트 생성할 영역 -->
+                        <div id="lineChartArea" class="chart"></div>
+                        <div id="controlsArea"></div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div> <!-- /container -->
+
+</th:block>
+
+<th:block layout:fragment="postStatScript">
+
+    <script th:inline="javascript">
+        var chartDrowFun = {
+
+	        chartDrow : function(){
+
+                /*
+                var boardList = [
+                    {create_date:"2023-10-20",none:2,secret:1,screenshot:3,question:1},
+                    {create_date:"2023-10-21",none:1,secret:1,screenshot:1,question:2},
+                    {create_date:"2023-10-22",none:3,secret:0,screenshot:1,question:3},
+                    {create_date:"2023-10-23",none:3,secret:0,screenshot:1,question:0},
+                    {create_date:"2023-10-24",none:1,secret:0,screenshot:2,question:1},
+                    {create_date:"2023-10-25",none:1,secret:1,screenshot:2,question:0}
+                ];
+                */
+
+                var boardList = [[${result}]];
+                //var boardList = result;
+
+
+                var queryObjectLen = boardList.length;
+
+	            var chartData = '';
+
+                //날짜형식 변경하고 싶으시면 이 부분 수정하세요.
+                var chartDateformat = 'MM월 dd일';
+                //라인차트의 라인 수
+                var chartLineCount = 10;
+                //컨트롤러 바 차트의 라인 수
+                var controlLineCount = 10;
+
+
+	            function drawDashboard() {
+
+                    var data = new google.visualization.DataTable();
+                    //그래프에 표시할 컬럼 추가
+                    data.addColumn('datetime', '날짜');
+                    data.addColumn('number', '전체');
+                    data.addColumn('number', '자유');
+                    data.addColumn('number', '유머');
+                    data.addColumn('number', '미스터리/공포');
+                    data.addColumn('number', '디지털');
+                    data.addColumn('number', '해외축구');
+                    data.addColumn('number', '공지');
+
+	                //그래프에 표시할 데이터
+	                var dataRow = [];
+	                var dateList = [];
+
+	                for (var i = 0; i < queryObjectLen; i++) {
+                        var create_date = boardList[i].create_date;
+	                    var free = boardList[i].free;
+	                    var humor = boardList[i].humor;
+	                    var mystery = boardList[i].mystery;
+	                    var digital = boardList[i].digital;
+	                    var football_world = boardList[i].football_world;
+	                    var notice = boardList[i].notice;
+
+	                    dateList.push(new Date(create_date.substring(0, 4), create_date.substring(5, 7) - 1, create_date.substring(8, 10)));
+	                    dataRow = [new Date(create_date.substring(0, 4), create_date.substring(5, 7) - 1, create_date.substring(8, 10)),
+	            	        free + humor + mystery + digital + football_world + notice, free, humor, mystery, digital, football_world, notice];
+	                    data.addRow(dataRow);
+	                }
+
+	                var chart = new google.visualization.ChartWrapper({
+                        chartType : 'LineChart',
+	                    containerId : 'lineChartArea', //라인 차트 생성할 영역
+	                    options : {
+                                chartArea : {width: '85%', height: '70%'},
+                                curveType : 'function',
+                                isStacked : 'percent',
+                                focusTarget : 'category',
+                                height : 500,
+                                width : '100%',
+                                legend : { position: "top", textStyle: {fontName: 'Noto Sans KR', fontSize: 13}},
+                                pointSize : 5,
+                                tooltip : {
+                                    textStyle : {fontName: 'Noto Sans KR', fontSize:12},
+                                    showColorCode : true,
+                                    trigger: 'both'
+                                },
+                                hAxis : {
+                                    format: chartDateformat,
+                                    gridlines:{
+                                        count:chartLineCount,
+                                        units: {
+                                            years : {format: ['yyyy년']},
+                                            months: {format: ['MM월']},
+                                            days  : {format: ['dd일']},
+                                            hours : {format: ['HH시']}
+                                        }
+                                    },
+                                    textStyle: {fontName: 'Noto Sans KR', fontSize:12},
+                                    ticks: dateList
+                                },
+                                vAxis : {minValue: 15,viewWindow:{min:0},gridlines:{count:-1}, format: '#', textStyle:{fontName: 'Noto Sans KR', fontSize:12}},
+                                animation : {startup: true,duration: 1000,easing: 'in' },
+                                annotations	: {
+                                    pattern: chartDateformat,
+                                    textStyle: {
+                                        fontName: 'Noto Sans KR',
+                                        fontSize: 15,
+                                        bold: true,
+                                        italic: true,
+                                        color: '#871b47',
+                                        auraColor: '#d799ae',
+                                        opacity: 0.8,
+                                        pattern: chartDateformat
+                                    }
+                                }
+                        }
+	                });
+
+	                var control = new google.visualization.ControlWrapper({
+                        controlType: 'ChartRangeFilter',
+                        containerId: 'controlsArea',  //control bar를 생성할 영역
+                        options: {
+                            ui:{
+                                chartType: 'LineChart',
+                                chartOptions: {
+                                    chartArea: {'width': '60%','height' : 80},
+                                    hAxis: {
+                                        'baselineColor': 'none',
+                                        format: chartDateformat,
+                                        textStyle: {fontName: 'Noto Sans KR', fontSize:12},
+                                        gridlines:{count:controlLineCount,units: {
+                                            years : {format: ['yyyy년']},
+                                            months: {format: ['MM월']},
+                                            days  : {format: ['dd일']},
+                                            hours : {format: ['HH시']}
+                                        }}
+                                    }
+                                }
+                            },
+                            filterColumnIndex: 0
+                        }
+	                });
+
+	                var date_formatter = new google.visualization.DateFormat({ pattern: chartDateformat});
+	                date_formatter.format(data, 0);
+
+	                var dashboard = new google.visualization.Dashboard(document.getElementById('Line_Controls_Chart'));
+	                window.addEventListener('resize', function() { dashboard.draw(data); }, false); //화면 크기에 따라 그래프 크기 변경
+	                dashboard.bind([control], [chart]);
+	                dashboard.draw(data);
+
+	            }
+	          google.charts.setOnLoadCallback(drawDashboard);
+	        }
+	    }
+    </script>
+    <script th:inline="javascript">
+        google.charts.load('50', {'packages':['line','controls']});
+        chartDrowFun.chartDrow(); //chartDrow() 실행
+    </script>
+</th:block>
+
+</html>

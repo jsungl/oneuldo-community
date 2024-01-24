@@ -1,6 +1,7 @@
 package hello.springcommunity.web;
 
 import hello.springcommunity.domain.member.Member;
+import hello.springcommunity.domain.post.CategoryCode;
 import hello.springcommunity.dto.comment.CommentResponseDTO;
 import hello.springcommunity.dto.member.MemberResponseDTO;
 import hello.springcommunity.dto.post.PostResponseDTO;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+import java.util.Map;
 
 
 @Slf4j
@@ -146,6 +149,33 @@ public class AdminController {
             return "error/redirect";
         }
 
+    }
+
+
+    /**
+     * 게시판 통계
+     */
+    @GetMapping("/postStat")
+    public String postStat(Model model) {
+
+        //오늘 등록한 게시물 갯수, 어제 등록한 게시물 갯수, 총 게시물 갯수
+        model.addAttribute("countToday", postService.countTodayPost());
+        model.addAttribute("countYesterday", postService.countYesterdayPost());
+        model.addAttribute("countTotal", postService.countTotalPost());
+
+        //카테고리 별 게시물 갯수
+        model.addAttribute("countFree", postService.countByCategory(CategoryCode.FREE));
+        model.addAttribute("countHumor", postService.countByCategory(CategoryCode.HUMOR));
+        model.addAttribute("countDigital", postService.countByCategory(CategoryCode.DIGITAL));
+        model.addAttribute("countFootball", postService.countByCategory(CategoryCode.FOOTBALL_WORLD));
+        model.addAttribute("countMystery", postService.countByCategory(CategoryCode.MYSTERY));
+        model.addAttribute("countNotice", postService.countByCategory(CategoryCode.NOTICE));
+
+        //일주일간의 카테고리 별 게시물 통계
+        List<Map<String, Object>> result = postService.getPostStat();
+        model.addAttribute("result", result);
+
+        return "admin/postStat";
     }
 
 
