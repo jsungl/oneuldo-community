@@ -1,358 +1,433 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/default_layout}">
-<head>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}">
-    <meta name="_csrf" th:content="${_csrf.token}">
-    <!-- ck-content css -->
-    <link rel="stylesheet" type="text/css" th:href="@{/css/ck-content.css}">
+      layout:decorate="~{layout/default_layout_spa}">
 
-    <th:block th:if="${post}">
-        <title>[[${post.title}]]</title>
-    </th:block>
+<div id="contentContainer" th:fragment="content">
 
-</head>
+    <header>
+        <!-- 상단 바 -->
+        <div class="top-header">
+            <nav class="navbar navbar-light bg-light" style="--bs-breadcrumb-divider: '∣';" aria-label="breadcrumb">
+                <div class="container d-flex justify-content-end">
+                    <ol class="breadcrumb mb-0" style="font-size:12px">
+                        <th:block sec:authorize="isAuthenticated()">
+                            <!-- 유저 -->
+                            <th:block sec:authorize="hasAnyRole('ROLE_USER', 'ROLE_SOCIAL')">
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/member/profile}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">내 정보</a></li>
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/member/myDocument}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">내 게시물</a></li>
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/member/myComment}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">내 댓글</a></li>
+                            </th:block>
 
-<!--<body>-->
-<th:block layout:fragment="content">
+                            <!-- 관리자 -->
+                            <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/admin/members}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">회원 관리</a></li>
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/admin/myDocument}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">내 게시물</a></li>
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/admin/postStat}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">게시판 통계</a></li>
+                            </th:block>
+
+                            <!-- 알림 -->
+                            <!-- 알림이 1개 이상 -->
+                            <li class="breadcrumb-item d-flex align-items-center">
+                                <div class="dropdown">
+                                    <a class="text-decoration-none" href="javascript:;" data-bs-toggle="dropdown">알림</a>
+                                    <ul class="dropdown-menu dropdown-menu-end p-2" id="oc_notification"
+                                        style="max-height:200px;overflow-y:scroll;font-size:12px;white-space:nowrap;">
+                                        <li th:each="notification:${notifications}" th:if="${notifications.size()} != 0">
+                                            <a class="dropdown-item" th:with="href=@{${notification.url}}" href="javascript:void(0);"
+                                               th:onclick="navigateTo([[${href}]]);">
+                                                <span th:text="${notification.sender}">아기로메로</span>
+                                                <span th:text="${#strings.abbreviate(notification.content, 12)}">내용</span>
+                                                <span th:text="${notification.createdDate}">4 일 전</span>
+                                            </a>
+                                        </li>
+                                        <!-- 알림이 없을경우 -->
+                                        <li th:unless="${notifications.size()} != 0">
+                                            알림이 존재하지 않습니다
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- 읽지 않은 알림 갯수 -->
+                                <span class="badge bg-danger ms-1" th:text="${notifications.size() == 0 ? '' : notifications.size()}" id="notificationCount">4</span>
+                            </li>
+
+                            <li class="breadcrumb-item">
+                                <form id="logoutForm" th:action="@{/logout}" method="post" style="display:inline">
+                                    <span style="border: 1px solid #ccc;background: #fff;padding: 2px 7px 2px 7px;border-radius: 5px;">
+                                        <a class="text-decoration-none" href="javascript:;" onclick="logout()">로그아웃</a>
+                                    </span>
+                                </form>
+                            </li>
+                        </th:block>
+                        <th:block sec:authorize="isAnonymous()">
+                            <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/signup}">회원가입</a></li>
+                            <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/login}">로그인</a></li>
+                        </th:block>
+                    </ol>
+                </div>
+            </nav>
+        </div>
+        <!-- 로고 -->
+        <div class="container p-2">
+            <div class="d-flex justify-content-center">
+                <a class="text-decoration-none" th:with="href=@{/}" href="javascript:void(0);"
+                   th:onclick="navigateTo([[${href}]]);">
+                    <img th:src="@{/img/logo/oneuldo_logo_short.png}" alt="logo" width="200">
+                </a>
+            </div>
+        </div>
+    </header>
+
 
     <div class="container py-5">
 
-        <!-- 게시물 내용 -->
-        <div class="content_wrapper">
-            <div class="nav_cate px-2">
-                <h5>
-                    <a class="text-underline-hover" th:text="${post.categoryName}" th:href="@{/posts(category=${post.categoryCode})}"
-                       style="color:#555">카테고리</a>
-                </h5>
-            </div>
-            <div class="header">
-
-                <div class="d-flex bd-highlight" style="border-top:1px solid #ccc;border-bottom:1px solid #ccc;background:#fcfcfc;">
-                    <div class="me-auto p-2 bd-highlight">
-                        <span class="title" th:text="${post.title}" style="font-size: large;font-weight:bold;">제목</span>
-                    </div>
-                    <div class="p-2 bd-highlight" style="white-space:nowrap;word-break:break-all;">
-                        <small class="createdDate" th:text="${post.createdDate}">2013-03-12</small>
-                    </div>
-                </div>
-
-                <div class="d-flex bd-highlight mb-3" style="border-bottom:1px solid #eee;">
-                    <div class="me-auto p-1 bd-highlight">
-                        <div class="btn-group dropend">
-                            <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown"
-                               th:text="${post.member.nickname}">작성자</a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" th:href="@{/post/search(searchType=memberId,keyword=${post.member.id})}">작성글</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="p-1 bd-highlight">
-                        <span style="color:#888">
-                            조회수
-                            <b th:text="${post.viewCount}" style="color:#666">조회수</b>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="body p-2">
-                <article th:class="'document_'+${post.id}">
-                    <div class="ck-content" th:utext="${post.content}">내용</div>
-                </article>
-            </div>
-        </div>
-
-
-        <!-- 추천버튼 -->
-        <div class="like-container d-flex align-items-center justify-content-center" style="height:200px">
-
+            <!-- 게시물 정보 -->
             <div>
-                <div class="d-flex justify-content-center">
-                    <!-- 로그인 유저 -->
-                    <th:block sec:authorize="isAuthenticated()">
-                        <div class="likeButtonGroup">
-                            <input type="hidden" id="like_check" th:value="${like}">
-
-                            <button type="button" class="btn btn-primary" th:onclick="likePost([[${post.id}]]);"
-                                    th:if="${like}">
-                                추천
-                                <i class="bi bi-hand-thumbs-up-fill"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-primary" th:onclick="likePost([[${post.id}]]);"
-                                    th:unless="${like}">
-                                추천
-                                <i class="bi bi-hand-thumbs-up"></i>
-                            </button>
+                <div class="nav_cate px-2">
+                    <!-- 카테고리 -->
+                    <h5 style="font-family: 'Black Han Sans', sans-serif;">
+                        <a class="text-underline-hover" th:text="${post.categoryName}" th:with="href=@{/posts(category=${post.categoryCode})}"
+                           href="javascript:void(0);"
+                           th:onclick="navigateTo([[${href}]]);"
+                           style="color:#555">카테고리</a>
+                    </h5>
+                </div>
+                <div class="header">
+                    <div class="d-flex bd-highlight" style="border-top:1px solid #ccc;border-bottom:1px solid #ccc;background:#fcfcfc;">
+                        <!-- 제목 -->
+                        <div class="me-auto p-2 bd-highlight">
+                            <span class="title" th:text="${post.title}" style="font-size: large;font-weight:bold;">제목</span>
                         </div>
-                    </th:block>
-
-                    <!-- 비로그인 유저 -->
-                    <th:block sec:authorize="isAnonymous()">
-                        <div>
-                            <button type="button" class="btn btn-outline-primary" onclick="loginCheck();">
-                                추천
-                                <i class="bi bi-hand-thumbs-up"></i>
-                            </button>
+                        <!-- 등록일 -->
+                        <div class="p-2 bd-highlight" style="white-space:nowrap;word-break:break-all;">
+                            <small class="createdDate" th:text="${post.createdDate}">2013-03-12</small>
                         </div>
-                    </th:block>
-                </div>
+                    </div>
 
-                <!-- 추천수 -->
-                <div class="like_count d-flex justify-content-center mt-3">
-                    <span th:text="${post.likeCount}" style="color:#1171cc;
-                                font:bold 14px georgia,sans-serif;
-                                border:1px solid #ccc;
-                                border-radius:3px;
-                                white-space:nowrap;
-                                padding:3px 7px 0;
-                                height:28px">0</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- 목록으로 -->
-        <div>
-            <button class="w-100 btn btn-secondary"
-                    th:onclick="|location.href='@{/posts}'|"
-                    type="button">
-                목록으로
-            </button>
-        </div>
-
-        <hr class="my-4">
-
-
-        <!-- 게시물 수정 삭제 버튼 -->
-        <th:block sec:authorize="isAuthenticated()" th:if="${#authentication.name == post.member.loginId} or ${#authentication.principal.member.role.getValue() == 'ROLE_ADMIN'}">
-            <form th:action="@{/post/{postId}/delete(postId=${post.id})}" method="post" onsubmit="return confirm('게시물을 삭제하시겠습니까?')">
-
-                <button class="btn btn-primary mb-5"
-                        th:onclick="|location.href='@{/post/{postId}/edit(postId=${post.id})}'|"
-                        type="button">
-                    <i class="bi bi-pencil-square"></i>
-                    수정
-                </button>
-
-                <button class="btn btn-danger mb-5"
-                        type="submit">
-                    <i class="bi bi-trash"></i>
-                    삭제
-                </button>
-            </form>
-        </th:block>
-
-
-
-        <!-- 댓글 리스트 -->
-        <div class="comment-list">
-            <th:block th:if="${comments.getTotalElements()} != 0">
-                <div class="card-header">
-                    댓글
-                    <b th:text="${totalCount}">1</b>
-                    개
-                </div>
-                <ul class="list-group list-group-flush">
-                    <th:block th:each="comment:${comments}">
-                        <!-- 템플릿 조각이 들어갈 곳 -->
-                        <div th:replace=":: comments(${comment})"></div>
-                    </th:block>
-
-                    <!-- 템플릿 조각 -->
-                    <!-- 처음 로드할 때는 안보이게 했다가 댓글을 불러왔을 때 -->
-                    <th:block th:if="${false}">
-                        <li class="list-group-item" th:fragment="comments(comment)"
-                            th:classappend="${comment.parent != null} ? 're' : ''"
-                            th:id="'comment_' + ${comment.id}"
-                            th:style="|margin-left: ${comment.depth * 2}%|"
-                            th:with="content=${comment.content}">
-                            <div>
-                                <i class="bi bi-arrow-return-right" th:if="${comment.parent} != null"></i>
-
-                                <div class="btn-group dropend">
-                                    <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown"
-                                       th:text="${comment.member.nickname}">작성자</a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" th:href="@{/post/search(searchType=memberId,keyword=${comment.member.id})}">작성글</a></li>
-                                    </ul>
-                                </div>
-
-                                <small class="text-muted" th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd HH:mm')}">registerDate</small>
-
-                                <!-- 답글 여부, 본인이 작성한 댓글 수정/삭제 여부 -->
-                                <th:block sec:authorize="isAuthenticated()" th:if="${!comment.isDeleted}">
-                                    <!-- 자기 댓글 수정/삭제 -->
-                                    <th:block th:if="${comment.member.loginId == #authentication.name} or ${#authentication.principal.member.role.getValue() == 'ROLE_ADMIN'}">
-                                        <a href="javascript:;" class="text-underline-hover ps-1" th:onclick="editComment([[${comment.id}]]);">수정</a>
-                                        <a href="javascript:;" class="text-underline-hover text-danger ps-1" th:onclick="deleteComment([[${comment.id}]], [[${post.id}]]);">삭제</a>
-                                    </th:block>
-
-                                    <!-- 다른사람 댓글 답글달기 -->
-<!--                                    <th:block th:if="${comment.member.loginId != #authentication.name}">-->
-<!--                                        <a href="javascript:;" class="text-decoration-none text-secondary" th:onclick="replyComment([[${comment.id}]]);">-->
-<!--                                            답글-->
-<!--                                            <i class="bi bi-chat-dots"></i>-->
-<!--                                        </a>-->
-<!--                                    </th:block>-->
-
-                                    <!-- 다른사람 댓글 답글달기 -->
-                                    <a href="javascript:;" class="text-decoration-none text-secondary ps-1" th:onclick="replyComment([[${comment.id}]]);">답글
-                                        <i class="bi bi-chat-dots"></i>
-                                    </a>
-                                </th:block>
-
-                            </div>
-
-                            <!-- 댓글내용 -->
-
-                            <!-- 관리자 -->
-                            <th:block th:if="${comment.member.getRoleValue()} == 'ROLE_ADMIN'">
-                                <div class="content-wrapper my-3" th:id="'commentContent' + ${comment.id}" style="color:#dc3545">
-                                    <a class="findParent text-decoration-none" href="javascript:;" th:if="${comment.parent} != null"
-                                       th:text="${comment.parent.member.nickname}"
-                                       th:onclick="moveToParent([[${comment.parent.id}]]);"
-                                       style="color:#aaa;">부모댓글 닉네임</a>
-                                    [(${#strings.replace(#strings.escapeXml(content), '&#10;', '&lt;br /&gt;')})]
-                                </div>
-                            </th:block>
-
-                            <!-- 일반 유저 -->
-                            <th:block th:unless="${comment.member.getRoleValue()} == 'ROLE_ADMIN'">
-                                <div class="content-wrapper my-3" th:id="'commentContent' + ${comment.id}"
-                                     th:style="${comment.member.loginId == post.member.loginId} ? 'color:#045cdf'">
-                                    <a class="findParent text-decoration-none" href="javascript:;" th:if="${comment.parent} != null"
-                                       th:text="${comment.parent.member.nickname}"
-                                       th:onclick="moveToParent([[${comment.parent.id}]]);"
-                                       style="color:#aaa;">부모댓글 닉네임</a>
-                                    [(${#strings.replace(#strings.escapeXml(content), '&#10;', '&lt;br /&gt;')})]
-                                </div>
-                            </th:block>
-
-                            <!-- 댓글 수정 시각 -->
-                            <div th:id="'commentIsModified' + ${comment.id}" th:if="${comment.isModified}">
-                                [ 수정된 댓글입니다. 수정시각:
-                                <span th:text="${#temporals.format(comment.modifiedDate, 'yyyy-MM-dd HH:mm')}">modified date</span>
-                                ]
-                            </div>
-
-                            <!-- 댓글 수정 폼 -->
-                            <form class="collapse multi-collapse my-3" th:id="'commentUpdateForm' + ${comment.id}" style="display:none;">
-                                <input type="hidden" name="commentId" th:value="${comment.id}">
-                                <input type="hidden" name="postId" th:value="${post.id}">
-                                <input type="hidden" name="contextPath" th:value="${#httpServletRequest.requestURL}">
-                                <div class="form-group mb-3">
-                                    <textarea class="form-control" rows="3" id="commentUpdateContent" name="commentContent" th:text="${comment.content}"></textarea>
-                                </div>
-                                <button type="button" id="btnCommentUpdateSave" class="btn btn-outline-primary" onclick="editCommentSave(this.form)">저장</button>
-                            </form>
-
-                            <!-- 답글 폼 -->
-                            <div class="reComment wrapper my-3" th:id="'replyCommentForm' + ${comment.id}" style="display:none;">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item" style="margin-left:2%;">
-                                    <span>
-                                        <i class="bi bi-arrow-return-right"></i>
-                                        <span>답글달기</span>
-                                    </span>
-                                        <form onsubmit="return addComment(this, event)">
-                                            <input type="hidden" name="parentId" th:value="${comment.id}">
-                                            <input type="hidden" name="postId" th:value="${post.id}">
-                                            <input type="hidden" name="contextPath" th:value="${#httpServletRequest.requestURL}">
-                                            <div class="form-group mb-3">
-                                                <textarea class="form-control" rows="3" id="reCommentTextarea" name="content"></textarea>
-                                            </div>
-    <!--                                        <button type="button" id="btnReplyCommentSave" class="btn btn-outline-primary" onclick="replyCommentSave(this.form)">등록</button>-->
-                                            <button type="submit" class="btn btn-outline-primary">등록</button>
-                                            <button type="button" class="btn btn-outline-secondary" th:onclick="replyComment([[${comment.id}]]);">
-                                                닫기
-                                            </button>
-                                        </form>
+                    <div class="d-flex bd-highlight mb-3" style="border-bottom:1px solid #eee;">
+                        <!-- 작성자 -->
+                        <div class="me-auto p-1 bd-highlight">
+                            <div class="btn-group dropend">
+                                <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown"
+                                   th:text="${post.member.nickname}">작성자</a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" th:with="href=@{/post/search(searchType=memberId,keyword=${post.member.id})}"
+                                           href="javascript:void(0);"
+                                           th:onclick="navigateTo([[${href}]]);">작성글</a>
                                     </li>
                                 </ul>
                             </div>
+                        </div>
+                        <!-- 조회수 -->
+                        <div class="p-1 bd-highlight">
+                            <span style="color:#888">
+                                조회수
+                                <b th:text="${post.viewCount}" style="color:#666">조회수</b>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 내용 -->
+                <div class="body p-2">
+                    <article th:class="'document_'+${post.id}">
+                        <div class="ck-content" th:utext="${post.content}">내용</div>
+                    </article>
+                </div>
+            </div>
 
-                            <!-- 자식 댓글이 있는지 확인 -->
-                            <th:block th:unless="${#lists.isEmpty(comment.children)}" th:each="child:${comment.children}">
-                                <div th:replace=":: comments(${child})" />
-                            </th:block>
-                        </li>
-                    </th:block>
 
-                    <!-- 페이징 -->
-                    <div class="paging my-4">
-                        <ul class="pagination justify-content-center"
-                            th:with=
-                                    "pageNumber = ${comments.pageable.pageNumber},
-                                    pageSize = ${comments.pageable.pageSize},
-                                    totalPages = ${comments.totalPages},
-                                    startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
-                                    tempEndPage = ${startPage + pageSize - 1},
-                                    endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})">
+            <!-- 추천버튼 -->
+            <div class="like-container d-flex align-items-center justify-content-center" style="height:200px">
 
-                            <!-- 이전으로 이동 -->
-                            <!-- 첫 페이지인 경우 비활성화, 첫 페이지가 아니라면 현재 페이지 인덱스(0부터 시작) - 1 -->
-                            <li th:classappend="${comments.first} ? 'disabled'" class="page-item">
-                                <a class="page-link" href="javascript:;" th:onclick="moveToPage([[${pageNumber - 1}]]);" aria-label="Previous">
-                                    <span aria-hidden="true">&lt;</span>
-                                </a>
-                            </li>
+                <div>
+                    <div class="d-flex justify-content-center">
+                        <!-- 로그인 유저 -->
+                        <th:block sec:authorize="isAuthenticated()">
+                            <div class="likeButtonGroup">
+                                <input type="hidden" id="like_check" th:value="${like}">
 
-                            <!-- 페이지 리스트 루프(5페이지씩 분리)로 startPage 부터 endPage까지 반복 -->
-                            <!-- 페이지 번호 누르면 해당 페이지로 이동 -->
-                            <!-- page(페이지 번호) 와 현재 페이지 인덱스(0부터 시작) + 1 이 같으면 현재 보고있는 페이지이므로 활성화 -->
-                            <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
-                                <span th:if="${page == pageNumber + 1}" th:text="${page}" class="page-link"></span>
-                                <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link" href="javascript:;" th:onclick="moveToPage([[${page - 1}]]);"></a>
-                            </li>
+                                <button type="button" class="btn btn-primary" th:onclick="likePost([[${post.id}]]);"
+                                        th:if="${like}">
+                                    추천
+                                    <i class="bi bi-hand-thumbs-up-fill"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" th:onclick="likePost([[${post.id}]]);"
+                                        th:unless="${like}">
+                                    추천
+                                    <i class="bi bi-hand-thumbs-up"></i>
+                                </button>
+                            </div>
+                        </th:block>
 
-                            <!-- 다음으로 이동 -->
-                            <li th:classappend="${comments.last} ? 'disabled'" class="page-item">
-                                <a class="page-link" href="javascript:;" th:onclick="moveToPage([[${pageNumber + 1}]]);" aria-label="Next">
-                                    <span aria-hidden="true">&gt;</span>
-                                </a>
-                            </li>
-                        </ul>
+                        <!-- 비로그인 유저 -->
+                        <th:block sec:authorize="isAnonymous()">
+                            <div>
+                                <button type="button" class="btn btn-outline-primary" onclick="loginCheck();">
+                                    추천
+                                    <i class="bi bi-hand-thumbs-up"></i>
+                                </button>
+                            </div>
+                        </th:block>
                     </div>
 
-                </ul>
-            </th:block>
-        </div>
+                    <!-- 추천수 -->
+                    <div class="like_count d-flex justify-content-center mt-3">
+                        <span th:text="${post.likeCount}" style="color:#1171cc;
+                                    font:bold 14px georgia,sans-serif;
+                                    border:1px solid #ccc;
+                                    border-radius:3px;
+                                    white-space:nowrap;
+                                    padding:3px 7px 0;
+                                    height:28px">0</span>
+                    </div>
 
-        <!-- 댓글 폼 -->
-        <div class="card my-4">
-            <h6 class="card-header">댓글 쓰기</h6>
-            <div class="card-body">
-                <form th:id="commentSaveForm" onsubmit="return addComment(this, event)">
-
-                    <!-- 로그인 유저 -->
-                    <th:block sec:authorize="isAuthenticated()">
-                        <div class="row">
-                            <div class="col-10">
-                                <input type="hidden" name="postId" th:value="${post.id}">
-                                <input type="hidden" name="contextPath" th:value="${#httpServletRequest.requestURL}">
-                                <textarea name="content" class="form-control" id="commentTextarea" rows="3" placeholder="댓글을 입력하세요"></textarea>
-                            </div>
-                            <div class="col-2">
-                                <button type="submit" class="btn btn-outline-primary" style="width:100%;height:100%">등록</button>
-                            </div>
-                        </div>
-
-                    </th:block>
-
-                    <!-- 비로그인 유저 -->
-                    <th:block sec:authorize="isAnonymous()">
-                        <div class="container pb-5" style="background-color: #e9ecef;">
-                            <a href="/login" class="text-decoration-none">댓글을 작성하려면 로그인을 해주세요. 로그인 하시겠습니까?</a>
-                        </div>
-                    </th:block>
-                </form>
+                </div>
             </div>
-        </div>
 
-    </div> <!-- /container -->
-</th:block>
+            <!-- 목록버튼 -->
+            <div>
+                <button class="w-100 btn btn-secondary"
+                        th:with="href=@{/posts}"
+                        th:onclick="navigateTo([[${href}]]);"
+                        type="button">
+                    목록으로
+                </button>
+            </div>
 
-<th:block layout:fragment="postScript">
+            <hr class="my-4">
+
+            <!-- 게시물 수정 삭제 버튼 -->
+            <th:block sec:authorize="isAuthenticated()" th:if="${#authentication.name == post.member.loginId} or ${#authentication.principal.member.role.getValue() == 'ROLE_ADMIN'}">
+                <form th:action="@{/post/{postId}/delete(postId=${post.id})}" method="post" onsubmit="return confirm('게시물을 삭제하시겠습니까?')">
+
+                    <button class="btn btn-primary mb-5"
+                            th:onclick="|location.href='@{/post/{postId}/edit(postId=${post.id})}'|"
+                            type="button">
+                        <i class="bi bi-pencil-square"></i>
+                        수정
+                    </button>
+
+                    <button class="btn btn-danger mb-5"
+                            type="submit">
+                        <i class="bi bi-trash"></i>
+                        삭제
+                    </button>
+                </form>
+            </th:block>
+
+
+            <!-- 댓글 리스트 -->
+            <div class="comment-list">
+                <th:block th:if="${comments.getTotalElements()} != 0">
+                    <div class="card-header">
+                        댓글
+                        <b th:text="${totalCount}">1</b>
+                        개
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <th:block th:each="comment:${comments}">
+                            <!-- 템플릿 조각이 들어갈 곳 -->
+                            <div th:replace=":: comments(${comment})"></div>
+                        </th:block>
+
+                        <!-- 템플릿 조각 -->
+                        <!-- 처음 로드할 때는 안보이게 했다가 댓글을 불러왔을 때 -->
+                        <th:block th:if="${false}">
+                            <li class="list-group-item" th:fragment="comments(comment)"
+                                th:classappend="${comment.parent != null} ? 're' : ''"
+                                th:id="'comment_' + ${comment.id}"
+                                th:style="|margin-left: ${comment.depth * 2}%|"
+                                th:with="content=${comment.content}">
+                                <div>
+                                    <i class="bi bi-arrow-return-right" th:if="${comment.parent} != null"></i>
+
+                                    <div class="btn-group dropend">
+                                        <a class="text-underline-hover text-dark" href="javascript:;" data-bs-toggle="dropdown"
+                                           th:text="${comment.member.nickname}">작성자</a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" th:with="href=@{/post/search(searchType=memberId,keyword=${comment.member.id})}"
+                                                   href="javascript:void(0);"
+                                                   th:onclick="navigateTo([[${href}]]);">작성글</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <small class="text-muted" th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd HH:mm')}">registerDate</small>
+
+                                    <!-- 답글 여부, 본인이 작성한 댓글 수정/삭제 여부 -->
+                                    <th:block sec:authorize="isAuthenticated()" th:if="${!comment.isDeleted}">
+                                        <!-- 자기 댓글 수정/삭제 -->
+                                        <th:block th:if="${comment.member.loginId == #authentication.name} or ${#authentication.principal.member.role.getValue() == 'ROLE_ADMIN'}">
+                                            <a href="javascript:;" class="text-underline-hover ps-1" th:onclick="editComment([[${comment.id}]]);">수정</a>
+                                            <a href="javascript:;" class="text-underline-hover text-danger ps-1" th:onclick="deleteComment([[${comment.id}]], [[${post.id}]]);">삭제</a>
+                                        </th:block>
+
+
+                                        <!-- 다른사람 댓글 답글달기(자기댓글에 답글가능) -->
+                                        <a href="javascript:;" class="text-decoration-none text-secondary ps-1" th:onclick="replyComment([[${comment.id}]]);">답글
+                                            <i class="bi bi-chat-dots"></i>
+                                        </a>
+                                    </th:block>
+
+                                </div>
+
+                                <!-- 댓글내용 -->
+
+                                <!-- 관리자 -->
+                                <th:block th:if="${comment.member.getRoleValue()} == 'ROLE_ADMIN'">
+                                    <div class="content-wrapper my-3" th:id="'commentContent' + ${comment.id}" style="color:#dc3545">
+                                        <a class="findParent text-decoration-none" href="javascript:;" th:if="${comment.parent} != null"
+                                           th:text="${comment.parent.member.nickname}"
+                                           th:onclick="moveToParent([[${comment.parent.id}]]);"
+                                           style="color:#aaa;">부모댓글 닉네임</a>
+                                        [(${#strings.replace(#strings.escapeXml(content), '&#10;', '&lt;br /&gt;')})]
+                                    </div>
+                                </th:block>
+
+                                <!-- 일반 유저 -->
+                                <th:block th:unless="${comment.member.getRoleValue()} == 'ROLE_ADMIN'">
+                                    <div class="content-wrapper my-3" th:id="'commentContent' + ${comment.id}"
+                                         th:style="${comment.member.loginId == post.member.loginId} ? 'color:#045cdf'">
+                                        <a class="findParent text-decoration-none" href="javascript:;" th:if="${comment.parent} != null"
+                                           th:text="${comment.parent.member.nickname}"
+                                           th:onclick="moveToParent([[${comment.parent.id}]]);"
+                                           style="color:#aaa;">부모댓글 닉네임</a>
+                                        [(${#strings.replace(#strings.escapeXml(content), '&#10;', '&lt;br /&gt;')})]
+                                    </div>
+                                </th:block>
+
+                                <!-- 댓글 수정 시각 -->
+                                <div th:id="'commentIsModified' + ${comment.id}" th:if="${comment.isModified}">
+                                    [ 수정된 댓글입니다. 수정시각:
+                                    <span th:text="${#temporals.format(comment.modifiedDate, 'yyyy-MM-dd HH:mm')}">modified date</span>
+                                    ]
+                                </div>
+
+                                <!-- 댓글 수정 폼 -->
+                                <form class="collapse multi-collapse my-3" th:id="'commentUpdateForm' + ${comment.id}" style="display:none;">
+                                    <input type="hidden" name="commentId" th:value="${comment.id}">
+                                    <input type="hidden" name="postId" th:value="${post.id}">
+                                    <input type="hidden" name="contextPath" th:value="${#httpServletRequest.requestURL}">
+                                    <div class="form-group mb-3">
+                                        <textarea class="form-control" rows="3" id="commentUpdateContent" name="commentContent" th:text="${comment.content}"></textarea>
+                                    </div>
+                                    <button type="button" id="btnCommentUpdateSave" class="btn btn-outline-primary" onclick="editCommentSave(this.form)">저장</button>
+                                </form>
+
+                                <!-- 답글 폼 -->
+                                <div class="reComment wrapper my-3" th:id="'replyCommentForm' + ${comment.id}" style="display:none;">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item" style="margin-left:2%;">
+                                        <span>
+                                            <i class="bi bi-arrow-return-right"></i>
+                                            <span>답글달기</span>
+                                        </span>
+                                            <form onsubmit="return addComment(this, event)">
+                                                <input type="hidden" name="parentId" th:value="${comment.id}">
+                                                <input type="hidden" name="postId" th:value="${post.id}">
+                                                <input type="hidden" name="contextPath" th:value="${#httpServletRequest.requestURL}">
+                                                <div class="form-group mb-3">
+                                                    <textarea class="form-control" rows="3" id="reCommentTextarea" name="content"></textarea>
+                                                </div>
+        <!--                                        <button type="button" id="btnReplyCommentSave" class="btn btn-outline-primary" onclick="replyCommentSave(this.form)">등록</button>-->
+                                                <button type="submit" class="btn btn-outline-primary">등록</button>
+                                                <button type="button" class="btn btn-outline-secondary" th:onclick="replyComment([[${comment.id}]]);">
+                                                    닫기
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- 자식 댓글이 있는지 확인 -->
+                                <th:block th:unless="${#lists.isEmpty(comment.children)}" th:each="child:${comment.children}">
+                                    <div th:replace=":: comments(${child})" />
+                                </th:block>
+                            </li>
+                        </th:block>
+
+                        <!-- 페이징 -->
+                        <div class="paging my-4">
+                            <ul class="pagination justify-content-center"
+                                th:with=
+                                        "pageNumber = ${comments.pageable.pageNumber},
+                                        pageSize = ${comments.pageable.pageSize},
+                                        totalPages = ${comments.totalPages},
+                                        startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+                                        tempEndPage = ${startPage + pageSize - 1},
+                                        endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})">
+
+                                <!-- 이전으로 이동 -->
+                                <!-- 첫 페이지인 경우 비활성화, 첫 페이지가 아니라면 현재 페이지 인덱스(0부터 시작) - 1 -->
+                                <li th:classappend="${comments.first} ? 'disabled'" class="page-item">
+                                    <a class="page-link" href="javascript:;" th:onclick="moveToPage([[${pageNumber - 1}]]);" aria-label="Previous">
+                                        <span aria-hidden="true">&lt;</span>
+                                    </a>
+                                </li>
+
+                                <!-- 페이지 리스트 루프(5페이지씩 분리)로 startPage 부터 endPage까지 반복 -->
+                                <!-- 페이지 번호 누르면 해당 페이지로 이동 -->
+                                <!-- page(페이지 번호) 와 현재 페이지 인덱스(0부터 시작) + 1 이 같으면 현재 보고있는 페이지이므로 활성화 -->
+                                <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
+                                    <span th:if="${page == pageNumber + 1}" th:text="${page}" class="page-link"></span>
+                                    <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link" href="javascript:;" th:onclick="moveToPage([[${page - 1}]]);"></a>
+                                </li>
+
+                                <!-- 다음으로 이동 -->
+                                <li th:classappend="${comments.last} ? 'disabled'" class="page-item">
+                                    <a class="page-link" href="javascript:;" th:onclick="moveToPage([[${pageNumber + 1}]]);" aria-label="Next">
+                                        <span aria-hidden="true">&gt;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </ul>
+                </th:block>
+            </div>
+
+            <!-- 댓글 폼 -->
+            <div class="card">
+                <h6 class="card-header">댓글 쓰기</h6>
+                <div class="card-body">
+                    <form th:id="commentSaveForm" onsubmit="return addComment(this, event)">
+
+                        <!-- 로그인 유저 -->
+                        <th:block sec:authorize="isAuthenticated()">
+                            <div class="row">
+                                <div class="col-10">
+                                    <input type="hidden" name="postId" th:value="${post.id}">
+                                    <input type="hidden" name="contextPath" th:value="${#httpServletRequest.requestURL}">
+                                    <textarea name="content" class="form-control" id="commentTextarea" rows="3" placeholder="댓글을 입력하세요"></textarea>
+                                </div>
+                                <div class="col-2">
+                                    <button type="submit" class="btn btn-outline-primary" style="width:100%;height:100%">등록</button>
+                                </div>
+                            </div>
+
+                        </th:block>
+
+                        <!-- 비로그인 유저 -->
+                        <th:block sec:authorize="isAnonymous()">
+                            <div class="container pb-5" style="background-color: #e9ecef;">
+                                <a th:href="@{/login}" class="text-decoration-none">댓글을 작성하려면 로그인을 해주세요. 로그인 하시겠습니까?</a>
+                            </div>
+                        </th:block>
+                    </form>
+                </div>
+            </div>
+
+    </div>
+
+    <!-- 각 페이지마다 실행될 스크립트 -->
     <script th:inline="javascript">
         window.addEventListener('load', function() {
             const msg = [[${msg}]];
@@ -366,8 +441,31 @@
             alert("로그인 후 이용할 수 있습니다.");
             location.href = "/login";
         }
-    </script>
-</th:block>
 
-<!--</body>-->
+        //스크롤 이동
+        $(document).ready(function() {
+            let currentPage = window.location.href;
+            let anchor = currentPage.split('#')[1];
+            if(anchor) {
+                let commentId = anchor.split('_')[1];
+                let element = $('#comment_'+commentId)[0];
+                let scrollPosition = getElementScrollPosition(element);
+                window.scrollTo({
+                  top: scrollPosition,
+                  behavior: 'smooth'
+                });
+            }
+
+            function getElementScrollPosition(element) {
+                const elementPosition = element.getBoundingClientRect().top;
+                const currentWindowScrollY = window.scrollY;
+                const scrollDifference = currentWindowScrollY + elementPosition;
+                return element.scrollTop + scrollDifference;
+            }
+
+        });
+    </script>
+
+</div>
+
 </html>

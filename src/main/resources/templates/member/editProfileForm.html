@@ -1,25 +1,98 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/default_layout}">
-<head>
-    <title>회원 정보 변경</title>
-</head>
+      layout:decorate="~{layout/default_layout_spa}">
 
-<th:block layout:fragment="content">
-    <div class="container">
+
+<div id="contentContainer" th:fragment="content">
+
+    <header>
+        <!-- 상단 바 -->
+        <div class="top-header">
+            <nav class="navbar navbar-light bg-light" style="--bs-breadcrumb-divider: '∣';" aria-label="breadcrumb">
+                <div class="container d-flex justify-content-end">
+                    <ol class="breadcrumb mb-0" style="font-size:12px">
+                        <th:block sec:authorize="isAuthenticated()">
+                            <!-- 유저 -->
+                            <th:block sec:authorize="hasAnyRole('ROLE_USER', 'ROLE_SOCIAL')">
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/member/profile}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">내 정보</a></li>
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/member/myDocument}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">내 게시물</a></li>
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/member/myComment}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">내 댓글</a></li>
+                            </th:block>
+
+                            <!-- 관리자 -->
+                            <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/admin/members}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">회원 관리</a></li>
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/admin/myDocument}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">내 게시물</a></li>
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/admin/postStat}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">게시판 통계</a></li>
+                            </th:block>
+
+                            <!-- 알림 -->
+                            <!-- 알림이 1개 이상 -->
+                            <li class="breadcrumb-item d-flex align-items-center">
+                                <div class="dropdown">
+                                    <a class="text-decoration-none" href="javascript:;" data-bs-toggle="dropdown">알림</a>
+                                    <ul class="dropdown-menu dropdown-menu-end p-2" id="oc_notification"
+                                        style="max-height:200px;overflow-y:scroll;font-size:12px;white-space:nowrap;">
+                                        <li th:each="notification:${notifications}" th:if="${notifications.size()} != 0">
+                                            <a class="dropdown-item" th:with="href=@{${notification.url}}" href="javascript:void(0);"
+                                               th:onclick="navigateTo([[${href}]]);">
+                                                <span th:text="${notification.sender}">아기로메로</span>
+                                                <span th:text="${#strings.abbreviate(notification.content, 12)}">내용</span>
+                                                <span th:text="${notification.createdDate}">4 일 전</span>
+                                            </a>
+                                        </li>
+                                        <!-- 알림이 없을경우 -->
+                                        <li th:unless="${notifications.size()} != 0">
+                                            알림이 존재하지 않습니다
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- 읽지 않은 알림 갯수 -->
+                                <span class="badge bg-danger ms-1" th:text="${notifications.size() == 0 ? '' : notifications.size()}" id="notificationCount">4</span>
+                            </li>
+
+                            <li class="breadcrumb-item">
+                                <form id="logoutForm" th:action="@{/logout}" method="post" style="display:inline">
+                                    <span style="border: 1px solid #ccc;background: #fff;padding: 2px 7px 2px 7px;border-radius: 5px;">
+                                        <a class="text-decoration-none" href="javascript:;" onclick="logout()">로그아웃</a>
+                                    </span>
+                                </form>
+                            </li>
+                        </th:block>
+                        <th:block sec:authorize="isAnonymous()">
+                            <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/signup}">회원가입</a></li>
+                            <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/login}">로그인</a></li>
+                        </th:block>
+                    </ol>
+                </div>
+            </nav>
+        </div>
+        <!-- 로고 -->
+        <div class="container p-2">
+            <div class="d-flex justify-content-center">
+                <a class="text-decoration-none" th:with="href=@{/}" href="javascript:void(0);"
+                   th:onclick="navigateTo([[${href}]]);">
+                    <img th:src="@{/img/logo/oneuldo_logo_short.png}" alt="logo" width="200">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container inform">
 
         <div class="d-flex justify-content-center align-items-center" style="height:100px">
-            <h4>회원 정보 변경</h4>
+            <h4>회원 정보 수정</h4>
         </div>
 
-        <!-- 회원정보 수정 실패 -->
-        <div th:if="${msg}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            <span th:text="${msg}">변경실패</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
 
+        <!-- form -->
         <form id="editProfileForm" th:action th:object="${memberProfileUpdateDTO}" method="post">
             <div>
                 <label for="loginId">아이디</label>
@@ -55,11 +128,12 @@
 
             <div class="row" id="updateBtn">
                 <div class="col">
-                    <button class="w-100 btn btn-primary btn-lg" type="submit" onclick="loading('updateBtn');">변경</button>
+                    <button class="w-100 btn btn-primary btn-lg" type="submit" onclick="loading('updateBtn');">저장</button>
                 </div>
                 <div class="col">
                     <button class="w-100 btn btn-secondary btn-lg"
-                            th:onclick="|location.href='@{/member/profile}'|"
+                            th:with="href=@{/member/profile}"
+                            href="javascript:void(0);" th:onclick="navigateTo([[${href}]]);"
                             type="button">취소</button>
                 </div>
             </div>
@@ -74,11 +148,17 @@
 
         </form>
 
-    </div> <!-- /container -->
-</th:block>
+    </div>
 
-<th:block layout:fragment="editProfileScript">
+
+    <!-- 각 페이지마다 실행될 스크립트 -->
     <script th:inline="javascript">
+        window.addEventListener('load', function() {
+            const msg = [[${msg}]];
+            if(msg) {
+                alert(msg);
+            }
+        });
         window.addEventListener('pageshow', function() {
             const form = document.getElementById('editProfileForm');
             if(form !== null && form !== undefined) {
@@ -86,6 +166,7 @@
             }
         });
     </script>
-</th:block>
+
+</div>
 
 </html>

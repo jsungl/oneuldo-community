@@ -1,11 +1,91 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/default_layout}">
-<head>
-  <title>회원 정보</title>
-</head>
-<th:block layout:fragment="content">
+      layout:decorate="~{layout/default_layout_spa}">
+
+<div id="contentContainer" th:fragment="content">
+
+    <header>
+        <!-- 상단 바 -->
+        <div class="top-header">
+            <nav class="navbar navbar-light bg-light" style="--bs-breadcrumb-divider: '∣';" aria-label="breadcrumb">
+                <div class="container d-flex justify-content-end">
+                    <ol class="breadcrumb mb-0" style="font-size:12px">
+                        <th:block sec:authorize="isAuthenticated()">
+
+                            <!-- 유저 -->
+                            <th:block sec:authorize="hasAnyRole('ROLE_USER', 'ROLE_SOCIAL')">
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/member/profile}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">내 정보</a></li>
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/member/myDocument}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">내 게시물</a></li>
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/member/myComment}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">내 댓글</a></li>
+                            </th:block>
+
+                            <!-- 관리자 -->
+                            <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/admin/members}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">회원 관리</a></li>
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/admin/myDocument}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">내 게시물</a></li>
+                                <li class="breadcrumb-item"><a class="text-decoration-none" th:with="href=@{/admin/postStat}" href="javascript:void(0);"
+                                                               th:onclick="navigateTo([[${href}]]);">게시판 통계</a></li>
+                            </th:block>
+
+                            <!-- 알림 -->
+                            <!-- 알림이 1개 이상 -->
+                            <li class="breadcrumb-item d-flex align-items-center">
+                                <div class="dropdown">
+                                    <a class="text-decoration-none" href="javascript:;" data-bs-toggle="dropdown">알림</a>
+                                    <ul class="dropdown-menu dropdown-menu-end p-2" id="oc_notification"
+                                        style="max-height:200px;overflow-y:scroll;font-size:12px;white-space:nowrap;">
+                                        <li th:each="notification:${notifications}" th:if="${notifications.size()} != 0">
+                                            <a class="dropdown-item" th:with="href=@{${notification.url}}" href="javascript:void(0);"
+                                               th:onclick="navigateTo([[${href}]]);">
+                                                <span th:text="${notification.sender}">아기로메로</span>
+                                                <span th:text="${#strings.abbreviate(notification.content, 12)}">내용</span>
+                                                <span th:text="${notification.createdDate}">4 일 전</span>
+                                            </a>
+                                        </li>
+                                        <!-- 알림이 없을경우 -->
+                                        <li th:unless="${notifications.size()} != 0">
+                                            알림이 존재하지 않습니다
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- 읽지 않은 알림 갯수 -->
+                                <span class="badge bg-danger ms-1" th:text="${notifications.size() == 0 ? '' : notifications.size()}" id="notificationCount">4</span>
+                            </li>
+
+                            <!-- 로그아웃 -->
+                            <li class="breadcrumb-item">
+                                <form id="logoutForm" th:action="@{/logout}" method="post" style="display:inline">
+                                    <span style="border: 1px solid #ccc;background: #fff;padding: 2px 7px 2px 7px;border-radius: 5px;">
+                                        <a class="text-decoration-none" href="javascript:;" onclick="logout()">로그아웃</a>
+                                    </span>
+                                </form>
+                            </li>
+                        </th:block>
+                        <th:block sec:authorize="isAnonymous()">
+                            <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/signup}">회원가입</a></li>
+                            <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/login}">로그인</a></li>
+                        </th:block>
+                    </ol>
+                </div>
+            </nav>
+        </div>
+        <!-- 로고 -->
+        <div class="container p-2">
+            <div class="d-flex justify-content-center">
+                <a class="text-decoration-none" th:with="href=@{/}" href="javascript:void(0);"
+                   th:onclick="navigateTo([[${href}]]);">
+                    <img th:src="@{/img/logo/oneuldo_logo_short.png}" alt="logo" width="200">
+                </a>
+            </div>
+        </div>
+    </header>
+
     <div class="container inform">
 
         <div class="d-flex justify-content-center align-items-center" style="height:100px">
@@ -34,41 +114,48 @@
 
       <!-- 일반 로그인 사용자 -->
       <th:block sec:authorize="hasRole('ROLE_USER')">
-        <div class="row">
-          <div class="col">
-            <button class="w-100 btn btn-outline-primary btn-lg" type="button"
-                    onclick="location.href='editNicknameForm.html'"
-                    th:onclick="|location.href='@{/edit/profile}'|">
-              회원 정보 변경
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-outline-primary me-2" type="button"
+                    th:with="href=@{/edit/profile}"
+                    th:onclick="navigateTo([[${href}]]);">
+                회원 정보 수정
             </button>
-          </div>
-          <div class="col">
-            <button class="w-100 btn btn-outline-primary btn-lg"
+            <button class="btn btn-outline-primary me-2"
                     onclick="location.href='editPasswordForm.html'"
-                    th:onclick="|location.href='@{/edit/password}'|" type="button">
-              비밀번호 변경
+                    th:with="href=@{/edit/password}"
+                    th:onclick="navigateTo([[${href}]]);"
+                    type="button">
+                비밀번호 변경
             </button>
-          </div>
+            <button class="btn btn-outline-danger"
+                    onclick="location.href='memberLeave.html'"
+                    th:with="href=@{/member/leave}"
+                    th:onclick="navigateTo([[${href}]]);"
+                    type="button">
+                회원탈퇴
+            </button>
         </div>
       </th:block>
 
       <!-- 소셜 로그인 사용자 -->
       <th:block sec:authorize="hasRole('ROLE_SOCIAL')">
-        <div class="row">
-          <div class="col">
-            <button class="w-100 btn btn-outline-primary btn-lg" type="button"
-                    onclick="location.href='editNicknameForm.html'"
-                    th:onclick="|location.href='@{/edit/profile}'|">
-              회원 정보 변경
-            </button>
+          <div class="d-flex justify-content-end">
+              <button class="btn btn-outline-primary me-2" type="button"
+                      th:with="href=@{/edit/profile}"
+                      th:onclick="navigateTo([[${href}]]);">
+                  회원 정보 수정
+              </button>
+              <button class="btn btn-outline-danger"
+                      th:with="href=@{/member/leave}"
+                      th:onclick="navigateTo([[${href}]]);" type="button">
+                  회원탈퇴
+              </button>
           </div>
-        </div>
       </th:block>
 
-    </div> <!-- /container -->
-</th:block>
+    </div>
 
-<th:block layout:fragment="memberProfileScript">
+    <!-- 각 페이지마다 실행될 스크립트 -->
     <script th:inline="javascript">
         window.addEventListener('load', function() {
             const msg = [[${msg}]];
@@ -77,6 +164,7 @@
             }
         });
     </script>
-</th:block>
+
+</div>
 
 </html>

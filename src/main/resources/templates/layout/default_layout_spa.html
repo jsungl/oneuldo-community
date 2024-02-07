@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      th:with="lang=${#locale.language}" th:lang="${lang}">
+
+    <!-- 각 화면의 구성에 대한 설정 -->
+
+    <!-- Header -->
+    <th:block th:insert="layout/fragments/header :: headerFragment"></th:block>
+
+    <!-- Body -->
+    <body>
+
+        <div id="contentContainer" th:replace=":: content"></div>
+
+            <!-- 내용 -->
+<!--            <div id="contentContainer">-->
+<!--                <div th:replace=":: content"></div>-->
+<!--            </div>-->
+
+
+        <!-- toast -->
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="border:2px solid #4e78d0">
+                <div class="toast-header">
+                    <strong class="me-auto" id="notification_title">title</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    Hello, world! This is a toast message.
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <th:block th:insert="layout/fragments/footer :: footerFragment"></th:block>
+
+        <!-- 댓글 -->
+        <script th:src="@{/js/comment.js}" th:inline="javascript"></script>
+        <!-- 로딩버튼 -->
+        <script th:src="@{/js/loading.js}" th:inline="javascript"></script>
+        <!-- 게시물 좋아요 -->
+        <script th:src="@{/js/postLike.js}" th:inline="javascript"></script>
+
+
+        <!-- 공통 -->
+        <script th:inline="javascript">
+
+            function logout() {
+                document.getElementById('logoutForm').submit();
+            }
+
+            //페이지 이동
+            function navigateTo(path) {
+
+                $.ajax({
+                    url: path,
+                    type: "GET",
+                    success: function(data, status, xhr) {
+
+                        // 서버에서 받은 리다이렉트 주소로 리다이렉트
+                        if (xhr.status == 200 && xhr.getResponseHeader('Location')) {
+
+                            let redirectedUrl = xhr.getResponseHeader('Location');
+                            console.log('redirectedUrl: ',redirectedUrl);
+
+                            $.ajax({
+                                url: redirectedUrl,
+                                type: "GET",
+                                success: function(data) {
+                                    history.pushState(null, null, redirectedUrl);
+                                    let newContent = $(data).filter('#contentContainer').html();
+                                    let newTitle = $(data).filter('title').text();
+
+                                    $('head title').text(newTitle);
+                                    $('#contentContainer').html(newContent);
+                                },
+                                error: function(xhr, status, error) {
+                                    let errorMessage = xhr.responseText;
+                                    alert(errorMessage);
+                                }
+                            });
+
+                        } else {
+                            //페이지 이동없이 페이지 주소만 변경
+                            history.pushState(null, null, path);
+
+                            let newContent = $(data).filter('#contentContainer').html();
+                            let newTitle = $(data).filter('title').text();
+                            $('head title').text(newTitle);
+
+                            $('#contentContainer').html(newContent);
+                        }
+
+                    },
+                    error: function(xhr, status, error) {
+                        let errorMessage = xhr.responseText;
+                        alert(errorMessage);
+                    }
+                });
+
+                return false;
+            }
+
+            //뒤로가기, 앞으로가기 발생하는 이벤트
+            window.onpopstate = function (event) {
+                let currentPage = window.location.href;
+
+                //현재 페이지 주소를 가져와 페이지 교체
+                $.get(currentPage, function(data) {
+                    let newContent = $(data).filter('#contentContainer').html();
+                    let newTitle = $(data).filter('title').text();
+
+                    $('head title').text(newTitle);
+                    $('#contentContainer').html(newContent);
+                });
+            };
+
+
+        </script>
+
+    </body>
+
+</html>

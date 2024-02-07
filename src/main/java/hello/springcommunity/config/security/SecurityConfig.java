@@ -45,6 +45,7 @@ public class SecurityConfig {
     private final CustomLoginFailureHandler loginFailureHandler;
     private final OAuthLoginSuccessHandler oAuthLoginSuccessHandler;
     private final OAuthLoginFailureHandler oAuthLoginFailureHandler;
+    private final CustomLogoutSuccessHandler logoutSuccessHandler;
 
 
     @Bean
@@ -111,7 +112,8 @@ public class SecurityConfig {
          */
         http.authorizeRequests()
                 .antMatchers("/signup", "/find/**", "/login/**").anonymous()
-                .antMatchers("/post/add","/post/{postId}/edit","/post/{postId}/delete","/post/like/**","/member/**","/api/post/**").authenticated()
+                .antMatchers("/post/add","/post/{postId}/edit","/post/{postId}/delete","/post/like/**","/member/**","/api/post/**",
+                        "/my-websocket-endpoint", "/notifications/subscribe").authenticated()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll(); //그 외 요청들은 모두 접근허용
 
@@ -201,11 +203,18 @@ public class SecurityConfig {
         /**
          * 로그아웃
          */
+//        http.logout()
+//            .logoutUrl("/logout") // 로그아웃 처리 URL (= form action url)
+//            .logoutSuccessUrl("/?logout=true") //로그아웃 성공시 이동할 url
+//            .invalidateHttpSession(true) //로그아웃시 생성된 세션 삭제
+//            .deleteCookies("JSESSIONID");
+
         http.logout()
-            .logoutUrl("/logout") // 로그아웃 처리 URL (= form action url)
-            .logoutSuccessUrl("/?logout=true") //로그아웃 성공시 이동할 url
-            .invalidateHttpSession(true) //로그아웃시 생성된 세션 삭제
-            .deleteCookies("JSESSIONID");
+                .logoutUrl("/logout") // 로그아웃 처리 URL (= form action url)
+                .logoutSuccessHandler(logoutSuccessHandler) //로그아웃 성공 핸들러
+                .invalidateHttpSession(true) //로그아웃시 생성된 세션 삭제
+                .deleteCookies("JSESSIONID")
+                .permitAll();
 
 
         /**

@@ -1,13 +1,18 @@
 package hello.springcommunity.web.post;
 
+import hello.springcommunity.domain.notification.Notification;
 import hello.springcommunity.domain.post.CategoryCode;
 import hello.springcommunity.dto.comment.CommentResponseDTO;
+import hello.springcommunity.dto.notification.NotificationDTO;
 import hello.springcommunity.dto.post.PostResponseDTO;
 import hello.springcommunity.dto.security.UserDetailsDTO;
 import hello.springcommunity.domain.post.Post;
+import hello.springcommunity.exception.CustomRuntimeException;
 import hello.springcommunity.service.comment.CommentServiceImpl;
+import hello.springcommunity.service.notification.NotificationService;
 import hello.springcommunity.service.post.PostService;
 import hello.springcommunity.dto.post.PostRequestDTO;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -43,6 +48,7 @@ public class PostController {
 
     private final PostService postService;
     private final CommentServiceImpl commentService;
+    private final NotificationService notificationService;
 
     /**
      * CategoryCode(Enum)의 모든종류를 배열로 반환
@@ -75,17 +81,24 @@ public class PostController {
                 model.addAttribute("posts", list);
                 model.addAttribute("searchType", searchType);
                 model.addAttribute("keyword", keyword);
-                return "post/searchedPost";
+                model.addAttribute("title", keyword);
+
 
             }else {
                 //검색조건을 선택하지 않고 검색시 전체 게시물 목록 조회
                 return "redirect:/posts";
             }
 
-        } catch (UsernameNotFoundException | IllegalArgumentException e) {
-            model.addAttribute("msg", e.getMessage());
-            return "error/redirect";
         }
+//        catch (UsernameNotFoundException | IllegalArgumentException e) {
+//            model.addAttribute("msg", e.getMessage());
+//            return "error/redirect";
+//        }
+        catch (RuntimeException e) {
+            throw new CustomRuntimeException("검색에 실패하였습니다.");
+        }
+
+        return "post/searchedPost";
 
     }
 
@@ -153,18 +166,92 @@ public class PostController {
 
             //개행문자
             //model.addAttribute("nlString", "\r\n");
-            return "post/post";
 
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("msg", e.getMessage());
-            return "post/notFound";
+            model.addAttribute("title", post.getTitle());
 
-        } catch (UsernameNotFoundException e) {
-            model.addAttribute("msg", "게시물을 조회할 수 없습니다.");
+
+        }
+//        catch (IllegalArgumentException e) {
+//            model.addAttribute("msg", e.getMessage());
+//            return "post/notFound";
+//        }
+
+//        catch (UsernameNotFoundException e) {
+//            model.addAttribute("msg", "게시물을 조회할 수 없습니다.");
+//            return "error/redirect";
+//        }
+        catch (IllegalArgumentException e) {
+            throw new CustomRuntimeException("게시물이 존재하지 않습니다.");
+        }
+        catch (RuntimeException e) {
+            throw new CustomRuntimeException("게시물을 조회할 수 없습니다.");
         }
 
-        return "error/redirect";
+        return "post/post";
+
+
     }
+
+
+    @GetMapping(value = "/notify", headers = "X-Requested-With=XMLHttpRequest")
+    @ResponseBody
+    public ResponseEntity<?> handleAjaxRequest(@RequestParam(value = "notificationId") Long notificationId,
+                                                @RequestParam(value = "postId") Long postId,
+                                                @RequestParam(value = "commentId") Long commentId,
+                                                @AuthenticationPrincipal UserDetailsDTO dto,
+                                                RedirectAttributes redirectAttributes,
+                                                Model model) {
+        try {
+
+            // 알림을 받은 본인이면 읽음과 동시에 삭제
+            if(dto != null) {
+                Notification notification = notificationService.getNotification(notificationId);
+                if(notification.getId().equals(notificationId) && notification.getReceiver().equals(dto.getUsername())) {
+                    notificationService.deleteNotification(notification);
+                }
+            }
+
+            String redirectUrl = "/post/" + postId + "?commentId=" + commentId + "#comment_" + commentId;
+
+            // ResponseEntity로 리다이렉트 주소 응답을 생성
+            return ResponseEntity.status(200).header("Location", redirectUrl).body(commentId);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("알림이 존재하지 않습니다.");
+        }
+
+    }
+
+    @GetMapping("/notify")
+    public String handleNonAjaxRequest(@RequestParam(value = "notificationId") Long notificationId,
+                                     @RequestParam(value = "postId") Long postId,
+                                     @RequestParam(value = "commentId") Long commentId,
+                                     @AuthenticationPrincipal UserDetailsDTO dto,
+                                     RedirectAttributes redirectAttributes,
+                                     Model model) {
+        try {
+            // 알림을 받은 본인이면 읽음과 동시에 삭제
+            if(dto != null) {
+                Notification notification = notificationService.getNotification(notificationId);
+                if(notification.getId().equals(notificationId) && notification.getReceiver().equals(dto.getUsername())) {
+                    notificationService.deleteNotification(notification);
+                }
+            }
+
+            redirectAttributes.addAttribute("postId", postId);
+            redirectAttributes.addAttribute("commentId", commentId);
+
+
+        } catch (IllegalArgumentException e) {
+//            model.addAttribute("msg", e.getMessage());
+//            return "error/redirect";
+            throw new CustomRuntimeException("알림이 존재하지 않습니다.");
+        }
+
+        return "redirect:/post/{postId}";
+
+    }
+
 
 
     /**
@@ -203,8 +290,6 @@ public class PostController {
         }
 
         try {
-            //log.info("postForm.getContent()={}", postForm.getContent());
-            //<p><img src="https://oneuldo-communication.s3.ap-northeast-2.amazonaws.com/temp/2/ea2cbf2d-90bc-43da-96cd-af4455c77639.png" width="400" height="400"></p>
             Post savedPost = postService.addPost(postForm, dto.getUsername());
             //이미지가 있을경우 경로 이동
             postService.parseContextAndMoveImages(savedPost);
@@ -212,19 +297,20 @@ public class PostController {
             redirectAttributes.addAttribute("postId", savedPost.getId()); //IDENTITY 방식에 의해 DB에 저장후 id 값과 등록날짜(regDate)를 확인할 수 있다
             redirectAttributes.addFlashAttribute("msg", "게시물이 등록되었습니다.");
 
-            //해당 게시물의 상세페이지로 바로 이동
-            return "redirect:/post/{postId}";
-
-        } catch (UsernameNotFoundException e) {
-            model.addAttribute("msg", "게시물을 등록할 수 없습니다.");
-            return "error/redirect";
 
         }
-//        catch (Exception e) {
-//            redirectAttributes.addFlashAttribute("msg", "게시물 등록에 실패하였습니다.");
-//            redirectAttributes.addFlashAttribute("prevPostSaveReq", postForm);
-//            return "redirect:/post/add";
+//        catch (UsernameNotFoundException e) {
+//            model.addAttribute("msg", "게시물을 등록할 수 없습니다.");
+//            return "error/redirect";
 //        }
+        catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("msg", "게시물 등록에 실패하였습니다.");
+            redirectAttributes.addFlashAttribute("prevPostSaveReq", postForm);
+            return "redirect:/post/add";
+        }
+
+        //해당 게시물의 상세페이지로 바로 이동
+        return "redirect:/post/{postId}";
 
     }
 
@@ -237,6 +323,7 @@ public class PostController {
     public String editForm(@PathVariable Long postId,
                            @AuthenticationPrincipal UserDetailsDTO dto,
                            HttpServletRequest request,
+                           RedirectAttributes redirectAttributes,
                            Model model) {
 
         try {
@@ -259,12 +346,23 @@ public class PostController {
 
             model.addAttribute("role", dto.getMember().getRoleValue());
             model.addAttribute("postId", postId);
-            return "post/editForm";
 
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("msg", "존재하지 않는 게시물입니다.");
-            return "post/notFound";
         }
+//        catch (IllegalArgumentException e) {
+//            model.addAttribute("msg", "존재하지 않는 게시물입니다.");
+//            return "post/notFound";
+//        }
+        catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("msg", "게시물이 존재하지 않습니다.");
+            return "redirect:/posts";
+        }
+        catch (RuntimeException e) {
+            redirectAttributes.addAttribute("postId", postId);
+            redirectAttributes.addFlashAttribute("msg", "게시물을 수정할 수 없습니다.");
+            return "redirect:/post/{postId}";
+        }
+
+        return "post/editForm";
 
     }
 
@@ -297,21 +395,23 @@ public class PostController {
 
             redirectAttributes.addFlashAttribute("msg", "게시물이 수정되었습니다.");
             redirectAttributes.addAttribute("postId", post.getId());
-            //상세페이지로 이동
-            return "redirect:/post/{postId}";
 
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("msg", "게시물을 수정할 수 없습니다.");
-            return "error/redirect";
 
         }
-//        catch (Exception e) {
-//            redirectAttributes.addFlashAttribute("msg", "게시물 수정에 실패하였습니다.");
-//            redirectAttributes.addFlashAttribute("prevPostUpdateReq", postRequestDTO);
-//            redirectAttributes.addAttribute("postId", postId);
-//            return "redirect:/post/{postId}/edit";
+//        catch (IllegalArgumentException e) {
+//            model.addAttribute("msg", "게시물을 수정할 수 없습니다.");
+//            return "error/redirect";
+//
 //        }
+        catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("msg", "게시물 수정에 실패하였습니다.");
+            redirectAttributes.addFlashAttribute("prevPostUpdateReq", postRequestDTO);
+            redirectAttributes.addAttribute("postId", postId);
+            return "redirect:/post/{postId}/edit";
+        }
 
+        //상세페이지로 이동
+        return "redirect:/post/{postId}";
 
     }
 
@@ -335,19 +435,20 @@ public class PostController {
                 postService.deletePost(post);
             }
 
-            return "redirect:/posts";
-
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("msg", "게시물을 삭제할 수 없습니다.");
-            return "error/redirect";
 
         }
-
-//        catch (Exception e) {
-//            redirectAttributes.addFlashAttribute("msg", "게시물 삭제에 실패하였습니다.");
-//            redirectAttributes.addAttribute("postId", postId);
-//            return "redirect:/post/{postId}";
+//        catch (IllegalArgumentException e) {
+//            model.addAttribute("msg", "게시물을 삭제할 수 없습니다.");
+//            return "error/redirect";
+//
 //        }
+        catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("msg", "게시물 삭제에 실패하였습니다.");
+            redirectAttributes.addAttribute("postId", postId);
+            return "redirect:/post/{postId}";
+        }
+
+        return "redirect:/posts";
 
     }
 
@@ -361,7 +462,8 @@ public class PostController {
 
         try {
             postService.likePost(postId, dto.getUsername());
-            //게시물 추천수
+
+            //현재 게시물 추천수
             Integer likeCount = postService.getPostLikeCount(postId);
 
             boolean like = false;
@@ -406,9 +508,10 @@ public class PostController {
                 redirectAttributes.addFlashAttribute(key, errorMap.get(key));
             }
             return true;
+        } else {
+            return false;
         }
 
-        return false;
     }
 
 
