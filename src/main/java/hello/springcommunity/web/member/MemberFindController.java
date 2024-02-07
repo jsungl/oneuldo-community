@@ -117,7 +117,6 @@ public class MemberFindController {
 
         MemberResponseDTO member = (MemberResponseDTO) session.getAttribute(FIND_MEMBER);
         if(member != null) {
-            //log.info("findId={}", member.getLoginId());
             model.addAttribute("findMember", member);
         }
 
@@ -197,8 +196,7 @@ public class MemberFindController {
             redirectAttributes.addFlashAttribute("valid_email", "가입된 계정이 없습니다.");
 
         } catch (RuntimeException e) {
-            model.addAttribute("msg", "비밀번호 찾기에 실패하였습니다.");
-            return "error/redirect";
+            redirectAttributes.addFlashAttribute("msg", "비밀번호 찾기에 실패하였습니다.");
         }
 
         redirectAttributes.addFlashAttribute("prevFindPasswordDTO", findPasswordDTO);

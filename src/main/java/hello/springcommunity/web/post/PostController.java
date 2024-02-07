@@ -89,12 +89,7 @@ public class PostController {
                 return "redirect:/posts";
             }
 
-        }
-//        catch (UsernameNotFoundException | IllegalArgumentException e) {
-//            model.addAttribute("msg", e.getMessage());
-//            return "error/redirect";
-//        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             throw new CustomRuntimeException("검색에 실패하였습니다.");
         }
 
@@ -170,20 +165,9 @@ public class PostController {
             model.addAttribute("title", post.getTitle());
 
 
-        }
-//        catch (IllegalArgumentException e) {
-//            model.addAttribute("msg", e.getMessage());
-//            return "post/notFound";
-//        }
-
-//        catch (UsernameNotFoundException e) {
-//            model.addAttribute("msg", "게시물을 조회할 수 없습니다.");
-//            return "error/redirect";
-//        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new CustomRuntimeException("게시물이 존재하지 않습니다.");
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             throw new CustomRuntimeException("게시물을 조회할 수 없습니다.");
         }
 
@@ -243,8 +227,6 @@ public class PostController {
 
 
         } catch (IllegalArgumentException e) {
-//            model.addAttribute("msg", e.getMessage());
-//            return "error/redirect";
             throw new CustomRuntimeException("알림이 존재하지 않습니다.");
         }
 
@@ -298,12 +280,7 @@ public class PostController {
             redirectAttributes.addFlashAttribute("msg", "게시물이 등록되었습니다.");
 
 
-        }
-//        catch (UsernameNotFoundException e) {
-//            model.addAttribute("msg", "게시물을 등록할 수 없습니다.");
-//            return "error/redirect";
-//        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("msg", "게시물 등록에 실패하였습니다.");
             redirectAttributes.addFlashAttribute("prevPostSaveReq", postForm);
             return "redirect:/post/add";
@@ -347,16 +324,10 @@ public class PostController {
             model.addAttribute("role", dto.getMember().getRoleValue());
             model.addAttribute("postId", postId);
 
-        }
-//        catch (IllegalArgumentException e) {
-//            model.addAttribute("msg", "존재하지 않는 게시물입니다.");
-//            return "post/notFound";
-//        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("msg", "게시물이 존재하지 않습니다.");
             return "redirect:/posts";
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             redirectAttributes.addAttribute("postId", postId);
             redirectAttributes.addFlashAttribute("msg", "게시물을 수정할 수 없습니다.");
             return "redirect:/post/{postId}";
@@ -396,14 +367,7 @@ public class PostController {
             redirectAttributes.addFlashAttribute("msg", "게시물이 수정되었습니다.");
             redirectAttributes.addAttribute("postId", post.getId());
 
-
-        }
-//        catch (IllegalArgumentException e) {
-//            model.addAttribute("msg", "게시물을 수정할 수 없습니다.");
-//            return "error/redirect";
-//
-//        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("msg", "게시물 수정에 실패하였습니다.");
             redirectAttributes.addFlashAttribute("prevPostUpdateReq", postRequestDTO);
             redirectAttributes.addAttribute("postId", postId);
@@ -436,13 +400,7 @@ public class PostController {
             }
 
 
-        }
-//        catch (IllegalArgumentException e) {
-//            model.addAttribute("msg", "게시물을 삭제할 수 없습니다.");
-//            return "error/redirect";
-//
-//        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("msg", "게시물 삭제에 실패하였습니다.");
             redirectAttributes.addAttribute("postId", postId);
             return "redirect:/post/{postId}";

@@ -1,8 +1,13 @@
 package hello.springcommunity.web;
 
+import hello.springcommunity.domain.notification.Notification;
+import hello.springcommunity.dto.post.PostResponseDTO;
 import hello.springcommunity.dto.security.UserDetailsDTO;
+import hello.springcommunity.service.notification.NotificationService;
+import hello.springcommunity.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -11,12 +16,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 
 @Slf4j
 @RequiredArgsConstructor
 @Controller
 public class HomeController {
+
+    private final PostService postService;
 
     /**
      * Spring Security 3.2 부터는 @AuthenticationPrincipal 어노테이션을 이용하여
@@ -30,19 +38,13 @@ public class HomeController {
                        @RequestParam(value = "expired", required = false) String expired,
                        Model model) {
 
-        if(request.getSession().getAttribute("runtimeExMessage") != null) {
-            String msg = (String) request.getSession().getAttribute("runtimeExMessage");
-            model.addAttribute("errorMessage", msg);
-            request.getSession().removeAttribute("runtimeExMessage");
-        }
-
         /**
          * 세션이 유효하지 않거나 만료시 에러 메시지 출력
          */
         if(invalid != null && invalid.equals("true")) {
-            model.addAttribute("errorMessage", "세션이 유효하지 않아 로그아웃 처리 되었습니다.");
+            model.addAttribute("msg", "세션이 유효하지 않아 로그아웃 처리 되었습니다.");
         } else if (expired != null && expired.equals("true")) {
-            model.addAttribute("errorMessage", "세션이 만료되어 로그아웃 처리 되었습니다.");
+            model.addAttribute("msg", "세션이 만료되어 로그아웃 처리 되었습니다.");
         }
 
         /**
@@ -63,11 +65,16 @@ public class HomeController {
 
         if(authentication == null) {
             log.info("비회원");
-            return "home";
         }
 
+        List<PostResponseDTO> topNotice = postService.getTopNotice();
+        model.addAttribute("topNotice", topNotice);
+        Page<PostResponseDTO> posts = postService.getAllPost("id", 0);
+        model.addAttribute("posts", posts);
+        model.addAttribute("sort_index", "id");
 
-        return "home";
+        model.addAttribute("title", "오늘도 커뮤");
+        return "post/posts";
     }
 
 }

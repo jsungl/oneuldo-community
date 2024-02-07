@@ -1,13 +1,10 @@
 package hello.springcommunity.domain.post;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import hello.springcommunity.domain.BaseTimeEntity;
-import hello.springcommunity.domain.TimeEntity;
 import hello.springcommunity.domain.comment.Comment;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.member.MemberLikePost;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.util.List;

@@ -7,7 +7,7 @@ import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.dto.member.MemberProfileUpdateDTO;
 import hello.springcommunity.dto.member.MemberPwdUpdateDTO;
 import hello.springcommunity.dto.security.UserDetailsDTO;
-import hello.springcommunity.service.member.MemberAuthService;
+import hello.springcommunity.exception.CustomRuntimeException;
 import hello.springcommunity.service.member.MemberService;
 import hello.springcommunity.service.member.MemberUpdateService;
 import hello.springcommunity.service.security.UserDetailsServiceImpl;
@@ -17,7 +17,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -58,6 +57,7 @@ public class MemberUpdateController {
     @GetMapping("/edit/profile")
     public String updateProfileForm(@AuthenticationPrincipal UserDetailsDTO dto, HttpServletRequest request, Model model) {
 
+
         try {
             Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
             if(inputFlashMap != null && inputFlashMap.get("prevProfileUpdateDTO") != null) {
@@ -71,12 +71,12 @@ public class MemberUpdateController {
                 model.addAttribute("memberProfileUpdateDTO", updateDTO);
             }
 
-            return "member/editProfileForm";
-
-        } catch (UsernameNotFoundException e) {
-            model.addAttribute("msg", "회원정보를 변경할 수 없습니다.");
-            return "error/redirect";
+        } catch (RuntimeException e) {
+            throw new CustomRuntimeException("회원정보를 변경할 수 없습니다.");
         }
+
+        model.addAttribute("title", "회원 정보 수정");
+        return "member/editProfileForm";
 
     }
 
@@ -122,8 +122,8 @@ public class MemberUpdateController {
             return "redirect:/member/profile";
 
         } catch (RuntimeException e) {
-            model.addAttribute("msg", "회원정보 변경에 실패하였습니다.");
-            return "error/redirect";
+            redirectAttributes.addFlashAttribute("msg", "회원정보 수정에 실패하였습니다.");
+            return "redirect:/edit/profile";
         }
 
 
@@ -144,6 +144,8 @@ public class MemberUpdateController {
             model.addAttribute("memberPwdUpdateDTO", new MemberPwdUpdateDTO());
         }
 
+        model.addAttribute("title", "비밀번호 변경");
+        
         return "member/editPasswordForm";
     }
 
@@ -186,9 +188,10 @@ public class MemberUpdateController {
             redirectAttributes.addFlashAttribute("msg", "비밀번호가 변경되었습니다.");
             return "redirect:/member/profile";
 
-        } catch (UsernameNotFoundException e) {
-            model.addAttribute("msg", "비밀번호 변경에 실패하였습니다.");
-            return "error/redirect";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("msg", "비밀번호 변경에 실패하였습니다.");
+            return "redirect:/edit/password";
+
         }
 
 

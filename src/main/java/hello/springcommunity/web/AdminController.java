@@ -6,6 +6,7 @@ import hello.springcommunity.dto.comment.CommentResponseDTO;
 import hello.springcommunity.dto.member.MemberResponseDTO;
 import hello.springcommunity.dto.post.PostResponseDTO;
 import hello.springcommunity.dto.security.UserDetailsDTO;
+import hello.springcommunity.exception.CustomRuntimeException;
 import hello.springcommunity.service.comment.CommentServiceImpl;
 import hello.springcommunity.service.member.MemberService;
 import hello.springcommunity.service.post.PostService;
@@ -17,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,11 +38,6 @@ public class AdminController {
     private final PostService postService;
     private final CommentServiceImpl commentService;
 
-    @GetMapping
-    public String info() {
-        return "admin/adminInfo";
-    }
-
 
     /**
      * 전체 회원목록 조회
@@ -52,6 +47,7 @@ public class AdminController {
     public String members(Model model, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<MemberResponseDTO> members = memberService.getAllMember(pageable);
         model.addAttribute("members", members);
+        model.addAttribute("title", "회원 관리");
 
         return "admin/members";
     }
@@ -69,12 +65,13 @@ public class AdminController {
             Page<PostResponseDTO> posts = postService.getMemberAllPost(member.getId(), pageable);
 
             model.addAttribute("posts", posts);
-            return "admin/adminOwnDocument";
+            model.addAttribute("title", "내 게시물");
 
-        } catch (UsernameNotFoundException e) {
-            model.addAttribute("msg", "게시물을 조회할 수 없습니다.");
-            return "error/redirect";
+
+        } catch (RuntimeException e) {
+            throw new CustomRuntimeException("게시물을 조회할 수 없습니다.");
         }
+        return "admin/adminOwnDocument";
 
     }
 
@@ -89,18 +86,20 @@ public class AdminController {
         try {
             MemberResponseDTO member = memberService.getMemberById(id);
 
+            //탈퇴한 회원
             if(!member.isActivated()) {
-                model.addAttribute("msg", "이미 탈퇴된 회원입니다.");
-                return "error/redirect";
+                throw new CustomRuntimeException("이미 탈퇴된 회원입니다.");
             }
 
             model.addAttribute("member", member);
-            return "admin/memberProfile";
+            model.addAttribute("title", "회원 정보");
 
-        } catch (UsernameNotFoundException e) {
-            model.addAttribute("msg", "회원정보를 조회할 수 없습니다.");
-            return "error/redirect";
+
+        } catch (RuntimeException e) {
+            throw new CustomRuntimeException("회원정보를 조회할 수 없습니다.");
         }
+
+        return "admin/memberProfile";
 
     }
 
@@ -119,12 +118,16 @@ public class AdminController {
             model.addAttribute("nickname", member.getNickname());
             model.addAttribute("memberActivated", member.isActivated());
             model.addAttribute("posts", posts);
-            return "admin/memberDocument";
+            model.addAttribute("title", member.getNickname() + "님 게시물");
 
-        } catch (UsernameNotFoundException e) {
-            model.addAttribute("msg", "게시물을 조회할 수 없습니다.");
-            return "error/redirect";
+
+        } catch (RuntimeException e) {
+            throw new CustomRuntimeException("게시물을 조회할 수 없습니다.");
         }
+
+        return "admin/memberDocument";
+
+
     }
 
 
@@ -142,12 +145,14 @@ public class AdminController {
             model.addAttribute("nickname", member.getNickname());
             model.addAttribute("memberActivated", member.isActivated());
             model.addAttribute("comments", comments);
-            return "admin/memberComment";
+            model.addAttribute("title", member.getNickname() + "님 댓글");
 
-        } catch (UsernameNotFoundException e) {
-            model.addAttribute("msg", "댓글을 조회할 수 없습니다.");
-            return "error/redirect";
+
+        } catch (RuntimeException e) {
+            throw new CustomRuntimeException("댓글을 조회할 수 없습니다.");
         }
+
+        return "admin/memberComment";
 
     }
 
@@ -174,6 +179,7 @@ public class AdminController {
         //일주일간의 카테고리 별 게시물 통계
         List<Map<String, Object>> result = postService.getPostStat();
         model.addAttribute("result", result);
+        model.addAttribute("title", "게시판 통계");
 
         return "admin/postStat";
     }

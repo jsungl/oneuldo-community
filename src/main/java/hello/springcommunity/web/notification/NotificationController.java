@@ -24,7 +24,6 @@ public class NotificationController {
     // 응답 mime type 은 반드시 text/event-stream 이여야 한다
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> subscribe(@AuthenticationPrincipal UserDetailsDTO dto) {
-        //log.info("User ID={}", dto.getUsername());
         return new ResponseEntity<>(notificationService.connect(dto.getUsername()), HttpStatus.OK);
     }
 

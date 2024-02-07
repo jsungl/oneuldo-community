@@ -2,6 +2,8 @@ package hello.springcommunity.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -20,6 +22,31 @@ public class GlobalExceptionHandler{
      */
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleRuntimeEx(RuntimeException e, HttpServletRequest request) {
+        log.error("[handleRuntimeEx 실행]",e);
+        String requestURI = request.getRequestURI();
+        log.info("requestURI={}", requestURI);
+
+        return "error/500";
+    }
+
+    /**
+     * CustomRuntimeException 처리
+     */
+    @ExceptionHandler(CustomRuntimeException.class)
+    public ResponseEntity<?> handleCustomRuntimeEx(CustomRuntimeException e, HttpServletRequest request) {
+        log.error("[handleCustomRuntimeEx 실행]",e);
+        String requestURI = request.getRequestURI();
+        log.info("requestURI={}", requestURI); // /edit/profile
+
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    //RuntimeException 처리
+    /*
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     protected void handleRuntimeEx(RuntimeException e, HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.error("[handleRuntimeEx 실행]",e);
         String requestURI = request.getRequestURI();
@@ -28,21 +55,7 @@ public class GlobalExceptionHandler{
         request.getSession().setAttribute("runtimeExMessage", "서버내부에서 오류가 발생하였습니다.");
         response.sendRedirect("/");
 
-    }
-
-    //Exception 발생
-    /*
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleException(Exception e, HttpServletRequest request) {
-        log.error("[handleException 실행]",e);
-        String requestURI = request.getRequestURI();
-        log.info("requestURI={}", requestURI);
-
-        return "error/500";
-    }
-
-     */
+    }*/
 
 
     //유저가 존재하지 않을 때 발생
@@ -55,8 +68,7 @@ public class GlobalExceptionHandler{
         log.info("requestURI={}", requestURI);
 
         return "error/404";
-    }
-    */
+    }*/
 
     //요구한 원소가 없을 때 발생
     /*

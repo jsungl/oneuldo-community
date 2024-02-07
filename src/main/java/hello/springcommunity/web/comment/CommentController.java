@@ -1,8 +1,10 @@
 package hello.springcommunity.web.comment;
 
+import hello.springcommunity.domain.notification.NotificationType;
 import hello.springcommunity.dto.comment.CommentRequestDTO;
 import hello.springcommunity.dto.security.UserDetailsDTO;
 import hello.springcommunity.service.comment.CommentServiceImpl;
+import hello.springcommunity.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,7 @@ import java.util.Map;
 public class CommentController {
 
     private final CommentServiceImpl commentService;
+    private final NotificationService notificationService;
 
     /**
      * 댓글 등록
@@ -37,6 +40,17 @@ public class CommentController {
 
         try {
             Long id = commentService.addComment(commentRequestDTO, postId, dto.getUsername());
+
+            // 새 댓글 알림 전송
+            Map<String, Object> param = new HashMap<>();
+            param.put("postId", postId);
+            param.put("sender", dto.getName()); //닉네임
+            param.put("content", commentRequestDTO.getContent());
+            param.put("notificationType", NotificationType.NEW_COMMENT);
+            param.put("url", "/post/notify?postId="+postId+"&commentId="+id+"#comment_"+id);
+
+            notificationService.notifyNewComment(param);
+
             //dataType 이 JSON이 아니여야 한다
             return ResponseEntity.status(HttpStatus.OK).body(id);
 
@@ -50,7 +64,7 @@ public class CommentController {
             errorMap.put("INVALID_PARAMETER_INCLUDED", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMap);
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             Map<String, String> errorMap = new HashMap<>();
             errorMap.put("UNEXPECTED_ERROR", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMap);
@@ -74,7 +88,7 @@ public class CommentController {
             Map<String, String> errorMap = new HashMap<>();
             errorMap.put("INVALID_PARAMETER_INCLUDED", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMap);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             Map<String, String> errorMap = new HashMap<>();
             errorMap.put("UNEXPECTED_ERROR", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMap);
@@ -93,7 +107,7 @@ public class CommentController {
             return new ResponseEntity(HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

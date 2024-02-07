@@ -2,7 +2,6 @@ package hello.springcommunity.domain.post;
 
 
 import hello.springcommunity.domain.BaseTimeEntity;
-import hello.springcommunity.domain.TimeEntity;
 import lombok.*;
 
 import javax.persistence.*;

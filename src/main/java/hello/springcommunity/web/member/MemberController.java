@@ -7,6 +7,7 @@ import hello.springcommunity.dto.comment.CommentResponseDTO;
 import hello.springcommunity.dto.member.MemberLeaveResponseDTO;
 import hello.springcommunity.dto.post.PostResponseDTO;
 import hello.springcommunity.dto.security.UserDetailsDTO;
+import hello.springcommunity.exception.CustomRuntimeException;
 import hello.springcommunity.service.comment.CommentServiceImpl;
 import hello.springcommunity.service.member.MemberService;
 import hello.springcommunity.dto.member.MemberResponseDTO;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -27,7 +27,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.NoSuchElementException;
 
 import static hello.springcommunity.common.SessionConst.OAUTH2_MEMBER;
 
@@ -38,21 +37,10 @@ import static hello.springcommunity.common.SessionConst.OAUTH2_MEMBER;
 public class MemberController {
 
     private final MemberService memberService;
-    //private final HttpSession httpSession;
     private final DisConnectOauth2UserService disConnectOauth2UserService;
     private final CommentServiceImpl commentService;
     private final PostService postService;
 
-
-    /**
-     * 마이페이지 - 회원 정보 수정, 회원 탈퇴
-     */
-    //@PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("/info")
-    public String memberInfo(@AuthenticationPrincipal UserDetailsDTO dto, Model model) {
-        model.addAttribute("loginId", dto.getUsername());
-        return "member/memberInfo";
-    }
 
 
     /**
@@ -63,11 +51,14 @@ public class MemberController {
         try {
             MemberResponseDTO member = memberService.getMemberDtoByLoginId(dto.getUsername());
             model.addAttribute("member", member);
-            return "member/memberProfile";
-        } catch (UsernameNotFoundException e) {
-            model.addAttribute("msg", "회원정보를 조회할 수 없습니다.");
-            return "error/redirect";
+            model.addAttribute("title", "회원 정보");
+
+        } catch (RuntimeException e) {
+            throw new CustomRuntimeException("회원정보를 조회할 수 없습니다.");
         }
+
+        return "member/memberProfile";
+
 
     }
 
@@ -84,12 +75,14 @@ public class MemberController {
             Page<PostResponseDTO> posts = postService.getMemberAllPost(member.getId(), pageable);
 
             model.addAttribute("posts", posts);
-            return "member/memberOwnDocument";
+            model.addAttribute("title", "내 게시물");
+            
 
-        } catch (UsernameNotFoundException e) {
-            model.addAttribute("msg", "회원님이 작성한 게시물을 조회할 수 없습니다.");
-            return "error/redirect";
+        } catch (RuntimeException e) {
+            throw new CustomRuntimeException("게시물을 조회할 수 없습니다.");
         }
+
+        return "member/memberOwnDocument";
 
     }
 
@@ -106,13 +99,14 @@ public class MemberController {
             Page<CommentResponseDTO> comments = commentService.getMemberCommentAll(member.getId(), pageable);
 
             model.addAttribute("comments", comments);
-            return "member/memberOwnComment";
+            model.addAttribute("title", "내 댓글");
+            
 
-        } catch (UsernameNotFoundException e) {
-            model.addAttribute("msg", "회원님이 작성한 댓글을 조회할 수 없습니다.");
-            return "error/redirect";
+        } catch (RuntimeException e) {
+            throw new CustomRuntimeException("댓글을 조회할 수 없습니다.");
         }
 
+        return "member/memberOwnComment";
 
     }
 
@@ -121,7 +115,8 @@ public class MemberController {
      * 회원 탈퇴
      */
     @GetMapping("/leave")
-    public String leaveForm() {
+    public String leaveForm(Model model) {
+        model.addAttribute("title", "회원탈퇴");
         return "member/memberLeave";
     }
 
@@ -136,7 +131,7 @@ public class MemberController {
         try {
 
             if("ROLE_ADMIN".equals(dto.getMember().getRoleValue())) {
-                model.addAttribute("msg", "관리자는 탈퇴처리를 할 수 없습니다.");
+                model.addAttribute("msg", "잘못된 접근입니다.");
                 return "error/redirect";
             }
 
@@ -151,7 +146,7 @@ public class MemberController {
 
                 //세션에 저장된 회원정보가 없거나 AccessToken이 없는경우 로그아웃
                 if(userSessionDTO == null || !StringUtils.hasText(userSessionDTO.getAccessToken())) {
-                    model.addAttribute("msg", "회원탈퇴에 실패하였습니다.");
+                    model.addAttribute("msg", "세션정보가 유효하지 않아 회원탈퇴에 실패하였습니다.");
                     return "member/procLogout";
                 }
 
@@ -166,7 +161,7 @@ public class MemberController {
                         return "redirect:/member/leave";
                     }
                 }
-                //로그아웃
+                //회원탈퇴 성공 -> 로그아웃
                 session.removeAttribute("oauth2member");
                 model.addAttribute("msg", memberLeaveResponseDTO.getMessage());
                 return "member/procLogout";
@@ -187,10 +182,9 @@ public class MemberController {
 
             }
 
-
-        } catch (UsernameNotFoundException | NoSuchElementException e) {
-            model.addAttribute("msg", "회원탈퇴에 실패하였습니다.");
-            return "error/redirect";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("msg", "회원탈퇴에 실패하였습니다.");
+            return "redirect:/member/leave";
         }
 
     }

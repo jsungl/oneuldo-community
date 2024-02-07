@@ -90,6 +90,7 @@ public class GlobalController {
         }
 
         model.addAttribute("sort_index", sort);
+        model.addAttribute("title", "게시물 목록");
         return "post/posts";
 
     }
@@ -174,12 +175,14 @@ public class GlobalController {
             memberService.join(memberSaveRequestDTO, path);
 
             redirectAttributes.addFlashAttribute("msg", "가입시 입력한 메일주소로 메일을 보냈습니다. 메일 확인 후 인증버튼을 눌러주세요!");
-            return "redirect:/login";
 
         } catch (RuntimeException e) {
-            model.addAttribute("msg", "회원가입에 실패하였습니다.");
-            return "error/redirect";
+            redirectAttributes.addFlashAttribute("msg", "회원가입에 실패하였습니다.");
+            return "redirect:/signup";
         }
+
+        return "redirect:/login";
+
     }
 
 
