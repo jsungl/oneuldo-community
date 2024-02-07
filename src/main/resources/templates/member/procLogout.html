@@ -4,16 +4,21 @@
     <meta charset="UTF-8">
     <!-- favicon -->
     <link rel="shortcut icon" th:href="@{/img/favicon.ico}" type="image/x-icon"/>
+    <title>오늘도 커뮤</title>
+
 </head>
 <body>
-  <script th:inline="javascript">
-    window.addEventListener('load', function() {
-        const msg = [[${msg}]];
-        if(msg) {
-            alert(msg);
-        }
-        location.href="/logout";
-    });
-  </script>
+    <form id="logoutForm" th:action="@{/logout}" method="post" style="display:inline">
+    </form>
+
+    <script th:inline="javascript">
+        window.addEventListener('load', function() {
+            const msg = [[${msg}]];
+            if(msg) {
+                alert(msg);
+            }
+            document.getElementById('logoutForm').submit();
+        });
+    </script>
 </body>
 </html>
