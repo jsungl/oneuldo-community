@@ -2,18 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
-<head>
-    <title>아이디 찾기 결과</title>
-</head>
 
-<th:block layout:fragment="content">
+    <head>
+        <title>결과 - 아이디 찾기</title>
+    </head>
 
-    <div class="container">
+    <div class="container inform" layout:fragment="content">
 
         <div class="d-flex align-items-center justify-content-center" style="height:150px">
             <div>
                 <div class="d-flex justify-content-center">
-                    <h4>아이디 조회</h4>
+                    <h3>아이디 조회</h3>
                 </div>
                 <div class="text-center">
                     <p style="color:#767676; margin:0"><small>개인정보보호를 위해 일부분은 *로 표시됩니다.</small></p>
@@ -34,7 +33,7 @@
 
             <div class="mbrTplBoxList">
                 <ul
-                    th:with="temp = ${#strings.substring(findMember.getLoginId(), 3)},
+                    th:with="temp = ${#strings.substring(findMember.getLoginId(), 2)},
                             size = ${#strings.length(temp)}">
                     <li class="d-flex justify-content-center" style="list-style: none;">
                         <span th:text="${#strings.replace(findMember.getLoginId(), temp, #strings.repeat('*', size))}">아이디</span>
@@ -62,5 +61,4 @@
 
     </div>
 
-</th:block>
 </html>

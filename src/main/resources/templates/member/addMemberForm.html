@@ -2,16 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
-<head>
-    <title>회원 가입</title>
-</head>
 
-<th:block layout:fragment="content">
+    <head>
+        <title>회원 가입</title>
+    </head>
 
-    <div class="container">
+    <div class="container inform" layout:fragment="content">
 
         <div class="d-flex justify-content-center align-items-center" style="height:100px">
-            <h4>회원가입</h4>
+            <h3>회원가입</h3>
         </div>
 
         <h5 class="mb-3">회원 정보 입력</h5>
@@ -82,12 +81,8 @@
                 <div class="col">
                     <button class="w-100 btn btn-primary btn-lg" type="submit" onclick="loading('signupBtn');">회원 가입</button>
                 </div>
-                <div class="col">
-                    <button class="w-100 btn btn-secondary btn-lg"
-                            th:onclick="|location.href='@{/}'|"
-                            type="button">돌아가기</button>
-                </div>
             </div>
+
             <div class="row" id="loading" style="display:none">
                 <div class="col">
                     <button class="w-100 btn btn-primary btn-lg" disabled>
@@ -97,12 +92,9 @@
                 </div>
             </div>
         </form>
+    </div>
 
-    </div> <!-- /container -->
-</th:block>
-
-<th:block layout:fragment="addMemberFormScript">
-    <script th:inline="javascript">
+    <script th:inline="javascript" layout:fragment="addMemberForm">
         window.addEventListener('pageshow', function() {
             const form = document.getElementById('addMemberForm');
             if(form !== null && form !== undefined) {
@@ -110,7 +102,5 @@
             }
         });
     </script>
-</th:block>
-
 
 </html>

@@ -2,16 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
-<head>
-    <title>아이디 찾기</title>
-</head>
 
-<th:block layout:fragment="content">
+    <head>
+        <title>아이디 찾기</title>
+    </head>
 
-    <div class="container">
+    <div class="container inform" layout:fragment="content">
 
         <div class="d-flex justify-content-center align-items-center" style="height:100px">
-            <h4>아이디 찾기</h4>
+            <h3>아이디 찾기</h3>
         </div>
 
         <div class="col">
@@ -52,10 +51,8 @@
 
     </div>
 
-</th:block>
 
-<th:block layout:fragment="findIdScript">
-    <script th:inline="javascript">
+    <script th:inline="javascript" layout:fragment="findId">
         window.addEventListener('pageshow', function() {
             const form = document.getElementById('findIdForm');
             if(form !== null && form !== undefined) {
@@ -63,6 +60,6 @@
             }
         });
     </script>
-</th:block>
+
 
 </html>

@@ -11,46 +11,113 @@
 
     <!-- Body -->
     <body>
-        <!-- 로고 -->
+
         <header>
-            <div class="top-header" style="height:30px"></div>
-            <div class="container">
-                <div class="d-flex justify-content-center">
-                    <a href="/posts" class="text-decoration-none">
-                        <img th:src="@{/img/logo/oneuldo_logo_short.png}" alt="logo" width="200">
-                    </a>
+                <!-- 상단 바 -->
+                <div class="top-header">
+                    <nav class="navbar navbar-light bg-light" style="--bs-breadcrumb-divider: '∣';" aria-label="breadcrumb">
+                        <div class="container d-flex justify-content-end">
+                            <ol class="breadcrumb mb-0" style="font-size:12px">
+                                <th:block sec:authorize="isAuthenticated()">
+
+                                    <!-- 유저 -->
+                                    <th:block sec:authorize="hasAnyRole('ROLE_USER', 'ROLE_SOCIAL')">
+                                        <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/member/profile}">내 정보</a></li>
+                                        <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/member/myDocument}">내 게시물</a></li>
+                                        <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/member/myComment}">내 댓글</a></li>
+                                    </th:block>
+
+                                    <!-- 관리자 -->
+                                    <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+                                        <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/admin/members}">회원 관리</a></li>
+                                        <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/admin/myDocument}">내 게시물</a></li>
+                                        <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/admin/postStat}">게시판 통계</a></li>
+                                    </th:block>
+
+                                    <!-- 알림 -->
+                                    <!-- 알림이 1개 이상 -->
+                                    <li class="breadcrumb-item d-flex align-items-center">
+                                        <div class="dropdown">
+                                            <a class="text-decoration-none" href="javascript:;" data-bs-toggle="dropdown">알림</a>
+                                            <ul class="dropdown-menu dropdown-menu-end p-2" id="oc_notification"
+                                                style="max-height:200px;overflow-y:scroll;font-size:12px;white-space:nowrap;">
+                                                <li th:each="notification:${notifications}" th:if="${notifications.size()} != 0">
+                                                    <a class="dropdown-item" th:with="href=@{${notification.url}}" href="javascript:void(0);"
+                                                       th:onclick="navigateTo([[${href}]]);">
+                                                        <span th:text="${notification.sender}">아기로메로</span>
+                                                        <span th:text="${#strings.abbreviate(notification.content, 12)}">내용</span>
+                                                        <span th:text="${notification.createdDate}">4 일 전</span>
+                                                    </a>
+                                                </li>
+                                                <!-- 알림이 없을경우 -->
+                                                <li th:unless="${notifications.size()} != 0">
+                                                    알림이 존재하지 않습니다
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <!-- 읽지 않은 알림 갯수 -->
+                                        <span class="badge bg-danger ms-1" th:text="${notifications.size() == 0 ? '' : notifications.size()}" id="notificationCount">4</span>
+                                    </li>
+
+                                    <!-- 로그아웃 -->
+                                    <li class="breadcrumb-item">
+                                        <form id="logoutForm" th:action="@{/logout}" method="post" style="display:inline">
+                                            <span style="border: 1px solid #ccc;background: #fff;padding: 2px 7px 2px 7px;border-radius: 5px;">
+                                                <a class="text-decoration-none" href="javascript:;" onclick="logout()">로그아웃</a>
+                                            </span>
+                                        </form>
+                                    </li>
+                                </th:block>
+                                <th:block sec:authorize="isAnonymous()">
+                                    <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/signup}">회원가입</a></li>
+                                    <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/login}">로그인</a></li>
+                                </th:block>
+                            </ol>
+                        </div>
+                    </nav>
                 </div>
-            </div>
+                <!-- 로고 -->
+                <div class="container p-2">
+                    <div class="d-flex justify-content-center">
+                        <a class="text-decoration-none" th:href="@{/}">
+                            <img th:src="@{/img/logo/oneuldo_logo_short.png}" alt="logo" width="200">
+                        </a>
+                    </div>
+                </div>
         </header>
 
+        <!-- 내용 -->
         <th:block layout:fragment="content"></th:block>
 
-        <!-- Bootstrap Bundle with Popper -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-                integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script th:src="@{/js/comment.js}" th:inline="javascript"></script>
-        <script th:src="@{/js/loading.js}" th:inline="javascript"></script>
-        <script th:src="@{/js/postLike.js}" th:inline="javascript"></script>
+        <!-- Footer -->
+        <th:block th:insert="layout/fragments/footer :: footerFragment"></th:block>
 
-        <!-- script -->
-        <th:block layout:fragment="addMemberFormScript"></th:block>
-        <th:block layout:fragment="loginFormScript"></th:block>
-        <th:block layout:fragment="addFormScript"></th:block>
-        <th:block layout:fragment="editFormScript"></th:block>
-        <th:block layout:fragment="editProfileScript"></th:block>
-        <th:block layout:fragment="editPasswordScript"></th:block>
-        <th:block layout:fragment="findIdScript"></th:block>
-        <th:block layout:fragment="findPasswordScript"></th:block>
-        <th:block layout:fragment="postScript"></th:block>
-        <th:block layout:fragment="postsScript"></th:block>
-        <th:block layout:fragment="memberProfileScript"></th:block>
-        <th:block layout:fragment="memberLeaveScript"></th:block>
-        <th:block layout:fragment="postStatScript"></th:block>
+        <!-- 공통 -->
+        <script th:src="@{/js/loading.js}" th:inline="javascript"></script>
+        <script th:inline="javascript">
+            window.addEventListener('load', function() {
+                const msg = [[${msg}]];
+                if(msg) {
+                    alert(msg);
+                }
+
+                const openerWindow = window.opener;
+                if(openerWindow) {
+                    openerWindow.location.href = "/login?error=true";
+                    window.close();
+                }
+            });
+        </script>
+
+        <!-- 각 페이지마다 실행될 스크립트 -->
+        <th:block layout:fragment="addForm"></th:block>
+        <th:block layout:fragment="editForm"></th:block>
+        <th:block layout:fragment="loginForm"></th:block>
+        <th:block layout:fragment="addMemberForm"></th:block>
+        <th:block layout:fragment="findId"></th:block>
+        <th:block layout:fragment="findPassword"></th:block>
+
 
     </body>
-
-    <!-- Footer -->
-    <th:block th:insert="layout/fragments/footer :: footerFragment"></th:block>
 
 </html>

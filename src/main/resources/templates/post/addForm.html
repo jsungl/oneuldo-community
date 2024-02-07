@@ -2,22 +2,22 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
-<head>
-    <title>게시물 등록</title>
 
-    <!-- CKEditor 5의 스타일 및 자바스크립트 추가 -->
-    <link rel="stylesheet" th:href="@{/js/ckeditor5/sample/styles.css}">
-    <script th:src="@{/js/ckeditor5/build/ckeditor.js}" th:inline="javascript"></script>
-    <style>
-        .ck.ck-editor {
-            width:inherit;
-        }
-    </style>
+    <head>
+        <!-- CKEditor 5의 스타일 및 자바스크립트 추가 -->
+        <script th:src="@{/js/ckeditor5/build/ckeditor.js}"></script>
+        <link rel="stylesheet" th:href="@{/js/ckeditor5/sample/styles.css}">
+        <style>
+            .ck.ck-editor {
+                width:inherit;
+            }
+        </style>
+        <title>게시물 등록</title>
+    </head>
 
-</head>
-<th:block layout:fragment="content">
+<!--<th:block layout:fragment="content">-->
 
-    <div class="container">
+    <div class="container" layout:fragment="content">
 
         <div class="d-flex justify-content-center align-items-center" style="height:100px">
             <h4>게시물 등록</h4>
@@ -77,74 +77,56 @@
 
         </form>
 
-
-    </div> <!-- /container -->
-</th:block>
-
-<th:block layout:fragment="addFormScript">
-    <script th:inline="javascript">
-        window.addEventListener('load', function() {
-            const msg = [[${errorMessage}]];
-            if(msg) {
-                alert(msg);
-            }
-        });
-        window.addEventListener('pageshow', function() {
-            const form = document.getElementById('addPostForm');
-            if(form !== null && form !== undefined) {
-                form.reset();
-            }
-        });
-    </script>
+    </div>
 
     <!-- CKEditor 초기화 스크립트 -->
-    <script th:inline="javascript">
+    <script th:inline="javascript" layout:fragment="addForm">
 
-        ClassicEditor
-            .create(document.getElementById("editor"), {
-                language: "ko",
-                placeholder: '내용을 입력하세요',
-				ckfinder : {
-                    uploadUrl: "/api/image/upload",
-                    withCredentials: true
-                },
-                image : {
-                    upload: {
-                        types: ['jpeg', 'png', 'gif', 'jpg']
+            ClassicEditor
+                .create(document.getElementById("editor"), {
+                    language: "ko",
+                    placeholder: '내용을 입력하세요',
+                    ckfinder : {
+                        uploadUrl: "/api/image/upload",
+                        withCredentials: true
+                    },
+                    image : {
+                        upload: {
+                            types: ['jpeg', 'png', 'gif', 'jpg']
+                        }
+                    },
+                })
+                .then(editor => {
+                    window.editor = editor;
+                })
+                .catch(handleSampleError);
+
+
+            function handleSampleError(error) {
+                const issueUrl = 'https://github.com/ckeditor/ckeditor5/issues';
+
+                const message = [
+                    'Oops, something went wrong!',
+                    `Please, report the following error on ${issueUrl} with the build id "y9ylhgvx2qa3-7raeafrec2to" and the error stack trace:`
+                ].join('\n');
+
+                console.error(message);
+                console.error(error);
+                alert(message);
+            }
+
+            function viewCheckBox(option, role) {
+                if(role == 'ROLE_ADMIN') {
+                    const container = document.getElementById('notice_fixed');
+                    if(option == 'NOTICE') {
+                       container.style.display = 'block';
+                    } else {
+                        container.style.display = 'none';
                     }
-                },
-
-            })
-            .then(editor => {
-                window.editor = editor;
-            })
-            .catch(handleSampleError);
-
-        function handleSampleError(error) {
-            const issueUrl = 'https://github.com/ckeditor/ckeditor5/issues';
-
-            const message = [
-                'Oops, something went wrong!',
-                `Please, report the following error on ${issueUrl} with the build id "y9ylhgvx2qa3-7raeafrec2to" and the error stack trace:`
-            ].join('\n');
-
-            console.error(message);
-            console.error(error);
-            alert(message);
-        }
-    </script>
-    <script th:inline="javascript">
-        function viewCheckBox(option, role) {
-            if(role == 'ROLE_ADMIN') {
-                const container = document.getElementById('notice_fixed');
-                if(option == 'NOTICE') {
-                   container.style.display = 'block';
-                } else {
-                    container.style.display = 'none';
                 }
             }
-        }
+
     </script>
-</th:block>
+<!--</th:block>-->
 
 </html>

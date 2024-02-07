@@ -2,163 +2,100 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
-<head>
 
-  <style>
-    .divide-line {
-       display: flex;
-       align-items: center;
-    }
-    .bar{
-      flex: auto;
-      border: none;
-      height: 1px;
-      background-color: #000;
-    }
-    .txt {
-      padding: 0 10px;
-    }
+    <head>
+      <title>로그인</title>
+    </head>
 
-    .n-signin-btn {
-      width: 48px;
-      height: 48px;
-      /* Set the background image */
-      /* background-image: url('img/naver/btnG_icon.png'); */
-      /* Make the background image cover the button */
-      background-size: cover;
-      /* Center the background image */
-      background-position: center;
-      /* Optional: Add some padding and other styles */
-      padding: 10px;
-      border: none;
-    }
+    <div class="container inform p-3" layout:fragment="content">
 
-    .g-signin-btn {
-      width: 48px;
-      height: 48px;
-      /* Set the background image */
-      /* background-image: url('img/google/btn_icon.png'); */
-      /* Make the background image cover the button */
-      background-size: cover;
-      /* Center the background image */
-      background-position: center;
-      /* Optional: Add some padding and other styles */
-      padding: 10px;
-      border: none;
-    }
-  </style>
-  <title>로그인</title>
-</head>
-
-<th:block layout:fragment="content">
-  <div class="container inform p-3">
-
-    <div class="d-flex justify-content-center align-items-center" style="height:100px">
-      <h4>로그인</h4>
-    </div>
-
-    <!-- 일반 로그인 -->
-    <form id="loginForm" th:action="@{/login/process}" th:object="${loginForm}" method="post">
-
-      <div th:if="${#fields.hasGlobalErrors()}">
-        <p class="field-error" th:each="err : ${#fields.globalErrors()}"
-           th:text="${err}">전체 오류 메시지</p>
+      <div class="d-flex justify-content-center align-items-center" style="height:100px">
+        <h3>로그인</h3>
       </div>
 
-      <div th:if="${errorMessage}">
-        <p class="field-error" th:text="${errorMessage}">오류 메시지</p>
-      </div>
+      <!-- 일반 로그인 -->
+      <form id="loginForm" th:action="@{/login/process}" th:object="${loginForm}" method="post">
 
-      <div>
-        <label for="loginId">로그인 ID</label>
-        <input type="text" id="loginId" th:field="*{loginId}" class="form-control"
-               th:errorclass="field-error">
-        <div class="field-error" th:errors="*{loginId}" />
-      </div>
+        <div th:if="${#fields.hasGlobalErrors()}">
+          <p class="field-error" th:each="err : ${#fields.globalErrors()}"
+             th:text="${err}">전체 오류 메시지</p>
+        </div>
 
-      <div>
-        <label for="password">비밀번호</label>
-        <input type="password" id="password" th:field="*{password}"
-               class="form-control"
-               th:errorclass="field-error">
-        <div class="field-error" th:errors="*{password}" />
-      </div>
+        <div th:if="${errorMessage}">
+          <p class="field-error" th:text="${errorMessage}">오류 메시지</p>
+        </div>
 
-      <div class="row mt-3">
-        <div class="col">
-          <button class="w-100 btn btn-primary btn-lg" type="submit">
-            로그인
-          </button>
+        <div>
+          <label for="loginId">로그인 ID</label>
+          <input type="text" id="loginId" th:field="*{loginId}" class="form-control"
+                 th:errorclass="field-error">
+          <div class="field-error" th:errors="*{loginId}" />
+        </div>
+
+        <div>
+          <label for="password">비밀번호</label>
+          <input type="password" id="password" th:field="*{password}"
+                 class="form-control"
+                 th:errorclass="field-error">
+          <div class="field-error" th:errors="*{password}" />
+        </div>
+
+        <div class="row mt-3">
+          <div class="col">
+            <button class="w-100 btn btn-primary btn-lg" type="submit">
+              로그인
+            </button>
+          </div>
+        </div>
+      </form>
+
+
+      <div class="d-flex justify-content-center my-3">
+        <div class="me-3 ms-3">
+          <a th:href="@{/signup}" class="text-decoration-none text-dark">
+            회원가입
+          </a>
+        </div>
+        <div class="me-3 ms-3">
+          <a th:href="@{/find/id}" class="text-decoration-none text-dark">
+            아이디 찾기
+          </a>
+        </div>
+        <div class="ms-3">
+          <a th:href="@{/find/password}" class="text-decoration-none text-dark">
+            비밀번호 찾기
+          </a>
         </div>
       </div>
-    </form>
 
-
-    <div class="d-flex justify-content-center my-3">
-      <div class="me-3 ms-3">
-        <a th:href="@{/signup}" class="text-decoration-none text-dark">
-          회원가입
-        </a>
+      <div class="divide-line my-4">
+        <hr class="bar">
+        <span class="txt">OR</span>
+        <hr class="bar">
       </div>
-      <div class="me-3 ms-3">
-        <a th:href="@{/find/id}" class="text-decoration-none text-dark">
-          아이디 찾기
-        </a>
-      </div>
-      <div class="ms-3">
-        <a th:href="@{/find/password}" class="text-decoration-none text-dark">
-          비밀번호 찾기
-        </a>
-      </div>
-    </div>
 
-    <div class="divide-line my-4">
-      <hr class="bar">
-      <span class="txt">OR</span>
-      <hr class="bar">
-    </div>
+      <!-- social login -->
+      <div class="login-social mb-3">
+        <div class="login-social-title d-flex justify-content-center">
+          <div style="color:#a2a2a2">SNS 계정으로 간편 로그인/회원가입</div>
+        </div>
+        <div class="login-social-btn d-flex justify-content-center mt-3">
+          <div class="row" th:with="nlogin_url=|@{/oauth2/authorization/naver}|, glogin_url=|@{/oauth2/authorization/google}|">
+            <div class="col">
+              <!--            <button class="n-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/naver}'|"></button>-->
+              <button class="n-signIn-btn p-3" type="button" th:onclick="popup([[${nlogin_url}]])" th:style="'background-image:url(' + @{/img/naver/btnG_icon.png} + ');'"></button>
 
-    <!-- social login -->
-    <div class="login-social mb-3">
-      <div class="login-social-title d-flex justify-content-center">
-        <div style="color:#a2a2a2">SNS 계정으로 간편 로그인/회원가입</div>
-      </div>
-      <div class="login-social-btn d-flex justify-content-center mt-3">
-        <div class="row" th:with="nlogin_url=|@{/oauth2/authorization/naver}|, glogin_url=|@{/oauth2/authorization/google}|">
-          <div class="col">
-            <!--            <button class="n-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/naver}'|"></button>-->
-            <button class="n-signin-btn p-3" type="button" th:onclick="popup([[${nlogin_url}]])" th:style="'background-image:url(' + @{/img/naver/btnG_icon.png} + ');'"></button>
-
-          </div>
-          <div class="col">
-            <!--            <button class="g-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/google}'|"></button>-->
-            <button class="g-signin-btn p-3" type="button" th:onclick="popup([[${glogin_url}]])" th:style="'background-image:url(' + @{/img/google/btn_icon.png} + ');'"></button>
+            </div>
+            <div class="col">
+              <!--            <button class="g-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/google}'|"></button>-->
+              <button class="g-signIn-btn p-3" type="button" th:onclick="popup([[${glogin_url}]])" th:style="'background-image:url(' + @{/img/google/btn_icon.png} + ');'"></button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </div> <!-- /container -->
 
-
-
-  </div> <!-- /container -->
-
-</th:block>
-
-<th:block layout:fragment="loginFormScript">
-  <script th:inline="javascript">
-        window.addEventListener('load', function() {
-            // 페이지 로드 후 실행
-            const openerWindow = window.opener;
-            if(openerWindow) {
-                openerWindow.location.href = "/login?error=true";
-                window.close();
-            }
-
-            const msg = [[${msg}]];
-            if(msg) {
-                alert(msg);
-            }
-        });
+    <script th:inline="javascript" layout:fragment="loginForm">
 
         window.addEventListener('pageshow', function() {
             // 페이지가 화면에 보여질 때 실행
@@ -171,7 +108,8 @@
         function popup(url) {
           window.open(url,"","width=700px,height=500px,top=200px,left=200px;");
         }
+
     </script>
-</th:block>
+
 
 </html>

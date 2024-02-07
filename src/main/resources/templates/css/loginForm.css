@@ -1,0 +1,45 @@
+
+/* 공통 */
+.divide-line {
+   display: flex;
+   align-items: center;
+}
+
+.divide-line .bar{
+  flex: auto;
+  border: none;
+  height: 1px;
+  background-color: #000;
+}
+
+.divide-line .txt {
+  padding: 0 10px;
+}
+
+.n-signIn-btn {
+  width: 48px;
+  height: 48px;
+  /* Set the background image */
+  /* background-image: url('img/naver/btnG_icon.png'); */
+  /* Make the background image cover the button */
+  background-size: cover;
+  /* Center the background image */
+  background-position: center;
+  /* Optional: Add some padding and other styles */
+  padding: 10px;
+  border: none;
+}
+
+.g-signIn-btn {
+  width: 48px;
+  height: 48px;
+  /* Set the background image */
+  /* background-image: url('img/google/btn_icon.png'); */
+  /* Make the background image cover the button */
+  background-size: cover;
+  /* Center the background image */
+  background-position: center;
+  /* Optional: Add some padding and other styles */
+  padding: 10px;
+  border: none;
+}

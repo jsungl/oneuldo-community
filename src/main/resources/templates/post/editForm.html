@@ -2,21 +2,21 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default_layout}">
-<head>
-    <title>게시물 수정</title>
 
-    <!-- CKEditor 5의 스타일 및 자바스크립트 추가 -->
-    <link rel="stylesheet" th:href="@{/js/ckeditor5/sample/styles.css}">
-    <script th:src="@{/js/ckeditor5/build/ckeditor.js}" th:inline="javascript"></script>
-    <style>
-        .ck.ck-editor {
-            width:inherit;
-        }
-    </style>
-</head>
-<th:block layout:fragment="content">
+    <head>
+        <!-- CKEditor 5의 스타일 및 자바스크립트 추가 -->
+        <link rel="stylesheet" th:href="@{/js/ckeditor5/sample/styles.css}">
+        <script th:src="@{/js/ckeditor5/build/ckeditor.js}" th:inline="javascript"></script>
+        <style>
+            .ck.ck-editor {
+                width:inherit;
+            }
+        </style>
+        <title>게시물 수정</title>
+    </head>
 
-    <div class="container">
+
+    <div class="container" layout:fragment="content">
 
         <div class="d-flex justify-content-center align-items-center" style="height:100px">
             <h4>게시물 수정</h4>
@@ -76,27 +76,11 @@
 
         </form>
 
-    </div> <!-- /container -->
-</th:block>
-
-<th:block layout:fragment="editFormScript">
-    <script th:inline="javascript">
-        window.addEventListener('load', function() {
-            const msg = [[${errorMessage}]];
-            if(msg) {
-                alert(msg);
-            }
-        });
-
-        function submitEditForm(form,event) {
-            event.preventDefault();
-            $("#categoryCode").removeAttr("disabled");
-            form.submit();
-        }
-    </script>
+    </div>
 
     <!-- CKEditor 초기화 스크립트 -->
-    <script th:inline="javascript">
+    <script th:inline="javascript" layout:fragment="editForm">
+
         ClassicEditor
             .create(document.getElementById("editor"), {
                 language: "ko",
@@ -127,7 +111,12 @@
             console.error(error);
             alert(message);
         }
+
+        function submitEditForm(form,event) {
+            event.preventDefault();
+            $("#categoryCode").removeAttr("disabled");
+            form.submit();
+        }
     </script>
-</th:block>
 
 </html>
