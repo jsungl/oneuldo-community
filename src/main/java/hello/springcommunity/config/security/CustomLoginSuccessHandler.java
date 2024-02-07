@@ -1,6 +1,5 @@
 package hello.springcommunity.config.security;
 
-import hello.springcommunity.dto.security.UserDetailsDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -35,12 +34,13 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         //UserDetailsDTO userDetailsDTO = (UserDetailsDTO) authentication.getPrincipal();
 
         String url = "/";
+        boolean match = false;
+
         String prevPage = (String) request.getSession().getAttribute("prevPage");
         if(prevPage != null){
             request.getSession().removeAttribute("prevPage");
+            match = whitelist.stream().anyMatch(i -> prevPage.contains(i));
         }
-
-        boolean match = whitelist.stream().anyMatch(i -> prevPage.contains(i));
 
 
         /**
@@ -53,7 +53,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         RequestCache requestCache = new HttpSessionRequestCache();
         SavedRequest savedRequest = requestCache.getRequest(request, response);
 
-        if(savedRequest != null) {
+        if(prevPage != null && savedRequest != null) {
             /**
              * 1. Security 가 요청을 가로챈 경우
              */
@@ -76,8 +76,6 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         }
 
         response.sendRedirect(url);
-
-
 
     }
 

@@ -203,12 +203,6 @@ public class SecurityConfig {
         /**
          * 로그아웃
          */
-//        http.logout()
-//            .logoutUrl("/logout") // 로그아웃 처리 URL (= form action url)
-//            .logoutSuccessUrl("/?logout=true") //로그아웃 성공시 이동할 url
-//            .invalidateHttpSession(true) //로그아웃시 생성된 세션 삭제
-//            .deleteCookies("JSESSIONID");
-
         http.logout()
                 .logoutUrl("/logout") // 로그아웃 처리 URL (= form action url)
                 .logoutSuccessHandler(logoutSuccessHandler) //로그아웃 성공 핸들러
