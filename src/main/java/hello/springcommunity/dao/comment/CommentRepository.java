@@ -40,8 +40,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     /**
      * 특정 회원이 작성한 댓글 모두 조회
      */
-    @EntityGraph(attributePaths = {"post", "member", "children"})
-    Page<Comment> findByMemberId(Long id, Pageable pageable);
+//    @EntityGraph(attributePaths = {"post", "member", "children"})
+//    Page<Comment> findByMemberId(Long id, Pageable pageable);
 
     /**
      * 그룹 내 총 대댓글 수(최상위 부모 댓글 제외)

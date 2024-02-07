@@ -291,14 +291,16 @@ public class CommentServiceImpl {
      */
     public Page<CommentResponseDTO> getMemberCommentAll(Long id, Pageable pageable) {
 
-        Page<Comment> comments = commentRepository.findByMemberId(id, pageable);
+        //Page<Comment> comments = commentRepository.findByMemberId(id, pageable);
+        List<Comment> comments = commentQueryRepository.findByMemberId(id, pageable);
 
         List<CommentResponseDTO> list = new ArrayList<>();
         for(Comment comment : comments) {
             CommentResponseDTO dto = entityToDto(comment);
             list.add(dto);
         }
-        return new PageImpl<>(list, pageable, comments.getTotalElements());
+        //return new PageImpl<>(list, pageable, comments.getTotalElements());
+        return new PageImpl<>(list, pageable, comments.size());
     }
 
 }

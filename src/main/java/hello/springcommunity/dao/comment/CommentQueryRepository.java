@@ -140,6 +140,28 @@ public class CommentQueryRepository {
                 .execute();
     }
 
+    /**
+     * 회원이 작성한 댓글 모두 조회
+     */
+    public List<Comment> findByMemberId(Long id, Pageable pageable) {
+
+        List<Long> ids = query.select(comment.id)
+                .from(comment)
+                .where(comment.member.id.eq(id))
+                .orderBy(comment.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+
+        return query.selectFrom(comment)
+                .leftJoin(comment.post).fetchJoin()
+                .leftJoin(comment.member).fetchJoin()
+                .leftJoin(comment.children).fetchJoin()
+                .where(comment.id.in(ids))
+                .orderBy(comment.id.desc())
+                .fetch().stream().distinct().collect(Collectors.toList()); //중복제거
+    }
 
 
     /**

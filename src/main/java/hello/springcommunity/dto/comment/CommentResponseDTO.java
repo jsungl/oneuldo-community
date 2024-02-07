@@ -31,6 +31,7 @@ public class CommentResponseDTO {
     private Integer depth;
     private Boolean isDeleted;
     private Boolean isModified;
+    private Boolean isCanRead;
     private List<CommentResponseDTO> children = new ArrayList<>();
 
 
@@ -46,6 +47,7 @@ public class CommentResponseDTO {
         this.depth = depth;
         this.isDeleted = isDeleted;
         this.isModified = isModified;
+        this.isCanRead = post.getMember().getActivated();
     }
 
 
