@@ -45,7 +45,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     /**
      * 이메일로 회원 조회
      */
-    Optional<Member> findByEmail(String email);
+    @Query("select m from Member m where m.email = :email and m.activated = TRUE")
+    Optional<Member> findByEmail(@Param("email") String email);
 
     /**
      * 회원 id 로 조회

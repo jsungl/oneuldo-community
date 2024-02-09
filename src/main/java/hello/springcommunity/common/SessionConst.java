@@ -17,4 +17,7 @@ public class SessionConst {
     /* 비밀번호 찾기를 한 FindPasswordDTO 객체 */
     public static final String FIND_MEMBER_PASSWORD = "findPassword";
 
+    /* 소셜 계정 사용자의 랜덤 아이디 */
+    public static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789";
+
 }

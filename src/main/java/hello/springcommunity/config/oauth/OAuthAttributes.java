@@ -1,11 +1,15 @@
 package hello.springcommunity.config.oauth;
 
+import hello.springcommunity.common.SessionConst;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.domain.member.Role;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
+import java.util.Random;
+
+import static hello.springcommunity.common.SessionConst.*;
 
 /**
  * 소셜 로그인 성공시 사용자 정보를 담을 클래스
@@ -53,7 +57,8 @@ public class OAuthAttributes {
         /*{id=AvMxLlwRODQIV8a35S8A6Ru-sCuz_I_HDL1YLqXgMC4, nickname=JS, email=morefromjs@gmail.com, name=이재성}*/
 
         return OAuthAttributes.builder()
-                .oauth2Id(registrationId + "_" + response.get("id"))
+                .oauth2Id(createRandomLoginId())
+                //.oauth2Id(registrationId + "_" + response.get("id"))
                 //.nickname(response.get("nickname") + "_" + response.get("id"))
                 .nickname("n_" + response.get("id").toString().substring(0,7))
                 .email((String) response.get("email"))
@@ -62,12 +67,14 @@ public class OAuthAttributes {
                 .build();
     }
 
+
     /**
      * 구글 로그인시 가져온 attribute를 설정
      */
     private static OAuthAttributes ofGoogle(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
         return OAuthAttributes.builder()
-                .oauth2Id(registrationId + "_" + attributes.get("sub"))
+                .oauth2Id(createRandomLoginId())
+                //.oauth2Id(registrationId + "_" + attributes.get("sub"))
                 //.nickname(attributes.get("name") + "_" + attributes.get("sub"))
                 .nickname("g_" + attributes.get("sub").toString().substring(0,7))
                 .email((String) attributes.get("email"))
@@ -87,5 +94,19 @@ public class OAuthAttributes {
                 .email(email)
                 .role(Role.SOCIAL)
                 .build();
+    }
+
+    /**
+     * 랜덤 아이디 생성
+     */
+    private static String createRandomLoginId() {
+        Random random = new Random();
+        StringBuffer key = new StringBuffer();
+
+        for (int i = 0; i < 12; i++) {
+            int index = random.nextInt(CHARACTERS.length());
+            key.append(CHARACTERS.charAt(index));
+        }
+        return key.toString();
     }
 }

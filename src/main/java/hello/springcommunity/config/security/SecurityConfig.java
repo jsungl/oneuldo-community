@@ -113,7 +113,7 @@ public class SecurityConfig {
         http.authorizeRequests()
                 .antMatchers("/signup", "/find/**", "/login/**").anonymous()
                 .antMatchers("/post/add","/post/{postId}/edit","/post/{postId}/delete","/post/like/**","/member/**","/api/post/**",
-                        "/my-websocket-endpoint", "/notifications/subscribe").authenticated()
+                        "/notifications/subscribe").authenticated()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll(); //그 외 요청들은 모두 접근허용
 
