@@ -46,7 +46,7 @@ public class MemberUpdateController {
      */
     @InitBinder("memberProfileUpdateDTO")
     public void init(WebDataBinder dataBinder) {
-        log.info("memberProfileUpdateDTO init binder={}", dataBinder);
+        //log.info("memberProfileUpdateDTO init binder={}", dataBinder);
         dataBinder.addValidators(checkNicknameValidator);
         dataBinder.addValidators(checkMailValidator);
     }

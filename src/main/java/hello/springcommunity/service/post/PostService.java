@@ -602,7 +602,6 @@ public class PostService {
 
             } else {
                 //모두 삭제한 경우
-                log.info("기존 이미지 모두 삭제");
                 for(Element image : originDocimages) {
                     String source = image.attr("src").replace("https://oneuldo-communication.s3.ap-northeast-2.amazonaws.com/", "");
                     imageService.delete(source);

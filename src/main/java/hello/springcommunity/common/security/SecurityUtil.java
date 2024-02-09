@@ -20,7 +20,7 @@ public class SecurityUtil {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if(authentication == null || authentication.getName() == null) {
-            log.info("SecurityContext에 인증정보가 없습니다");
+            //log.info("SecurityContext에 인증정보가 없습니다");
             return Optional.empty();
         }
 
@@ -31,7 +31,7 @@ public class SecurityUtil {
             username = (String) authentication.getPrincipal();
         }
 
-        log.info("username={}", username);
+        //log.info("username={}", username);
         return Optional.ofNullable(username);
     }
 

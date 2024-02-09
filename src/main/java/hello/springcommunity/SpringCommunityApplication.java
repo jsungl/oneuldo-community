@@ -1,9 +1,7 @@
 package hello.springcommunity;
 
-import hello.springcommunity.dao.member.MemberRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 /**
@@ -29,8 +27,8 @@ public class SpringCommunityApplication {
 
 //	@Bean
 //	@Profile("local")
-	public TestDataInit testDataInit(MemberRepository memberRepository) {
-		return new TestDataInit(memberRepository);
-	}
+//	public TestDataInit testDataInit(MemberRepository memberRepository) {
+//		return new TestDataInit(memberRepository);
+//	}
 
 }

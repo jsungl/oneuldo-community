@@ -52,7 +52,7 @@ public class GlobalController {
      */
     @InitBinder("memberSaveRequestDTO")
     public void init(WebDataBinder dataBinder) {
-        log.info("memberSaveRequestDTO init binder={}", dataBinder);
+        //log.info("memberSaveRequestDTO init binder={}", dataBinder);
         dataBinder.addValidators(checkIdValidator);
         dataBinder.addValidators(checkNicknameValidator);
         dataBinder.addValidators(checkMailValidator);

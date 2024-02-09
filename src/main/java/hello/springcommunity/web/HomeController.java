@@ -1,9 +1,7 @@
 package hello.springcommunity.web;
 
-import hello.springcommunity.domain.notification.Notification;
 import hello.springcommunity.dto.post.PostResponseDTO;
 import hello.springcommunity.dto.security.UserDetailsDTO;
-import hello.springcommunity.service.notification.NotificationService;
 import hello.springcommunity.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,9 +61,9 @@ public class HomeController {
          * - authenticated : 인증여부
          */
 
-        if(authentication == null) {
-            log.info("비회원");
-        }
+//        if(authentication == null) {
+//            log.info("비회원");
+//        }
 
         List<PostResponseDTO> topNotice = postService.getTopNotice();
         model.addAttribute("topNotice", topNotice);

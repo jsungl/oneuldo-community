@@ -12,9 +12,8 @@
     <!-- Body -->
     <body>
 
+        <!-- 내용 -->
         <div id="contentContainer" th:replace=":: content"></div>
-
-            <!-- 내용 -->
 <!--            <div id="contentContainer">-->
 <!--                <div th:replace=":: content"></div>-->
 <!--            </div>-->
@@ -63,7 +62,6 @@
                         if (xhr.status == 200 && xhr.getResponseHeader('Location')) {
 
                             let redirectedUrl = xhr.getResponseHeader('Location');
-                            console.log('redirectedUrl: ',redirectedUrl);
 
                             $.ajax({
                                 url: redirectedUrl,

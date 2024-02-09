@@ -34,7 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional(readOnly = true, noRollbackFor = {UsernameNotFoundException.class,NoSuchElementException.class})
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.info("loadUserByUsername() 실행");
+        //log.info("loadUserByUsername() 실행");
         Member member = memberRepository.findByLoginId(username).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
 
         if(member.getRoleValue().equals("ROLE_USER")) {

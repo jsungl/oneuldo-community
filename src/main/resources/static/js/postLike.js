@@ -20,9 +20,7 @@ function likePost(postId) {
                 dataType:'json'
             }).done(function (result) {
                 //클릭 해제된 이미지로 바꾸기 + 추천 숫자 갱신
-                //$(".like-container").load(contextPath + " .like-container");
 
-                console.log(result);
                 let like = result.isLike;
                 let likeCount = result.likeCount;
                 let postId = result.postId;
@@ -62,9 +60,7 @@ function likePost(postId) {
                 dataType:'json' //서버로부터의 응답결과의 형태가 json이라면 이를 javascript object로 변경
             }).done(function (result) {
                 //클릭된 이미지로 바꾸기 + 추천 숫자 갱신
-                //$(".like-container").load(contextPath + " .like-container");
 
-                console.log(result);
                 let like = result.isLike;
                 let likeCount = result.likeCount;
                 let postId = result.postId;

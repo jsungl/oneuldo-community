@@ -194,12 +194,12 @@ public class CommentServiceImpl {
 
         //현재 대댓글의 depth 값과 그룹 내 최대 depth 값을 비교하여 step(그룹 내 순서)를 정한다
         if(commentDepth < groupMaxDepth) {
-            log.info("그룹 내 최대 depth 보다 작음");
+            //log.info("그룹 내 최대 depth 보다 작음");
             //step = 그룹내의 총 자식 댓글 수(최상위 부모 댓글 제외) +1
             return Math.toIntExact(childCount + 1);
 
         } else if(commentDepth == groupMaxDepth) {
-            log.info("그룹 내 최대 depth 와 같음");
+            //log.info("그룹 내 최대 depth 와 같음");
             //그룹 내에서 commentStep + child 보다 큰 step 인 댓글들을 모두 +1
             //commentRepository.plusCommentStep(commentGroupId, commentStep + child);
             commentQueryRepository.plusCommentStep(postId, commentGroupId, commentStep + child);
@@ -207,7 +207,7 @@ public class CommentServiceImpl {
             return commentStep + child + 1;
 
         } else if(commentDepth > groupMaxDepth) {
-            log.info("그룹 내 최대 depth 보다 큼");
+            //log.info("그룹 내 최대 depth 보다 큼");
             // 그룹 내에서 commentStep 보다 큰 step 인 댓글들을 모두 +1
             //commentRepository.plusCommentStep(commentGroupId, commentStep);
             commentQueryRepository.plusCommentStep(postId, commentGroupId, commentStep);

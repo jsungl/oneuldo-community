@@ -36,7 +36,7 @@ public class NotificationInterceptor implements HandlerInterceptor {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if(modelAndView != null && authentication != null && !authentication.getName().equals("anonymousUser")) {
-            log.info("---------NotificationInterceptor 실행!---------");
+            //log.info("---------NotificationInterceptor 실행!---------");
             String loginId = ((UserDetailsDTO) authentication.getPrincipal()).getUsername();
             List<NotificationDTO> list = notificationService.getAll(loginId);
             modelAndView.addObject("notifications", list);

@@ -8,7 +8,6 @@ function addComment(form, event) {
     let contextPath = form.contextPath.value;
     let header = $("meta[name='_csrf_header']").attr('content');
     let csrf_token = $("meta[name='_csrf']").attr('content');
-    //let csrf_token = form._csrf.value;
     let parentId;
     let comment;
 
@@ -123,10 +122,9 @@ function editCommentSave(form) {
                 //댓글 위치
                 const myElement = document.getElementById('comment_'+result);
                 const verticalScrollPosition = setElementScrollPosition(myElement);
-                // 수직 스크롤 위치 설정하기
                 window.scrollTo({
                   top: verticalScrollPosition,
-                  behavior: 'smooth' // 부드러운 스크롤(선택 사항)
+                  behavior: 'smooth'
                 });
             });
 
@@ -220,10 +218,9 @@ function moveToParent(commentId) {
         const myElement = document.getElementById('comment_'+commentId);
         const verticalScrollPosition = setElementScrollPosition(myElement);
 
-        //수직 스크롤 위치 설정하기
         window.scrollTo({
           top: verticalScrollPosition,
-          behavior: 'smooth' // 부드러운 스크롤(선택 사항)
+          behavior: 'smooth'
         });
     });
 }
