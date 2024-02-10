@@ -39,3 +39,4 @@ application.properties
 generated\
 application-oauth.properties
 application-local.properties
+application-prod.properties
