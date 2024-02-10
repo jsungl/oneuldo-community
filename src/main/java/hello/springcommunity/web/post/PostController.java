@@ -273,12 +273,9 @@ public class PostController {
 
         try {
             Post savedPost = postService.addPost(postForm, dto.getUsername());
-            //이미지가 있을경우 경로 이동
-            postService.parseContextAndMoveImages(savedPost);
 
             redirectAttributes.addAttribute("postId", savedPost.getId()); //IDENTITY 방식에 의해 DB에 저장후 id 값과 등록날짜(regDate)를 확인할 수 있다
             redirectAttributes.addFlashAttribute("msg", "게시물이 등록되었습니다.");
-
 
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("msg", "게시물 등록에 실패하였습니다.");
@@ -357,12 +354,8 @@ public class PostController {
         }
 
         try {
-            //Long id = postService.updatePost(postId, postRequestDTO);
             postService.parseContextAndEditImages(postId, postRequestDTO);
             Post post = postService.updatePost(postId, postRequestDTO);
-
-            //이미지가 있을경우 경로 이동
-            postService.parseContextAndMoveImages(post);
 
             redirectAttributes.addFlashAttribute("msg", "게시물이 수정되었습니다.");
             redirectAttributes.addAttribute("postId", post.getId());

@@ -57,6 +57,7 @@ public class PostService {
      * 게시물 등록
      */
     public Post addPost(PostRequestDTO postRequestDTO, String loginId) {
+
         Member member = memberRepository.findByLoginId(loginId).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
 
         //공지여부 확인
@@ -75,7 +76,11 @@ public class PostService {
                 .notice(savedNotice)
                 .build();
 
-        return postRepository.save(post);
+        Post savedPost = postRepository.save(post);
+        //이미지가 있을경우 경로 이동
+        parseContextAndMoveImages(savedPost);
+
+        return savedPost;
     }
 
 
@@ -84,7 +89,6 @@ public class PostService {
      */
     public Post updatePost(Long id, PostRequestDTO postRequestDTO) {
 
-        //Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
         Post post = postQueryRepository.findOne(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다."));
         post.updatePost(postRequestDTO.getTitle(), postRequestDTO.getContent());
 
@@ -95,8 +99,12 @@ public class PostService {
             post.setNotice(notice);
         }
 
-        //return post.getId();
-        return postRepository.save(post);
+        Post savedPost = postRepository.save(post);
+        //이미지가 있을경우 경로 이동
+        parseContextAndMoveImages(savedPost);
+
+        return savedPost;
+
     }
 
 
@@ -489,7 +497,7 @@ public class PostService {
      * HTML 파싱 및 이미지 경로 변경
      * S3 임시 폴더 -> 실제 폴더
      */
-    public void parseContextAndMoveImages(Post post) {
+    private void parseContextAndMoveImages(Post post) {
 
         String content = post.getContent();
         //Jsoup 은 HTML 파싱 및 조작을 위한 라이브러리. HTML 문서에서 원하는 정보를 추출할 때 사용한다.(웹 크롤링)
@@ -525,12 +533,9 @@ public class PostService {
             if(!post.getImageYn()) post.setImageYn(true);
 
         } else {
-            //imageService.delete(삭제한 이미지 파일 소스);
-            //게시물 수정시 이미지를 삭제해서 이미지가 없다면
             if(post.getImageYn()) post.setImageYn(false);
         }
 
-        //post.updatePost(post.getTitle(), content);
     }
 
     /**
