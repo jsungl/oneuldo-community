@@ -38,3 +38,4 @@ out/
 application.properties
 generated\
 application-oauth.properties
+application-local.properties
