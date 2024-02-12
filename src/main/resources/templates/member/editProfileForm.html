@@ -94,10 +94,13 @@
 
         <!-- form -->
         <form id="editProfileForm" th:action th:object="${memberProfileUpdateDTO}" method="post">
-            <div>
-                <label for="loginId">아이디</label>
-                <input type="text" id="loginId" class="form-control" th:field="*{loginId}" readonly>
-            </div>
+
+<!--            <th:block sec:authorize="hasRole('ROLE_USER')">-->
+<!--                <div>-->
+<!--                    <label for="loginId">아이디</label>-->
+<!--                    <input type="text" id="loginId" class="form-control" th:field="*{loginId}" readonly>-->
+<!--                </div>-->
+<!--            </th:block>-->
 
             <div class="mb-3">
                 <label for="nickname">닉네임</label>

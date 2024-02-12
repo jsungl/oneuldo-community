@@ -1,9 +1,11 @@
 package hello.springcommunity.common.validation;
 
+import hello.springcommunity.common.security.SecurityUtil;
 import hello.springcommunity.dao.member.MemberRepository;
 import hello.springcommunity.domain.member.Member;
 import hello.springcommunity.dto.member.MemberProfileUpdateDTO;
 import hello.springcommunity.dto.member.MemberSaveRequestDTO;
+import hello.springcommunity.exception.CustomRuntimeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -45,7 +47,14 @@ public class CheckNicknameValidator implements Validator {
             MemberProfileUpdateDTO dto = (MemberProfileUpdateDTO) target;
             nickname = dto.getNickname();
 
-            Optional<Member> member = memberRepository.findByLoginId(dto.getLoginId());
+            Optional<String> username = SecurityUtil.getLoginId();
+            if(username.isEmpty()) {
+                throw new CustomRuntimeException("회원정보를 수정할수 없습니다.");
+            }
+
+            String loginId = username.get();
+
+            Optional<Member> member = memberRepository.findByLoginId(loginId);
             /** 닉네임을 변경한 경우 **/
             if(!member.get().getNickname().equals(nickname)) {
                 checkNickname(nickname, errors);

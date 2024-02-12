@@ -66,7 +66,8 @@ public class MemberUpdateController {
 
             } else {
                 Member member = memberService.getMemberByLoginId(dto.getUsername());
-                MemberProfileUpdateDTO updateDTO = new MemberProfileUpdateDTO(member.getLoginId(), member.getNickname(), member.getEmail());
+//                MemberProfileUpdateDTO updateDTO = new MemberProfileUpdateDTO(member.getLoginId(), member.getNickname(), member.getEmail());
+                MemberProfileUpdateDTO updateDTO = new MemberProfileUpdateDTO(member.getNickname(), member.getEmail());
 
                 model.addAttribute("memberProfileUpdateDTO", updateDTO);
             }

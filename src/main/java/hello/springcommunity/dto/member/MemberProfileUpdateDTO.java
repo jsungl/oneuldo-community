@@ -19,8 +19,8 @@ import static hello.springcommunity.common.validation.ValidationGroups.*;
 @AllArgsConstructor
 public class MemberProfileUpdateDTO {
 
-    @NotBlank(message = "아이디를 입력해주세요.")
-    private String loginId;
+//    @NotBlank(message = "아이디를 입력해주세요.")
+//    private String loginId;
 
     @NotBlank(message = "닉네임을 입력해주세요.", groups = NotBlankGroup.class)
     @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,8}$", message = "닉네임은 특수문자를 포함하지 않은 2~8자리여야 합니다.", groups = PatternGroup.class)

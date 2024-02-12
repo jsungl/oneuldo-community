@@ -56,15 +56,19 @@ public class OAuthAttributes {
         log.info("응답={}", response);
         /*{id=AvMxLlwRODQIV8a35S8A6Ru-sCuz_I_HDL1YLqXgMC4, nickname=JS, email=morefromjs@gmail.com, name=이재성}*/
 
+        String randomLoginId = createRandomLoginId();
+
         return OAuthAttributes.builder()
-                .oauth2Id(createRandomLoginId())
-                //.oauth2Id(registrationId + "_" + response.get("id"))
-                //.nickname(response.get("nickname") + "_" + response.get("id"))
-                .nickname("n_" + response.get("id").toString().substring(0,7))
+                .oauth2Id(randomLoginId)
+                .nickname(randomLoginId)
                 .email((String) response.get("email"))
                 .attributes(response)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
+
+        //.oauth2Id(registrationId + "_" + response.get("id"))
+        //.nickname(response.get("nickname") + "_" + response.get("id"))
+        //.nickname("n_" + response.get("id").toString().substring(0,7))
     }
 
 
@@ -96,6 +100,7 @@ public class OAuthAttributes {
                 .build();
     }
 
+
     /**
      * 랜덤 아이디 생성
      */
@@ -103,7 +108,7 @@ public class OAuthAttributes {
         Random random = new Random();
         StringBuffer key = new StringBuffer();
 
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < 8; i++) {
             int index = random.nextInt(CHARACTERS.length());
             key.append(CHARACTERS.charAt(index));
         }
