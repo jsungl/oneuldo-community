@@ -76,15 +76,19 @@ public class OAuthAttributes {
      * 구글 로그인시 가져온 attribute를 설정
      */
     private static OAuthAttributes ofGoogle(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
+        String randomLoginId = createRandomLoginId();
+
         return OAuthAttributes.builder()
-                .oauth2Id(createRandomLoginId())
-                //.oauth2Id(registrationId + "_" + attributes.get("sub"))
-                //.nickname(attributes.get("name") + "_" + attributes.get("sub"))
-                .nickname("g_" + attributes.get("sub").toString().substring(0,7))
+                .oauth2Id(randomLoginId)
+                .nickname(randomLoginId)
                 .email((String) attributes.get("email"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
+
+        //.oauth2Id(registrationId + "_" + attributes.get("sub"))
+        //.nickname(attributes.get("name") + "_" + attributes.get("sub"))
+        //.nickname("g_" + attributes.get("sub").toString().substring(0,7))
     }
 
 

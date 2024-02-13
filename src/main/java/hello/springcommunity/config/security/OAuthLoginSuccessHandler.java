@@ -21,7 +21,7 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("oauth2 로그인 성공!");
-        log.info("authenticated={}", authentication.isAuthenticated());
+        //log.info("authenticated={}", authentication.isAuthenticated());
 
         response.sendRedirect("/");
     }

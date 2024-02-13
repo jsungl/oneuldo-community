@@ -113,9 +113,15 @@ public class GlobalController {
         }
 
         if(request.getSession().getAttribute("errorMessage") != null) {
-            String msg = (String) request.getSession().getAttribute("errorMessage");
-            model.addAttribute("errorMessage", msg);
+            String errorMessage = (String) request.getSession().getAttribute("errorMessage");
+            String message = (String) request.getSession().getAttribute("msg");
+
+            model.addAttribute("errorMessage", errorMessage);
+            model.addAttribute("msg", message);
+
             request.getSession().removeAttribute("errorMessage");
+            request.getSession().removeAttribute("msg");
+
         }
 
         return "login/loginForm";
