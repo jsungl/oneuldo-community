@@ -61,3 +61,13 @@ th,td:not(.title):not(.content) {
   white-space:normal;
   word-break:break-all;
 }
+
+/* ------------------------------------------------------------------ */
+/* 모바일 화면 */
+.separator::after {
+  content: " | ";
+}
+.info {
+    font-size:12px;
+    color:#999
+}

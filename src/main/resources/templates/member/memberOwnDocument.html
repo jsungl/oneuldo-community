@@ -87,7 +87,46 @@
 
   <div class="container">
 
-    <div class="col-md-12">
+    <!-- 모바일 화면에 출력 -->
+    <div class="row d-md-none">
+      <div class="d-flex justify-content-center align-items-center" style="height:100px">
+        <h4>내 게시물</h4>
+      </div>
+
+      <div>
+        <table class="table">
+          <thead>
+            <tr style="font-size:14px">
+              <th style="border-top:2px solid #444">제목</th>
+              <th style="border-top:2px solid #444">작성일</th>
+            </tr>
+          </thead>
+          <!-- 게시물 목록 -->
+          <tbody>
+            <tr th:each="post:${posts}" th:if="${posts.getTotalElements() != 0}" style="font-size:13px">
+              <td class="title">
+                <a class="text-underline-hover text-dark" th:with="href=@{/post/{postId}(postId=${post.id})}"
+                   href="javascript:void(0);" th:onclick="navigateTo([[${href}]]);" th:text="${post.title}">제목</a>
+                <span th:text="|[${post.commentCount}]|" th:if="${post.commentCount} != 0">댓글개수</span>
+                <i class="upload_image" title="사진" th:if="${post.imageYn}" th:style="'background:url(' + @{/img/image.gif} + ');'"></i>
+                <div class="info">
+                  <span class="separator">게시판: [[${post.categoryName}]]</span>
+                  <span th:classappend="${post.likeCount != 0 ? 'separator' : ''}">조회: [[${post.viewCount}]]</span>
+                  <span th:if="${post.likeCount != 0}">추천: [[${post.likeCount == 0 ? '' : post.likeCount}]]</span>
+                </div>
+              </td>
+              <td class="reg_time" th:text="${post.createdDate}">2024-01-01</td>
+            </tr>
+            <tr class="no_content" th:unless="${posts.getTotalElements() != 0}">
+              <td colspan="2" class="text-center" style="border: none;font-size:13px">작성한 게시물이 존재하지 않습니다.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 데스크톱 화면에 출력 -->
+    <div class="row d-none d-md-block">
       <div class="d-flex justify-content-center align-items-center" style="height:100px">
         <h4>내 게시물</h4>
       </div>
@@ -134,62 +173,63 @@
           </tbody>
         </table>
       </div>
+    </div>
 
-      <!-- 페이징 버튼 -->
-      <div th:if="${!posts.isEmpty()}">
-          <ul class="pagination justify-content-center"
-              th:with="
-                  pageNumber = ${posts.pageable.pageNumber},
-                  pageSize = ${posts.pageable.pageSize},
-                  totalPages = ${posts.totalPages},
-                  startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
-                  tempEndPage = ${startPage + pageSize - 1},
-                  endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})">
 
-            <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
-              <a class="page-link" th:with="href=@{/member/myDocument(page=0)}"
-                 href="javascript:void(0);"
-                 th:onclick="navigateTo([[${href}]]);">
-                <span>&laquo;</span>
-              </a>
-            </li>
+    <!-- 페이징 버튼 -->
+    <div th:if="${!posts.isEmpty()}">
+        <ul class="pagination justify-content-center"
+            th:with="
+                pageNumber = ${posts.pageable.pageNumber},
+                pageSize = ${posts.pageable.pageSize},
+                totalPages = ${posts.totalPages},
+                startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+                tempEndPage = ${startPage + pageSize - 1},
+                endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})">
 
-            <li th:classappend="${posts.first} ? 'disabled'" class="page-item">
-              <a class="page-link" th:with="href=${posts.first} ? '#' : @{/member/myDocument(page=${pageNumber - 1})}"
-                 href="javascript:void(0);"
-                 th:onclick="navigateTo([[${href}]]);"
-                 aria-label="Previous">
-                <span aria-hidden="true">&lt;</span>
-              </a>
-            </li>
+          <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
+            <a class="page-link" th:with="href=@{/member/myDocument(page=0)}"
+               href="javascript:void(0);"
+               th:onclick="navigateTo([[${href}]]);">
+              <span>&laquo;</span>
+            </a>
+          </li>
 
-            <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
-              <span th:if="${page == pageNumber + 1}" th:text="${page}" class="page-link"></span>
-              <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link"
-                 th:with="href=@{/member/myDocument(page=${page - 1})}"
-                 href="javascript:void(0);"
-                 th:onclick="navigateTo([[${href}]]);"></a>
-            </li>
+          <li th:classappend="${posts.first} ? 'disabled'" class="page-item">
+            <a class="page-link" th:with="href=${posts.first} ? '#' : @{/member/myDocument(page=${pageNumber - 1})}"
+               href="javascript:void(0);"
+               th:onclick="navigateTo([[${href}]]);"
+               aria-label="Previous">
+              <span aria-hidden="true">&lt;</span>
+            </a>
+          </li>
 
-            <li th:classappend="${posts.last} ? 'disabled'" class="page-item">
-              <a class="page-link" th:with="href=${posts.last} ? '#' : @{/member/myDocument(page=${pageNumber + 1})}"
-                 href="javascript:void(0);"
-                 th:onclick="navigateTo([[${href}]]);"
-                 aria-label="Next">
-                <span aria-hidden="true">&gt;</span>
-              </a>
-            </li>
+          <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
+            <span th:if="${page == pageNumber + 1}" th:text="${page}" class="page-link"></span>
+            <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link"
+               th:with="href=@{/member/myDocument(page=${page - 1})}"
+               href="javascript:void(0);"
+               th:onclick="navigateTo([[${href}]]);"></a>
+          </li>
 
-            <li th:classappend="${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
-              <a class="page-link" th:with="href=@{/member/myDocument(page=${totalPages - 1})}"
-                 href="javascript:void(0);"
-                 th:onclick="navigateTo([[${href}]]);">
-                <span>&raquo;</span>
-              </a>
-            </li>
+          <li th:classappend="${posts.last} ? 'disabled'" class="page-item">
+            <a class="page-link" th:with="href=${posts.last} ? '#' : @{/member/myDocument(page=${pageNumber + 1})}"
+               href="javascript:void(0);"
+               th:onclick="navigateTo([[${href}]]);"
+               aria-label="Next">
+              <span aria-hidden="true">&gt;</span>
+            </a>
+          </li>
 
-          </ul>
-      </div>
+          <li th:classappend="${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
+            <a class="page-link" th:with="href=@{/member/myDocument(page=${totalPages - 1})}"
+               href="javascript:void(0);"
+               th:onclick="navigateTo([[${href}]]);">
+              <span>&raquo;</span>
+            </a>
+          </li>
+
+        </ul>
     </div>
 
   </div>

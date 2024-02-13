@@ -126,9 +126,10 @@
                     </div>
                 </div>
             </div>
+            <!-- 내용 -->
             <div class="body p-2">
                 <article>
-                    <div th:class="'document_'+${post.id}" th:text="${post.content}">내용</div>
+                    <div class="ck-content" th:utext="${post.content}">내용</div>
                 </article>
             </div>
         </div>

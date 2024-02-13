@@ -87,15 +87,14 @@
 
   <div class="container">
 
-      <div class="col-md-12">
-        <!-- 검색바 -->
-        <div class="d-flex align-items-start justify-content-center py-4" style="height:200px">
-
-          <div>
-            <form th:action="@{/post/search}" method="get" class="form-inline" autocomplete="off"
-                  onsubmit="return searchPost(this, event)">
-              <div class="row row-cols-auto">
-                <div class="col">
+      <!-- 검색바 -->
+      <div class="container py-4" style="height:250px">
+        <form th:action="@{/post/search}" method="get" class="form-inline" autocomplete="off"
+              onsubmit="return searchPost(this, event)">
+          <div class="row justify-content-center">
+            <div class="col-md-8 col-12">
+              <div class="row">
+                <div class="col-md-4">
                   <select class="form-select" id="searchType" name="searchType">
                     <option value="">검색 조건</option>
                     <option value="title" th:selected="${searchType} == 'title'">제목</option>
@@ -104,25 +103,29 @@
                     <option value="memberId" th:selected="${searchType} == 'memberId'" th:if="${searchType} == 'memberId'">회원번호</option>
                   </select>
                 </div>
-                <div class="col">
-                  <input class="form-control" type="text" id="keyword" name="keyword" th:value="${keyword}"/>
-                </div>
-                <div class="col">
-                  <button type="submit" class="search btn btn-light" style="border-color: #adb5bd;">검색</button>
+                <div class="col-md-8">
+                  <input type="text" id="keyword" name="keyword" class="form-control" th:value="${keyword}" />
                 </div>
               </div>
-            </form>
-
-            <!-- 검색결과 -->
-            <div class="search_result text-center mt-3">
-              <h4 th:if="${searchType} != 'memberId'">"[[${keyword}]]"에 대한 검색 결과</h4>
+            </div>
+            <div class="col-md-2 col-12 mt-3 mt-md-0">
+              <button type="submit" class="search btn btn-light w-100" style="border-color: #adb5bd;">검색</button>
             </div>
           </div>
+        </form>
+        <!-- 검색결과 -->
+        <div class="search_result text-center mt-3">
+          <h4 th:if="${searchType} != 'memberId'">"[[${keyword}]]"에 대한 검색 결과</h4>
         </div>
+      </div>
 
-        <div>
-          <nav style="--bs-breadcrumb-divider: '∣';" aria-label="breadcrumb">
-            <ol class="breadcrumb">
+
+      <!-- 모바일 화면에 출력 -->
+      <div class="d-md-none">
+        <!-- 홈 버튼, 등록 버튼 -->
+        <div class="pt-2 ps-2" style="border-top:1px solid #ddd;border-bottom:1px solid #ccc;background:#f9f9f9">
+          <nav style="--bs-breadcrumb-divider: '∣';font-size:13px" aria-label="breadcrumb">
+            <ol class="breadcrumb" style="margin-bottom:0.5rem">
               <li class="breadcrumb-item">
                 <a class="text-decoration-none" th:with="href=@{/}" href="javascript:void(0);"
                    th:onclick="navigateTo([[${href}]]);">
@@ -130,29 +133,169 @@
                 </a>
               </li>
               <li class="breadcrumb-item">
-                <a class="text-decoration-none" th:with="href=@{/posts?category=NOTICE}"
-                                             href="javascript:void(0);"
-                                             th:onclick="navigateTo([[${href}]]);">공지
-                </a>
+                <a class="text-underline-hover NOTICE" th:with="href=@{/posts?category=NOTICE}" href="javascript:void(0);"
+                   th:onclick="navigateTo([[${href}]]);" th:style="${listCategory == 'NOTICE'} ? 'text-decoration:underline' : ''">공지</a>
               </li>
+            </ol>
+          </nav>
 
+          <nav style="--bs-breadcrumb-divider: '';font-size:12px" aria-label="breadcrumb">
+            <ol class="breadcrumb" style="margin-bottom:0.5rem">
               <li class="breadcrumb-item">
-                <th:block sec:authorize="isAuthenticated()">
-                  <a class="text-decoration-none" th:with="href=@{/post/add}"
-                     href="javascript:void(0);"
-                     th:onclick="navigateTo([[${href}]]);">게시물 등록
-                  </a>
-                </th:block>
-
-                <th:block sec:authorize="isAnonymous()">
-                  <a class="text-decoration-none" th:href="@{/post/add}">게시물 등록</a>
-                </th:block>
+                <a class="text-underline-hover" th:with="href=@{/posts?category=FREE}" href="javascript:void(0);"
+                   th:onclick="navigateTo([[${href}]]);" th:style="${listCategory == 'FREE'} ? 'text-decoration:underline' : ''">자유</a>
+              </li>
+              <li class="breadcrumb-item">
+                <a class="text-underline-hover HUMOR" th:with="href=@{/posts?category=HUMOR}" href="javascript:void(0);"
+                   th:onclick="navigateTo([[${href}]]);" th:style="${listCategory == 'HUMOR'} ? 'text-decoration:underline' : ''">유머</a>
+              </li>
+              <li class="breadcrumb-item">
+                <a class="text-underline-hover MYSTERY" th:with="href=@{/posts?category=MYSTERY}" href="javascript:void(0);"
+                   th:onclick="navigateTo([[${href}]]);" th:style="${listCategory == 'MYSTERY'} ? 'text-decoration:underline' : ''">미스터리/공포</a>
+              </li>
+              <li class="breadcrumb-item">
+                <a class="text-underline-hover DIGITAL" th:with="href=@{/posts?category=DIGITAL}" href="javascript:void(0);"
+                   th:onclick="navigateTo([[${href}]]);" th:style="${listCategory == 'DIGITAL'} ? 'text-decoration:underline' : ''">디지털</a>
+              </li>
+              <li class="breadcrumb-item">
+                <a class="text-underline-hover FOOTBALL_WORLD" th:with="href=@{/posts?category=FOOTBALL_WORLD}" href="javascript:void(0);"
+                   th:onclick="navigateTo([[${href}]]);" th:style="${listCategory == 'FOOTBALL_WORLD'} ? 'text-decoration:underline' : ''">해외축구</a>
               </li>
             </ol>
           </nav>
         </div>
 
+        <!-- 게시물 목록 -->
+        <div>
+          <table class="table">
+            <tbody>
 
+              <!-- 공지 -->
+              <tr class="notice" th:each="post:${topNotice}" th:if="${topNotice}">
+                <td class="title">
+                  <a class="text-underline-hover" th:with="href=@{/post/{postId}(postId=${post.id})}"
+                     href="javascript:void(0);"
+                     th:onclick="navigateTo([[${href}]]);"
+                     th:text="${post.title}"
+                     th:classappend="${post.categoryCode}">제목</a>
+                  <i class="upload_image" title="사진" th:if="${post.imageYn}" th:style="'background:url(' + @{/img/image.gif} + ');'"></i>
+                  <div class="info">
+                    <span class="separator">
+                      <i class="bi bi-clock"></i>
+                      <span th:text="${post.createdDate}">작성일</span>
+                    </span>
+                    <span class="separator">
+                      <i class="bi bi-list"></i>
+                      <span th:text="${post.categoryName}">카테고리</span>
+                    </span>
+                    <span class="separator">
+                      <i class="bi bi-person-fill"></i>
+                      <span th:text="${post.member.nickname}">작성자</span>
+                    </span>
+                    <span>
+                      <i class="bi bi-eye"></i>
+                      <span th:text="${post.viewCount}">조회수</span>
+                    </span>
+                  </div>
+                </td>
+              </tr>
+
+
+              <!-- 게시물 -->
+              <tr th:each="post:${posts}" th:if="${posts.getTotalElements() != 0}">
+                <td class="title">
+                  <a class="text-underline-hover text-dark" th:with="href=@{/post/{postId}(postId=${post.id})}"
+                     href="javascript:void(0);"
+                     th:onclick="navigateTo([[${href}]]);"
+                     th:text="${post.title}">제목</a>
+                  <span th:text="|[${post.commentCount}]|" th:if="${post.commentCount} != 0">댓글개수</span>
+                  <i class="upload_image" title="사진" th:if="${post.imageYn}" th:style="'background:url(' + @{/img/image.gif} + ');'"></i>
+                  <div class="info">
+                    <span class="separator">
+                      <i class="bi bi-clock"></i>
+                      <span th:text="${post.createdDate}">작성일</span>
+                    </span>
+                    <span class="separator">
+                      <i class="bi bi-list"></i>
+                      <span th:text="${post.categoryName}">카테고리</span>
+                    </span>
+                    <span class="separator">
+                      <i class="bi bi-person-fill"></i>
+                      <span th:text="${post.member.nickname}">작성자</span>
+                    </span>
+                    <span th:classappend="${post.likeCount != 0 ? 'separator' : ''}">
+                      <i class="bi bi-eye"></i>
+                      <span th:text="${post.viewCount}">조회수</span>
+                    </span>
+                    <span>
+                      <i class="bi bi-hand-thumbs-up-fill" th:if="${post.likeCount != 0}"></i>
+                      <span th:text="${post.likeCount == 0 ? '' : post.likeCount}">추천수</span>
+                    </span>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="no_content" th:unless="${posts.getTotalElements() != 0}">
+                <td style="border: none">게시물이 존재하지 않습니다.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 게시물 등록 -->
+        <th:block sec:authorize="isAuthenticated()">
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-outline-primary btn-sm" th:onclick="|location.href='@{/post/add}'|">게시물 등록</button>
+          </div>
+        </th:block>
+      </div>
+
+
+      <!-- 데스크톱 화면에 출력 -->
+      <div class="d-none d-md-block">
+        <div class="bd_cnb mb-3" style="border:1px solid #ddd;border-radius:5px;background:#fff;box-shadow:0 1px 1px #aaa">
+          <div class="pt-2 ps-2">
+            <nav style="--bs-breadcrumb-divider: '';" aria-label="breadcrumb">
+              <ol class="breadcrumb" style="margin-bottom:0.5rem">
+                <li class="breadcrumb-item" style="padding-left:0.5rem;padding-right:0.5rem">
+                  <a class="text-decoration-none" th:with="href=@{/}" href="javascript:void(0);"
+                     th:onclick="navigateTo([[${href}]]);">
+                    <i class="bi bi-house-fill"></i>
+                  </a>
+                </li>
+                <li class="breadcrumb-item">
+                  <span class="separator"></span>
+                </li>
+                <li class="breadcrumb-item">
+                  <a class="text-underline-hover" th:with="href=@{/posts?category=FREE}" href="javascript:void(0);"
+                     th:onclick="navigateTo([[${href}]]);" th:style="${listCategory == 'FREE'} ? 'text-decoration:underline' : ''">자유</a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a class="text-underline-hover HUMOR" th:with="href=@{/posts?category=HUMOR}" href="javascript:void(0);"
+                     th:onclick="navigateTo([[${href}]]);" th:style="${listCategory == 'HUMOR'} ? 'text-decoration:underline' : ''">유머</a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a class="text-underline-hover MYSTERY" th:with="href=@{/posts?category=MYSTERY}" href="javascript:void(0);"
+                     th:onclick="navigateTo([[${href}]]);" th:style="${listCategory == 'MYSTERY'} ? 'text-decoration:underline' : ''">미스터리/공포</a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a class="text-underline-hover DIGITAL" th:with="href=@{/posts?category=DIGITAL}" href="javascript:void(0);"
+                     th:onclick="navigateTo([[${href}]]);" th:style="${listCategory == 'DIGITAL'} ? 'text-decoration:underline' : ''">디지털</a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a class="text-underline-hover FOOTBALL_WORLD" th:with="href=@{/posts?category=FOOTBALL_WORLD}" href="javascript:void(0);"
+                     th:onclick="navigateTo([[${href}]]);" th:style="${listCategory == 'FOOTBALL_WORLD'} ? 'text-decoration:underline' : ''">해외축구</a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a class="text-underline-hover NOTICE" th:with="href=@{/posts?category=NOTICE}" href="javascript:void(0);"
+                     th:onclick="navigateTo([[${href}]]);" th:style="${listCategory == 'NOTICE'} ? 'text-decoration:underline' : ''">공지</a>
+                </li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+
+        <!-- 게시물 목록 -->
         <div>
           <table class="table">
             <thead class="table-light">
@@ -209,69 +352,76 @@
           </table>
         </div>
 
-        <!-- 페이징 버튼 -->
-        <div th:if="${!posts.isEmpty()}">
-            <ul class="pagination justify-content-center"
-                th:with="
-                    pageNumber = ${posts.pageable.pageNumber},
-                    pageSize = ${posts.pageable.pageSize},
-                    totalPages = ${posts.totalPages},
-                    startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
-                    tempEndPage = ${startPage + pageSize - 1},
-                    endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})">
+        <!-- 게시물 등록 -->
+        <th:block sec:authorize="isAuthenticated()">
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-outline-primary" th:onclick="|location.href='@{/post/add}'|">게시물 등록</button>
+          </div>
+        </th:block>
+      </div>
 
-              <!-- 처음으로 이동 -->
-              <!-- 현재 페이지 인덱스(0부터 시작)가 페이지 사이즈보다 작을 경우 첫 페이지 라인(1~5페이지)에 머물러 있는 경우이므로 비활성화 한다 -->
-              <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
-                <a class="page-link" th:with="href=@{/post/search(searchType=${searchType},keyword=${keyword})}"
-                   href="javascript:void(0);"
-                   th:onclick="navigateTo([[${href}]]);">
-                  <span>&laquo;</span>
-                </a>
-              </li>
+      <!-- 페이징 버튼 -->
+      <div th:if="${!posts.isEmpty()}">
+          <ul class="pagination justify-content-center"
+              th:with="
+                  pageNumber = ${posts.pageable.pageNumber},
+                  pageSize = ${posts.pageable.pageSize},
+                  totalPages = ${posts.totalPages},
+                  startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+                  tempEndPage = ${startPage + pageSize - 1},
+                  endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})">
 
-              <!-- 이전으로 이동 -->
-              <!-- 첫 페이지인 경우 비활성화, 첫 페이지가 아니라면 현재 페이지 인덱스(0부터 시작) - 1 -->
-              <li th:classappend="${posts.first} ? 'disabled'" class="page-item">
-                <a class="page-link" th:with="href=${posts.first} ? '#' : @{/post/search(searchType=${searchType},keyword=${keyword},page=${pageNumber - 1})}"
-                   href="javascript:void(0);"
-                   th:onclick="navigateTo([[${href}]]);">
-                  <span aria-hidden="true">&lt;</span>
-                </a>
-              </li>
+            <!-- 처음으로 이동 -->
+            <!-- 현재 페이지 인덱스(0부터 시작)가 페이지 사이즈보다 작을 경우 첫 페이지 라인(1~5페이지)에 머물러 있는 경우이므로 비활성화 한다 -->
+            <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
+              <a class="page-link" th:with="href=@{/post/search(searchType=${searchType},keyword=${keyword})}"
+                 href="javascript:void(0);"
+                 th:onclick="navigateTo([[${href}]]);">
+                <span>&laquo;</span>
+              </a>
+            </li>
 
-              <!-- 페이지 리스트 루프(5페이지씩 분리)로 startPage 부터 endPage까지 반복 -->
-              <!-- 페이지 번호 누르면 해당 페이지로 이동 -->
-              <!-- page(페이지 번호) 와 현재 페이지 인덱스(0부터 시작) + 1 이 같으면 현재 보고있는 페이지이므로 활성화 -->
-              <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
-                <span th:if="${page == pageNumber + 1}" th:text="${page}" class="page-link"></span>
-                <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link"
-                   th:with="href=@{/post/search(searchType=${searchType},keyword=${keyword},page=${page - 1})}"
-                   href="javascript:void(0);"
-                   th:onclick="navigateTo([[${href}]]);">page</a>
-              </li>
+            <!-- 이전으로 이동 -->
+            <!-- 첫 페이지인 경우 비활성화, 첫 페이지가 아니라면 현재 페이지 인덱스(0부터 시작) - 1 -->
+            <li th:classappend="${posts.first} ? 'disabled'" class="page-item">
+              <a class="page-link" th:with="href=${posts.first} ? '#' : @{/post/search(searchType=${searchType},keyword=${keyword},page=${pageNumber - 1})}"
+                 href="javascript:void(0);"
+                 th:onclick="navigateTo([[${href}]]);">
+                <span aria-hidden="true">&lt;</span>
+              </a>
+            </li>
 
-              <!-- 다음으로 이동 -->
-              <li th:classappend="${posts.last} ? 'disabled'" class="page-item">
-                <a class="page-link" th:with="href=${posts.last} ? '#' : @{/post/search(searchType=${searchType},keyword=${keyword},page=${pageNumber + 1})}"
-                   href="javascript:void(0);"
-                   th:onclick="navigateTo([[${href}]]);">
-                  <span aria-hidden="true">&gt;</span>
-                </a>
-              </li>
+            <!-- 페이지 리스트 루프(5페이지씩 분리)로 startPage 부터 endPage까지 반복 -->
+            <!-- 페이지 번호 누르면 해당 페이지로 이동 -->
+            <!-- page(페이지 번호) 와 현재 페이지 인덱스(0부터 시작) + 1 이 같으면 현재 보고있는 페이지이므로 활성화 -->
+            <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
+              <span th:if="${page == pageNumber + 1}" th:text="${page}" class="page-link"></span>
+              <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link"
+                 th:with="href=@{/post/search(searchType=${searchType},keyword=${keyword},page=${page - 1})}"
+                 href="javascript:void(0);"
+                 th:onclick="navigateTo([[${href}]]);">page</a>
+            </li>
 
-              <!-- 마지막으로 이동 -->
-              <!-- startPage 가 왼쪽 연산보다 이상일 경우 마지막 페이지 라인에 있는 경우이므로 비활성화, 그게 아니면 전체 페이지수(totalPages) - 1 만큼 이동하여 마지막 페이지로 이동한다 -->
-              <li th:classappend="${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
-                <a class="page-link" th:with="href=@{/post/search(searchType=${searchType},keyword=${keyword},page=${totalPages - 1})}"
-                   href="javascript:void(0);"
-                   th:onclick="navigateTo([[${href}]]);">
-                  <span>&raquo;</span>
-                </a>
-              </li>
+            <!-- 다음으로 이동 -->
+            <li th:classappend="${posts.last} ? 'disabled'" class="page-item">
+              <a class="page-link" th:with="href=${posts.last} ? '#' : @{/post/search(searchType=${searchType},keyword=${keyword},page=${pageNumber + 1})}"
+                 href="javascript:void(0);"
+                 th:onclick="navigateTo([[${href}]]);">
+                <span aria-hidden="true">&gt;</span>
+              </a>
+            </li>
 
-            </ul>
-        </div>
+            <!-- 마지막으로 이동 -->
+            <!-- startPage 가 왼쪽 연산보다 이상일 경우 마지막 페이지 라인에 있는 경우이므로 비활성화, 그게 아니면 전체 페이지수(totalPages) - 1 만큼 이동하여 마지막 페이지로 이동한다 -->
+            <li th:classappend="${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
+              <a class="page-link" th:with="href=@{/post/search(searchType=${searchType},keyword=${keyword},page=${totalPages - 1})}"
+                 href="javascript:void(0);"
+                 th:onclick="navigateTo([[${href}]]);">
+                <span>&raquo;</span>
+              </a>
+            </li>
+
+          </ul>
       </div>
 
   </div>

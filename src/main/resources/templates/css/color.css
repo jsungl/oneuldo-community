@@ -1,6 +1,6 @@
 
 /* 공통 */
-/* 테이블 데이터 hover 시 배경색상 */
+/* 테이블 데이터가 없을경우 */
 tbody tr:not(.notice,.no_content):hover {
     background-color: rgba(0,0,0,.075);
 }
@@ -14,27 +14,27 @@ tbody tr:not(.notice,.no_content):hover {
 /* posts.html */
 /* 카테고리 색상 */
 .NOTICE, .NOTICE:hover {
-    color: #ff0000;
+    color: #ff0000 !important;
 }
 
 .FREE, .FREE:hover {
-    color: #000000;
+    color: #000000 !important;
 }
 
 .HUMOR, .HUMOR:hover {
-    color: #B22A2A;
+    color: #B22A2A !important;
 }
 
 .MYSTERY, .MYSTERY:hover {
-    color: #5f00bf;
+    color: #5f00bf !important;
 }
 
 .DIGITAL, .DIGITAL:hover {
-    color: #6B5BE5;
+    color: #6B5BE5 !important;
 }
 
 .FOOTBALL_WORLD, .FOOTBALL_WORLD:hover {
-    color: #007f7f;
+    color: #007f7f !important;
 }
 
 
@@ -55,5 +55,6 @@ tbody tr:not(.notice,.no_content):hover {
 .notice .title {
   font-weight:bold;
 }
+
 
 /* ------------------------------------------------------------------ */

@@ -89,7 +89,52 @@
 
 
   <div class="container">
-    <div class="col-md-12">
+
+    <!-- 모바일 화면에 출력 -->
+    <div class="row d-md-none">
+      <div class="d-flex justify-content-center align-items-center" style="height:100px">
+        <div class="row row-cols-auto align-items-center">
+          <div class="col">
+            <h4 th:text="${nickname}"></h4>
+          </div>
+          <div class="col">
+            님의 댓글
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <table class="table">
+          <thead>
+            <tr style="font-size:14px">
+              <th style="border-top:2px solid #444">내용</th>
+              <th style="border-top:2px solid #444">작성일</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="comment,stat:${comments}" th:if="${comments.getTotalElements() != 0} and ${comment.isCanRead}" style="font-size:13px">
+              <td class="content">
+                <div class="word" style="white-space:normal;word-break:break-all;">
+                  <a class="text-underline-hover text-dark" th:with="href=@{|/post/${comment.post.id}?commentId=${comment.id}#comment_${comment.id}|}"
+                     href="javascript:void(0);" th:onclick="navigateTo([[${href}]]);" th:text="${comment.content}">내용</a>
+                  <div class="info">
+                    <span>게시판: [[${comment.post.categoryName}]]</span>
+                  </div>
+                </div>
+              </td>
+              <td class="reg_time" th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd')}">2024-01-01</td>
+            </tr>
+            <tr class="no_content" th:unless="${comments.getTotalElements() != 0}">
+              <td colspan="2" style="border:none;font-size:13px">작성한 댓글이 존재하지 않습니다.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- 데스크톱 화면에 출력 -->
+    <div class="row d-none d-md-block">
 
       <div class="d-flex justify-content-center align-items-center" style="height:100px">
         <div class="row row-cols-auto align-items-center">
@@ -136,53 +181,53 @@
           </tbody>
         </table>
       </div>
-
-      <div th:if="${!comments.isEmpty()}">
-          <ul class="pagination justify-content-center"
-              th:with="
-                  pageNumber = ${comments.pageable.pageNumber},
-                  pageSize = ${comments.pageable.pageSize},
-                  totalPages = ${comments.totalPages},
-                  startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
-                  tempEndPage = ${startPage + pageSize - 1},
-                  endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})">
-
-            <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
-              <a class="page-link" th:with="href=@{/member/myComment(page=0)}" href="javascript:void(0);" th:onclick="navigateTo([[${href}]]);">
-                <span>&laquo;</span>
-              </a>
-            </li>
-
-            <li th:classappend="${comments.first} ? 'disabled'" class="page-item">
-              <a class="page-link" th:with="href=${comments.first} ? '#' : @{/member/myComment(page=${pageNumber - 1})}"
-                 href="javascript:void(0);" th:onclick="navigateTo([[${href}]]);" aria-label="Previous">
-                <span aria-hidden="true">&lt;</span>
-              </a>
-            </li>
-
-            <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
-                <span th:if="${page == pageNumber + 1}" th:text="${page}" class="page-link"></span>
-                <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link" th:with="href=@{/member/myComment(page=${page - 1})}"
-                   href="javascript:void(0);" th:onclick="navigateTo([[${href}]]);"></a>
-            </li>
-
-            <li th:classappend="${comments.last} ? 'disabled'" class="page-item">
-              <a class="page-link" th:with="href=${comments.last} ? '#' : @{/member/myComment(page=${pageNumber + 1})}"
-                 href="javascript:void(0);" th:onclick="navigateTo([[${href}]]);" aria-label="Next">
-                <span aria-hidden="true">&gt;</span>
-              </a>
-            </li>
-
-            <li th:classappend="${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
-              <a class="page-link" th:with="href=@{/member/myComment(page=${totalPages - 1})}" href="javascript:void(0);" th:onclick="navigateTo([[${href}]]);">
-                <span>&raquo;</span>
-              </a>
-            </li>
-
-          </ul>
-      </div>
-
     </div>
+
+    <div th:if="${!comments.isEmpty()}">
+        <ul class="pagination justify-content-center"
+            th:with="
+                pageNumber = ${comments.pageable.pageNumber},
+                pageSize = ${comments.pageable.pageSize},
+                totalPages = ${comments.totalPages},
+                startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+                tempEndPage = ${startPage + pageSize - 1},
+                endPage = (${tempEndPage > totalPages ? totalPages : tempEndPage})">
+
+          <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
+            <a class="page-link" th:with="href=@{/member/myComment(page=0)}" href="javascript:void(0);" th:onclick="navigateTo([[${href}]]);">
+              <span>&laquo;</span>
+            </a>
+          </li>
+
+          <li th:classappend="${comments.first} ? 'disabled'" class="page-item">
+            <a class="page-link" th:with="href=${comments.first} ? '#' : @{/member/myComment(page=${pageNumber - 1})}"
+               href="javascript:void(0);" th:onclick="navigateTo([[${href}]]);" aria-label="Previous">
+              <span aria-hidden="true">&lt;</span>
+            </a>
+          </li>
+
+          <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
+              <span th:if="${page == pageNumber + 1}" th:text="${page}" class="page-link"></span>
+              <a th:unless="${page == pageNumber + 1}" th:text="${page}" class="page-link" th:with="href=@{/member/myComment(page=${page - 1})}"
+                 href="javascript:void(0);" th:onclick="navigateTo([[${href}]]);"></a>
+          </li>
+
+          <li th:classappend="${comments.last} ? 'disabled'" class="page-item">
+            <a class="page-link" th:with="href=${comments.last} ? '#' : @{/member/myComment(page=${pageNumber + 1})}"
+               href="javascript:void(0);" th:onclick="navigateTo([[${href}]]);" aria-label="Next">
+              <span aria-hidden="true">&gt;</span>
+            </a>
+          </li>
+
+          <li th:classappend="${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
+            <a class="page-link" th:with="href=@{/member/myComment(page=${totalPages - 1})}" href="javascript:void(0);" th:onclick="navigateTo([[${href}]]);">
+              <span>&raquo;</span>
+            </a>
+          </li>
+
+        </ul>
+    </div>
+
   </div>
 
 </div>
