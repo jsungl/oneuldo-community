@@ -35,7 +35,7 @@
 
                             <!-- 알림 -->
                             <!-- 알림이 1개 이상 -->
-                            <li class="breadcrumb-item d-flex align-items-center">
+                            <li class="breadcrumb-item d-flex align-items-center d-none d-md-flex">
                                 <div class="dropdown">
                                     <a class="text-decoration-none" href="javascript:;" data-bs-toggle="dropdown">알림</a>
                                     <ul class="dropdown-menu dropdown-menu-end p-2" id="oc_notification"
@@ -74,6 +74,38 @@
                     </ol>
                 </div>
             </nav>
+
+            <!-- 모바일 버전 알림 -->
+            <th:block sec:authorize="isAuthenticated()">
+                <div class="d-md-none" id="mobile_notification">
+                    <div class="d-flex justify-content-end py-1" style="background:#666;font-size:11px">
+                        <span class="px-3">
+                            <a class="text-decoration-none text-white ps-2 py-1" data-bs-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                내 알림
+                            </a>
+                            <span class="badge bg-danger" th:text="${notifications.size() == 0 ? '' : notifications.size()}" id="notify_mobile_count">3</span>
+                        </span>
+                    </div>
+                    <div class="collapse" id="collapseExample">
+                        <div class="card card-body">
+                            <ul class="list-unstyled" id="notify_mobile_toggle">
+                                <li th:each="notification:${notifications}" th:if="${notifications.size()} != 0">
+                                    <a class="dropdown-item" th:with="href=@{${notification.url}}" href="javascript:void(0);"
+                                       th:onclick="navigateTo([[${href}]]);">
+                                        <span th:text="${notification.sender}">아기로메로</span>
+                                        <span th:text="${#strings.abbreviate(notification.content, 20)}">내용</span>
+                                        <span th:text="${notification.createdDate}">4 일 전</span>
+                                    </a>
+                                </li>
+                                <!-- 알림이 없을경우 -->
+                                <li th:unless="${notifications.size()} != 0">
+                                    알림이 존재하지 않습니다
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </th:block>
         </div>
         <!-- 로고 -->
         <div class="container p-2">
@@ -125,7 +157,7 @@
       <th:block sec:authorize="hasRole('ROLE_USER')">
 
         <!-- 데스크톱 화면에 출력 -->
-        <div class="row d-none d-md-block">
+        <div class="d-none d-md-block">
             <div class="d-flex justify-content-end">
                 <button class="btn btn-outline-primary me-2" type="button"
                         th:with="href=@{/edit/profile}"
@@ -150,7 +182,7 @@
         </div>
 
         <!-- 모바일 화면에 출력 -->
-        <div class="row d-md-none">
+        <div class="d-md-none">
             <div class="d-flex justify-content-end">
                 <button class="btn btn-outline-primary btn-sm me-2" type="button"
                         th:with="href=@{/edit/profile}"

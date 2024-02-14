@@ -36,12 +36,18 @@ function showToast(content) {
 function addItemToList(dto, count) {
     //const ul = $(".oc_notification");
     var ul = document.getElementById("oc_notification");
+    var mobileUlTag = document.getElementById("notify_mobile_toggle");
+
     let span = document.getElementById("notificationCount");
+    let mobileSpanTag = document.getElementById("notify_mobile_count");
+
 
     // 새로운 리스트 아이템 생성
     var li = document.createElement('li');
     let a = document.createElement('a');
-    let url = dto.url; //  /post/notify?notificationId=8&postId=20&commentId=22#comment_22
+
+    //  /post/notify?notificationId=8&postId=20&commentId=22#comment_22
+    let url = dto.url;
     a.setAttribute('class', 'dropdown-item');
     a.setAttribute('href', 'javascript:void(0);');
     a.setAttribute('onclick', 'navigateTo("' + url + '");');
@@ -74,13 +80,23 @@ function addItemToList(dto, count) {
         let liToRemove = ul.getElementsByTagName("li")[0];
         ul.removeChild(liToRemove);
         ul.appendChild(li);
+
+        //모바일
+        let mLiToRemove = mobileUlTag.getElementsByTagName("li")[0];
+        mobileUlTag.removeChild(mLiToRemove);
+        mobileUlTag.appendChild(li);
     } else {
         let firstChild = ul.firstChild;
         ul.insertBefore(li, firstChild);
+
+        //모바일
+        let mFirstChild = mobileUlTag.firstChild;
+        mobileUlTag.insertBefore(li, mFirstChild);
     }
 
     span.textContent = count;
-
+    //모바일
+    mobileSpanTag.textContent = count;
 }
 
 function getTimeAgo(timeString) {
