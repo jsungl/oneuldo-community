@@ -1,7 +1,7 @@
 # 오늘도 커뮤
+![logo](https://github.com/jsungl/spring-community/assets/79460509/1691744b-58be-4e18-9590-5984eeb765ef)
 
 ## [개요]
-![logo](https://github.com/jsungl/spring-community/assets/79460509/1691744b-58be-4e18-9590-5984eeb765ef)
 
 ### 프로젝트 소개 및 목적
 **‘오늘도 커뮤’** 는 스프링부트 프레임워크 기반의 JPA를 활용한 커뮤니티 게시판 프로젝트로, 사용자들에게 다양한 정보 공유를 위한 효율적인 플랫폼을 제공한다. 이번 프로젝트에서 JPA를 사용한 이유는 이전에 만들었던 스프링부트 기반의 간단한 게시판 프로젝트에서의 복잡한 CRUD 작업의 반복적인 코드를 최소화하고, 보다 간결한 방식으로 데이터베이스 데이터를 조작하도록 하기 때문이다. 그리고 JPA를 활용하면 객체지향적인 코드 작성을 통해 데이터베이스 유지보수가 쉬워지고 내부적으로 쿼리를 작성해주므로 성능 향상의 여러 기능을 제공해준다.
@@ -99,6 +99,7 @@
 
 #### 실시간 알림
 <img width="960" alt="알림" src="https://github.com/jsungl/spring-community/assets/79460509/e7e1303c-6aa0-47fd-94a9-3b19bc44b2ce">
+<img width="960" alt="알림2" src="https://github.com/jsungl/spring-community/assets/79460509/e907fa55-f58a-412c-a85c-0372307d150d">
 
 
 </details>
