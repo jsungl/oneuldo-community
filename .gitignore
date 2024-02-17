@@ -37,6 +37,7 @@ out/
 .vscode/
 application.properties
 generated\
-application-oauth.properties
+application-localOauth.properties
 application-local.properties
 application-prod.properties
+application-prodOauth.properties
