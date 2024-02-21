@@ -76,22 +76,43 @@
 
       <!-- social login -->
       <div class="login-social mb-3">
-        <div class="login-social-title d-flex justify-content-center">
+        <div class="login-social-title d-flex justify-content-center mb-3">
           <div style="color:#a2a2a2">SNS 계정으로 간편 로그인/회원가입</div>
         </div>
-        <div class="login-social-btn d-flex justify-content-center mt-3">
-          <div class="row" th:with="nlogin_url=|@{/oauth2/authorization/naver}|, glogin_url=|@{/oauth2/authorization/google}|">
-            <div class="col">
-              <!--            <button class="n-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/naver}'|"></button>-->
-              <button class="n-signIn-btn p-3" type="button" th:onclick="popup([[${nlogin_url}]])" th:style="'background-image:url(' + @{/img/naver/btnG_icon.png} + ');'"></button>
 
+        <!-- 모바일 화면에 출력 -->
+        <div class="d-flex justify-content-center d-md-none">
+          <div class="row" th:with="n_login_url=|@{/oauth2/authorization/naver}|, g_login_url=|@{/oauth2/authorization/google}|">
+            <div class="col">
+              <button class="n-signIn-btn p-3" type="button" th:onclick="popup([[${n_login_url}]])" th:style="'background-image:url(' + @{/img/naver/btnG_icon.png} + ');'"></button>
             </div>
             <div class="col">
-              <!--            <button class="g-signin-btn p-3" type="button" th:onclick="|location.href='@{/oauth2/authorization/google}'|"></button>-->
-              <button class="g-signIn-btn p-3" type="button" th:onclick="popup([[${glogin_url}]])" th:style="'background-image:url(' + @{/img/google/btn_icon.png} + ');'"></button>
+              <button class="g-signIn-btn p-3" type="button" th:onclick="popup([[${g_login_url}]])" th:style="'background-image:url(' + @{/img/google/btn_icon.png} + ');'"></button>
             </div>
           </div>
         </div>
+
+        <!-- 데스크톱 화면에 출력 -->
+        <div class="container d-none d-md-block" style="max-width:450px">
+          <div class="row mb-3" th:with="n_login_url=|@{/oauth2/authorization/naver}|">
+            <div class="col">
+              <button class="n-login-btn" type="button" th:onclick="popup([[${n_login_url}]])">
+                <img th:src="@{/img/naver/naver.svg}" style="width:19px;margin-right:10px">
+                네이버 로그인
+              </button>
+            </div>
+          </div>
+
+          <div class="row" th:with="g_login_url=|@{/oauth2/authorization/google}|">
+            <div class="col">
+              <button class="g-login-btn" type="button" th:onclick="popup([[${g_login_url}]])">
+                <img th:src="@{/img/google/g-logo.png}" style="width:22px;margin-right:10px">
+                Google 로그인
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div> <!-- /container -->
 
