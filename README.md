@@ -73,7 +73,7 @@
 <img width="960" alt="메인 페이지" src="https://github.com/jsungl/spring-community/assets/79460509/48625c3d-a2b9-4efb-ab15-f5b3103cf49e">
 
 #### 로그인
-<img width="960" alt="로그인 페이지" src="https://github.com/jsungl/spring-community/assets/79460509/74baf5a6-5bd2-4d63-88ee-b8803529fff0">
+<img width="960" alt="로그인v2" src="https://github.com/jsungl/oneuldo-community/assets/79460509/fa655275-85cc-452c-81fd-21a4c5de4637">
 
 #### 회원가입
 <img width="960" alt="회원가입 페이지" src="https://github.com/jsungl/spring-community/assets/79460509/59a76825-443c-4df2-b78d-7cd7703a2ff3">
